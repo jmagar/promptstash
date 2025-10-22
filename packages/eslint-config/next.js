@@ -48,4 +48,21 @@ export const nextJsConfig = [
       "react/prop-types": "off",
     },
   },
+  {
+    ignores: [
+      "**/.next/**",
+      "**/.turbo/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.vercel/**",
+      "**/out/**",
+      "**/*.config.js",
+      "**/*.config.mjs",
+      "**/*.config.ts",
+      "**/next-env.d.ts",
+      "**/.env*",
+      "**/tsconfig.tsbuildinfo",
+    ],
+  },
 ];
