@@ -12,7 +12,11 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --skip-generate",
     "db:reset": "prisma migrate reset --force",
+    "db:seed": "tsx prisma/seed.ts",
     "format": "prisma format"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
@@ -22,6 +26,7 @@
     "@types/node": "catalog:dev",
     "@workspace/typescript-config": "workspace:*",
     "prisma": "catalog:core",
+    "tsx": "^4.20.6",
     "typescript": "catalog:dev"
   }
 }

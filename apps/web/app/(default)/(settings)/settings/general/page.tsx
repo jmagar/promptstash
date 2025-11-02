@@ -1,5 +1,8 @@
 'use client';
 
+// Disable static generation for this page
+export const dynamic = 'force-dynamic';
+
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';

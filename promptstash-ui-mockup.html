@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptStash - Manage Your Claude Code Files</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        * {
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        *:is(i, svg, button, a) {
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+        }
+
+        :root {
+            --background: 35 20% 97%;
+            --foreground: 222.2 47% 11%;
+            --card: 30 25% 98%;
+            --card-foreground: 222.2 47% 11%;
+            --popover: 30 25% 98%;
+            --popover-foreground: 222.2 47% 11%;
+            --primary: 222.2 47.4% 11.2%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 35 15% 94%;
+            --secondary-foreground: 222.2 47.4% 11.2%;
+            --muted: 35 15% 94%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 35 15% 92%;
+            --accent-foreground: 222.2 47.4% 11.2%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 30 20% 88%;
+            --input: 30 20% 88%;
+            --ring: 222.2 84% 4.9%;
+            --radius: 0.5rem;
+        }
+
+        .dark {
+            --background: 240 10% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 240 10% 5%;
+            --card-foreground: 0 0% 98%;
+            --popover: 240 10% 5%;
+            --popover-foreground: 0 0% 98%;
+            --primary: 0 0% 98%;
+            --primary-foreground: 240 10% 3.9%;
+            --secondary: 240 3.7% 12%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 240 3.7% 12%;
+            --muted-foreground: 240 5% 64.9%;
+            --accent: 240 3.7% 12%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 3.7% 12%;
+            --input: 240 3.7% 12%;
+            --ring: 240 4.9% 83.9%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            height: 52px;
+            border-bottom: 1px solid hsl(var(--border));
+            background: hsl(var(--background));
+            display: grid;
+            grid-template-columns: 200px 1fr 200px;
+            align-items: center;
+            padding: 0 20px;
+            gap: 20px;
+            z-index: 50;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: hsl(var(--foreground));
+            letter-spacing: -0.01em;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #03A9F4 0%, #0288D1 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        html:not(.dark) .logo-icon {
+            box-shadow: 0 2px 4px rgba(3, 169, 244, 0.3);
+        }
+
+        .search-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-button {
+            width: 100%;
+            max-width: 500px;
+            height: 36px;
+            background: hsl(var(--secondary));
+            border: 1px solid hsl(var(--border));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .search-button:hover {
+            background: hsl(var(--accent));
+            border-color: hsl(var(--muted-foreground) / 0.2);
+        }
+
+        .search-button span {
+            flex: 1;
+            text-align: left;
+            color: hsl(var(--muted-foreground));
+            font-size: 13px;
+        }
+
+        .kbd {
+            background: hsl(var(--muted));
+            border: 1px solid hsl(var(--border));
+            border-radius: 3px;
+            padding: 1px 5px;
+            font-size: 11px;
+            font-family: monospace;
+            color: hsl(var(--muted-foreground));
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .icon-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: hsl(var(--muted-foreground));
+            position: relative;
+        }
+
+        .icon-button:hover {
+            background: hsl(var(--secondary));
+            color: hsl(var(--foreground));
+        }
+
+        /* Tooltip */
+        .icon-button::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -32px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.95);
+            background: hsl(var(--foreground));
+            color: hsl(var(--background));
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.15s ease;
+            font-weight: 500;
+        }
+
+        .icon-button:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #03A9F4 0%, #0288D1 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        html:not(.dark) .user-avatar {
+            box-shadow: 0 2px 4px rgba(3, 169, 244, 0.3);
+        }
+
+        html:not(.dark) .user-avatar:hover {
+            box-shadow: 0 3px 6px rgba(3, 169, 244, 0.4);
+        }
+
+        /* Main Content */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            border-right: 1px solid hsl(var(--border));
+            background: hsl(var(--background));
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 12px;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .scope-selector {
+            width: 100%;
+            height: 36px;
+            background: hsl(var(--secondary));
+            border: 1px solid hsl(var(--border));
+            border-radius: 6px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .scope-selector:hover {
+            background: hsl(var(--accent));
+            border-color: hsl(var(--muted-foreground) / 0.2);
+        }
+
+        .scope-selector:focus {
+            outline: none;
+            border-color: #03A9F4;
+            box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.1);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .tree-item:hover {
+            background: hsl(var(--accent));
+        }
+
+        .tree-item.active {
+            background: hsl(var(--accent));
+            font-weight: 600;
+        }
+
+        .tree-item.folder {
+            font-weight: 600;
+        }
+
+        .tree-item svg {
+            color: hsl(var(--muted-foreground));
+            flex-shrink: 0;
+        }
+
+        .tree-item:hover svg {
+            color: hsl(var(--foreground));
+        }
+
+        .tree-item.active svg {
+            color: #03A9F4;
+        }
+
+        .tree-item.folder > i[data-lucide="folder"] {
+            color: #03A9F4;
+        }
+
+        .tree-item:hover.folder > i[data-lucide="folder"] {
+            color: #0288D1;
+        }
+
+        .tree-children {
+            margin-left: 16px;
+            border-left: 1px solid hsl(var(--border));
+            padding-left: 4px;
+        }
+
+        .chevron {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.15s ease;
+            color: hsl(var(--muted-foreground));
+        }
+
+        .chevron.expanded {
+            transform: rotate(90deg);
+        }
+
+        /* Toolbar */
+        .toolbar {
+            height: 48px;
+            border-bottom: 1px solid hsl(var(--border));
+            background: hsl(var(--background));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            gap: 4px;
+        }
+
+        .toolbar-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: hsl(var(--muted-foreground));
+            position: relative;
+        }
+
+        .toolbar-button:hover {
+            background: hsl(var(--secondary));
+            color: hsl(var(--foreground));
+        }
+
+        .toolbar-button:focus,
+        .icon-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.1);
+        }
+
+        .toolbar-button.primary {
+            background: linear-gradient(135deg, #03A9F4 0%, #0288D1 100%);
+            color: white;
+            box-shadow: 0 1px 3px rgba(3, 169, 244, 0.3);
+        }
+
+        .toolbar-button.primary:hover {
+            opacity: 0.9;
+            background: linear-gradient(135deg, #03A9F4 0%, #0288D1 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(3, 169, 244, 0.4);
+        }
+
+        .toolbar-button::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -32px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.95);
+            background: hsl(var(--foreground));
+            color: hsl(var(--background));
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.15s ease;
+            font-weight: 500;
+            z-index: 1000;
+        }
+
+        .toolbar-button:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        .button {
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 5px;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--secondary));
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            color: hsl(var(--foreground));
+        }
+
+        .button:hover {
+            background: hsl(var(--accent));
+            border-color: hsl(var(--muted-foreground) / 0.2);
+        }
+
+        .button.primary {
+            background: linear-gradient(135deg, #03A9F4 0%, #0288D1 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 1px 3px rgba(3, 169, 244, 0.3);
+        }
+
+        .button.primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(3, 169, 244, 0.4);
+        }
+
+        .divider {
+            width: 1px;
+            height: 20px;
+            background: hsl(var(--border));
+            margin: 0 8px;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .breadcrumb {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 8px;
+            border-bottom: 1px solid hsl(var(--border));
+            background: hsl(var(--background));
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: hsl(var(--muted-foreground));
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+
+        .breadcrumb-item:not(.active):hover {
+            color: hsl(var(--foreground));
+            cursor: pointer;
+        }
+
+        .breadcrumb-item.active {
+            color: hsl(var(--foreground));
+            font-weight: 600;
+        }
+
+        .breadcrumb-item svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .content-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        html:not(.dark) .content-grid {
+            background: hsl(35 20% 95%);
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .file-card {
+            aspect-ratio: 1;
+            border: 1px solid hsl(var(--border));
+            border-radius: 8px;
+            background: hsl(var(--card));
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        html:not(.dark) .file-card {
+            background: hsl(30 25% 98%);
+        }
+
+        .file-card:hover {
+            background: hsl(var(--accent));
+            transform: translateY(-1px);
+            border-color: hsl(var(--muted-foreground) / 0.2);
+        }
+
+        html:not(.dark) .file-card:hover {
+            background: hsl(35 15% 92%);
+        }
+
+        .file-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #03A9F4 0%, #0288D1 100%);
+            color: white;
+        }
+
+        .file-icon.folder {
+            background: linear-gradient(135deg, #03A9F4 0%, #0288D1 100%);
+        }
+
+        .file-icon.agent {
+            background: linear-gradient(135deg, #FF5722 0%, #E64A19 100%);
+        }
+
+        .file-icon.skill {
+            background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%);
+        }
+
+        .file-icon.command {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+        }
+
+        .file-icon.json {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+        }
+
+        .file-icon.session {
+            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+        }
+
+        .file-name {
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+            line-height: 1.4;
+        }
+
+        .file-meta {
+            font-size: 11px;
+            color: hsl(var(--muted-foreground));
+            font-weight: 500;
+        }
+
+        .tag-list {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tag {
+            padding: 3px 7px;
+            border-radius: 4px;
+            background: hsl(var(--secondary));
+            font-size: 10px;
+            color: hsl(var(--muted-foreground));
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            text-transform: uppercase;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        html:not(.dark) .modal-overlay {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 480px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid hsl(var(--border));
+            border-radius: 6px;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-size: 13px;
+            transition: all 0.15s ease;
+            font-weight: 500;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #03A9F4;
+            box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: hsl(var(--muted-foreground));
+        }
+
+        .form-select {
+            width: 100%;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid hsl(var(--border));
+            border-radius: 6px;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-weight: 500;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #03A9F4;
+            box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* Editor Panel */
+        .editor-panel {
+            position: fixed;
+            right: 0;
+            top: 52px;
+            bottom: 0;
+            width: 55%;
+            background: hsl(var(--card));
+            border-left: 1px solid hsl(var(--border));
+            display: none;
+            flex-direction: column;
+            z-index: 40;
+        }
+
+        .editor-panel.active {
+            display: flex;
+        }
+
+        .editor-header {
+            height: 48px;
+            border-bottom: 1px solid hsl(var(--border));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .editor-title {
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .editor-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .code-editor {
+            width: 100%;
+            min-height: 300px;
+            padding: 14px;
+            border: 1px solid hsl(var(--border));
+            border-radius: 6px;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'SF Mono', 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: vertical;
+            font-weight: 500;
+        }
+
+        .code-editor:focus {
+            outline: none;
+            border-color: #03A9F4;
+            box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.1);
+        }
+
+        /* Session Viewer */
+        .session-viewer {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: hsl(var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .message-author {
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: -0.01em;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: hsl(var(--muted-foreground));
+            font-weight: 500;
+        }
+
+        .message-text {
+            padding: 10px 14px;
+            border-radius: 6px;
+            background: hsl(var(--secondary));
+            line-height: 1.5;
+            font-size: 13px;
+        }
+
+        .message.assistant .message-avatar {
+            background: linear-gradient(135deg, #03A9F4 0%, #0288D1 100%);
+            color: white;
+        }
+
+        .tool-call {
+            margin-top: 8px;
+            padding: 10px;
+            border: 1px solid hsl(var(--border));
+            border-radius: 6px;
+            background: hsl(var(--background));
+        }
+
+        .tool-call-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: hsl(var(--muted-foreground));
+            letter-spacing: -0.01em;
+        }
+
+        .tool-call-content {
+            font-size: 12px;
+            font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+            color: hsl(var(--muted-foreground));
+            overflow-x: auto;
+            font-weight: 500;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            right: 0;
+            top: 52px;
+            bottom: 0;
+            width: 360px;
+            background: hsl(var(--card));
+            border-left: 1px solid hsl(var(--border));
+            display: none;
+            flex-direction: column;
+            z-index: 40;
+        }
+
+        .settings-panel.active {
+            display: flex;
+        }
+
+        .settings-header {
+            height: 48px;
+            border-bottom: 1px solid hsl(var(--border));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .settings-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: hsl(var(--muted-foreground));
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .setting-description {
+            font-size: 11px;
+            color: hsl(var(--muted-foreground));
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+
+        .toggle {
+            width: 40px;
+            height: 22px;
+            background: hsl(var(--secondary));
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .toggle.active {
+            background: hsl(var(--foreground));
+        }
+
+        .toggle-thumb {
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.15s ease;
+        }
+
+        .toggle.active .toggle-thumb {
+            transform: translateX(18px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -240px;
+                top: 52px;
+                bottom: 0;
+                z-index: 30;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .editor-panel {
+                width: 100%;
+            }
+
+            .settings-panel {
+                width: 100%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: hsl(var(--muted));
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: hsl(var(--muted-foreground));
+        }
+
+        /* Light Mode Enhancements */
+        html:not(.dark) .header,
+        html:not(.dark) .toolbar,
+        html:not(.dark) .breadcrumb,
+        html:not(.dark) .sidebar {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        html:not(.dark) .file-card {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            border-color: hsl(var(--border) / 0.4);
+        }
+
+        html:not(.dark) .file-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            border-color: hsl(var(--border));
+        }
+
+        html:not(.dark) .modal {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        html:not(.dark) .context-menu {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        html:not(.dark) .toolbar-button.primary {
+            box-shadow: 0 2px 4px rgba(3, 169, 244, 0.25);
+        }
+
+        html:not(.dark) .toolbar-button.primary:hover {
+            box-shadow: 0 4px 8px rgba(3, 169, 244, 0.35);
+        }
+
+        html:not(.dark) .button.primary {
+            box-shadow: 0 2px 4px rgba(3, 169, 244, 0.25);
+        }
+
+        html:not(.dark) .button.primary:hover {
+            box-shadow: 0 4px 8px rgba(3, 169, 244, 0.35);
+        }
+
+        html:not(.dark) .editor-panel,
+        html:not(.dark) .settings-panel {
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.04);
+        }
+
+        html:not(.dark) .search-button {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        html:not(.dark) .scope-selector {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        html:not(.dark) .code-editor {
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        html:not(.dark) .message-text {
+            background: hsl(var(--secondary));
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        html:not(.dark) .tool-call {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        html:not(.dark) .tree-item:hover {
+            background: hsl(var(--accent));
+        }
+
+        html:not(.dark) .tree-item.active {
+            background: hsl(var(--accent));
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        html:not(.dark) .logo-icon {
+            box-shadow: 0 2px 4px rgba(3, 169, 244, 0.2);
+        }
+
+        html:not(.dark) .user-avatar {
+            box-shadow: 0 2px 4px rgba(3, 169, 244, 0.2);
+        }
+
+        html:not(.dark) .user-avatar:hover {
+            box-shadow: 0 3px 6px rgba(3, 169, 244, 0.3);
+        }
+
+        /* Dark Mode Specific */
+        html.dark .file-card {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        html.dark .file-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            padding: 4px;
+            min-width: 180px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .context-menu.active {
+            display: block;
+        }
+
+        .context-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.1s ease;
+            color: hsl(var(--foreground));
+            font-weight: 500;
+        }
+
+        .context-menu-item:hover {
+            background: hsl(var(--accent));
+        }
+
+        .context-menu-item svg {
+            width: 16px;
+            height: 16px;
+            color: hsl(var(--muted-foreground));
+            flex-shrink: 0;
+        }
+
+        .context-menu-item:hover svg {
+            color: hsl(var(--foreground));
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: hsl(var(--border));
+            margin: 4px 0;
+        }
+
+        .context-menu-item.danger {
+            color: #EF4444;
+        }
+
+        .context-menu-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .context-menu-item.danger svg {
+            color: #EF4444;
+        }
+
+        .context-menu-shortcut {
+            margin-left: auto;
+            font-size: 11px;
+            color: hsl(var(--muted-foreground));
+            font-family: monospace;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i data-lucide="layers"></i>
+                </div>
+                PromptStash
+            </div>
+            
+            <div class="search-wrapper">
+                <div class="search-button" onclick="toggleModal('search')">
+                    <i data-lucide="search"></i>
+                    <span>Search files and folders...</span>
+                    <span class="kbd">⌘K</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="icon-button" data-tooltip="Notifications">
+                    <i data-lucide="bell"></i>
+                </button>
+                <button class="icon-button" id="themeToggle" data-tooltip="Toggle Theme" onclick="toggleTheme()">
+                    <i data-lucide="moon"></i>
+                </button>
+                <button class="icon-button" data-tooltip="Help" onclick="alert('Help panel')">
+                    <i data-lucide="help-circle"></i>
+                </button>
+                <button class="icon-button" data-tooltip="Settings" onclick="toggleSettings()">
+                    <i data-lucide="settings"></i>
+                </button>
+                <div class="user-avatar">JM</div>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="scope-selector" onclick="toggleModal('scope')" tabindex="0">
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="user" size="16"></i>
+                            User
+                        </span>
+                        <i data-lucide="chevron-down" size="16"></i>
+                    </div>
+                </div>
+
+                <div class="sidebar-content">
+                    <div class="tree-item folder active" onclick="toggleFolder(this)">
+                        <i data-lucide="chevron-right" class="chevron expanded"></i>
+                        <i data-lucide="folder"></i>
+                        <span>.claude</span>
+                    </div>
+                    <div class="tree-children">
+                        <div class="tree-item folder" onclick="toggleFolder(this)">
+                            <i data-lucide="chevron-right" class="chevron expanded"></i>
+                            <i data-lucide="folder"></i>
+                            <span>agents</span>
+                        </div>
+                        <div class="tree-children">
+                            <div class="tree-item" onclick="openFile('agent')">
+                                <i data-lucide="file-text"></i>
+                                <span>security-reviewer.md</span>
+                            </div>
+                            <div class="tree-item">
+                                <i data-lucide="file-text"></i>
+                                <span>code-formatter.md</span>
+                            </div>
+                        </div>
+
+                        <div class="tree-item folder" onclick="toggleFolder(this)">
+                            <i data-lucide="chevron-right" class="chevron"></i>
+                            <i data-lucide="folder"></i>
+                            <span>commands</span>
+                        </div>
+
+                        <div class="tree-item folder" onclick="toggleFolder(this)">
+                            <i data-lucide="chevron-right" class="chevron"></i>
+                            <i data-lucide="folder"></i>
+                            <span>docs</span>
+                        </div>
+
+                        <div class="tree-item folder" onclick="toggleFolder(this)">
+                            <i data-lucide="chevron-right" class="chevron"></i>
+                            <i data-lucide="folder"></i>
+                            <span>hooks</span>
+                        </div>
+
+                        <div class="tree-item folder" onclick="toggleFolder(this)">
+                            <i data-lucide="chevron-right" class="chevron"></i>
+                            <i data-lucide="folder"></i>
+                            <span>plugins</span>
+                        </div>
+
+                        <div class="tree-item folder" onclick="toggleFolder(this)">
+                            <i data-lucide="chevron-right" class="chevron"></i>
+                            <i data-lucide="folder"></i>
+                            <span>prompts</span>
+                        </div>
+
+                        <div class="tree-item folder" onclick="toggleFolder(this)">
+                            <i data-lucide="chevron-right" class="chevron expanded"></i>
+                            <i data-lucide="folder"></i>
+                            <span>sessions</span>
+                        </div>
+                        <div class="tree-children">
+                            <div class="tree-item" onclick="openSession()">
+                                <i data-lucide="message-square"></i>
+                                <span>session-2025-01-02.jsonl</span>
+                            </div>
+                        </div>
+
+                        <div class="tree-item folder" onclick="toggleFolder(this)">
+                            <i data-lucide="chevron-right" class="chevron expanded"></i>
+                            <i data-lucide="folder"></i>
+                            <span>skills</span>
+                        </div>
+                        <div class="tree-children">
+                            <div class="tree-item folder">
+                                <i data-lucide="folder"></i>
+                                <span>code-review</span>
+                            </div>
+                            <div class="tree-item folder">
+                                <i data-lucide="folder"></i>
+                                <span>documentation</span>
+                            </div>
+                        </div>
+
+                        <div class="tree-item">
+                            <i data-lucide="file-text"></i>
+                            <span>CLAUDE.md</span>
+                        </div>
+                        <div class="tree-item">
+                            <i data-lucide="file-text"></i>
+                            <span>AGENTS.md</span>
+                        </div>
+                        <div class="tree-item" onclick="openFile('json')">
+                            <i data-lucide="braces"></i>
+                            <span>.mcp.json</span>
+                        </div>
+                        <div class="tree-item">
+                            <i data-lucide="braces"></i>
+                            <span>marketplace.json</span>
+                        </div>
+                        <div class="tree-item">
+                            <i data-lucide="braces"></i>
+                            <span>settings.local.json</span>
+                        </div>
+                        <div class="tree-item">
+                            <i data-lucide="braces"></i>
+                            <span>settings.json</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <button class="toolbar-button primary" data-tooltip="New File" onclick="toggleModal('newFile')">
+                        <i data-lucide="file-plus"></i>
+                    </button>
+                    <button class="toolbar-button" data-tooltip="New Folder" onclick="toggleModal('newFolder')">
+                        <i data-lucide="folder-plus"></i>
+                    </button>
+                    <div class="divider"></div>
+                    <button class="toolbar-button" data-tooltip="Upload">
+                        <i data-lucide="upload"></i>
+                    </button>
+                    <button class="toolbar-button" data-tooltip="Download">
+                        <i data-lucide="download"></i>
+                    </button>
+                    <div class="divider"></div>
+                    <button class="toolbar-button" data-tooltip="Sort">
+                        <i data-lucide="arrow-up-down"></i>
+                    </button>
+                    <button class="toolbar-button" data-tooltip="Filter">
+                        <i data-lucide="filter"></i>
+                    </button>
+                    <button class="toolbar-button" data-tooltip="Select Multiple">
+                        <i data-lucide="check-square"></i>
+                    </button>
+                    <div class="divider"></div>
+                    <button class="toolbar-button" data-tooltip="Share">
+                        <i data-lucide="share-2"></i>
+                    </button>
+                    <button class="toolbar-button" data-tooltip="More Options">
+                        <i data-lucide="more-horizontal"></i>
+                    </button>
+                </div>
+
+                <!-- Breadcrumb -->
+                <div class="breadcrumb">
+                    <div class="breadcrumb-item">
+                        <i data-lucide="home"></i>
+                        <span>User</span>
+                    </div>
+                    <i data-lucide="chevron-right" size="16"></i>
+                    <div class="breadcrumb-item active">
+                        <i data-lucide="folder"></i>
+                        <span>.claude</span>
+                    </div>
+                </div>
+
+                <!-- File Grid -->
+                <div class="content-grid">
+                    <div class="file-grid fade-in">
+                        <!-- Folder: agents -->
+                        <div class="file-card">
+                            <div class="file-icon folder">
+                                <i data-lucide="folder" size="24"></i>
+                            </div>
+                            <div class="file-name">agents</div>
+                            <div class="file-meta">2 files</div>
+                        </div>
+
+                        <!-- Folder: skills -->
+                        <div class="file-card">
+                            <div class="file-icon folder">
+                                <i data-lucide="folder" size="24"></i>
+                            </div>
+                            <div class="file-name">skills</div>
+                            <div class="file-meta">2 folders</div>
+                        </div>
+
+                        <!-- Folder: commands -->
+                        <div class="file-card">
+                            <div class="file-icon folder">
+                                <i data-lucide="folder" size="24"></i>
+                            </div>
+                            <div class="file-name">commands</div>
+                            <div class="file-meta">5 files</div>
+                        </div>
+
+                        <!-- Folder: docs -->
+                        <div class="file-card">
+                            <div class="file-icon folder">
+                                <i data-lucide="folder" size="24"></i>
+                            </div>
+                            <div class="file-name">docs</div>
+                            <div class="file-meta">1 folder</div>
+                        </div>
+
+                        <!-- Folder: hooks -->
+                        <div class="file-card">
+                            <div class="file-icon folder">
+                                <i data-lucide="folder" size="24"></i>
+                            </div>
+                            <div class="file-name">hooks</div>
+                            <div class="file-meta">Empty</div>
+                        </div>
+
+                        <!-- Folder: plugins -->
+                        <div class="file-card">
+                            <div class="file-icon folder">
+                                <i data-lucide="folder" size="24"></i>
+                            </div>
+                            <div class="file-name">plugins</div>
+                            <div class="file-meta">Empty</div>
+                        </div>
+
+                        <!-- Folder: prompts -->
+                        <div class="file-card">
+                            <div class="file-icon folder">
+                                <i data-lucide="folder" size="24"></i>
+                            </div>
+                            <div class="file-name">prompts</div>
+                            <div class="file-meta">Empty</div>
+                        </div>
+
+                        <!-- Folder: sessions -->
+                        <div class="file-card">
+                            <div class="file-icon folder">
+                                <i data-lucide="folder" size="24"></i>
+                            </div>
+                            <div class="file-name">sessions</div>
+                            <div class="file-meta">1 file</div>
+                        </div>
+
+                        <!-- Agent File -->
+                        <div class="file-card" onclick="openFile('agent')">
+                            <div class="file-icon agent">
+                                <i data-lucide="user-cog" size="24"></i>
+                            </div>
+                            <div class="file-name">security-reviewer.md</div>
+                            <div class="tag-list">
+                                <span class="tag">agent</span>
+                                <span class="tag">security</span>
+                            </div>
+                        </div>
+
+                        <!-- Skill File -->
+                        <div class="file-card">
+                            <div class="file-icon skill">
+                                <i data-lucide="lightbulb" size="24"></i>
+                            </div>
+                            <div class="file-name">code-review</div>
+                            <div class="tag-list">
+                                <span class="tag">skill</span>
+                                <span class="tag">review</span>
+                            </div>
+                        </div>
+
+                        <!-- Command File -->
+                        <div class="file-card">
+                            <div class="file-icon command">
+                                <i data-lucide="terminal" size="24"></i>
+                            </div>
+                            <div class="file-name">deploy-prod.md</div>
+                            <div class="tag-list">
+                                <span class="tag">command</span>
+                                <span class="tag">deploy</span>
+                            </div>
+                        </div>
+
+                        <!-- Session File -->
+                        <div class="file-card" onclick="openSession()">
+                            <div class="file-icon session">
+                                <i data-lucide="message-square" size="24"></i>
+                            </div>
+                            <div class="file-name">session-2025-01-02.jsonl</div>
+                            <div class="tag-list">
+                                <span class="tag">session</span>
+                            </div>
+                        </div>
+
+                        <!-- CLAUDE.md -->
+                        <div class="file-card">
+                            <div class="file-icon">
+                                <i data-lucide="file-text" size="24"></i>
+                            </div>
+                            <div class="file-name">CLAUDE.md</div>
+                            <div class="tag-list">
+                                <span class="tag">config</span>
+                            </div>
+                        </div>
+
+                        <!-- AGENTS.md -->
+                        <div class="file-card">
+                            <div class="file-icon">
+                                <i data-lucide="file-text" size="24"></i>
+                            </div>
+                            <div class="file-name">AGENTS.md</div>
+                            <div class="tag-list">
+                                <span class="tag">config</span>
+                            </div>
+                        </div>
+
+                        <!-- JSON File -->
+                        <div class="file-card" onclick="openFile('json')">
+                            <div class="file-icon json">
+                                <i data-lucide="braces" size="24"></i>
+                            </div>
+                            <div class="file-name">.mcp.json</div>
+                            <div class="tag-list">
+                                <span class="tag">config</span>
+                            </div>
+                        </div>
+
+                        <!-- marketplace.json -->
+                        <div class="file-card">
+                            <div class="file-icon json">
+                                <i data-lucide="braces" size="24"></i>
+                            </div>
+                            <div class="file-name">marketplace.json</div>
+                            <div class="tag-list">
+                                <span class="tag">config</span>
+                            </div>
+                        </div>
+
+                        <!-- settings.local.json -->
+                        <div class="file-card">
+                            <div class="file-icon json">
+                                <i data-lucide="braces" size="24"></i>
+                            </div>
+                            <div class="file-name">settings.local.json</div>
+                            <div class="tag-list">
+                                <span class="tag">config</span>
+                            </div>
+                        </div>
+
+                        <!-- settings.json -->
+                        <div class="file-card">
+                            <div class="file-icon json">
+                                <i data-lucide="braces" size="24"></i>
+                            </div>
+                            <div class="file-name">settings.json</div>
+                            <div class="tag-list">
+                                <span class="tag">config</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- New File Modal -->
+        <div class="modal-overlay" id="newFileModal">
+            <div class="modal fade-in">
+                <div class="modal-header">
+                    <h2 class="modal-title">New File</h2>
+                    <button class="icon-button" onclick="toggleModal('newFile')">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">File Type</label>
+                    <select class="form-select">
+                        <option>Agent (.md)</option>
+                        <option>Skill (folder)</option>
+                        <option>Command (.md)</option>
+                        <option>Prompt (.md)</option>
+                        <option>JSON Config (.json)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">File Name</label>
+                    <input type="text" class="form-input" placeholder="my-agent.md">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" placeholder="Brief description (max 500 chars)">
+                </div>
+
+                <div class="modal-actions">
+                    <button class="button" onclick="toggleModal('newFile')">Cancel</button>
+                    <button class="button primary" onclick="toggleModal('newFile')">Create</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Folder Modal -->
+        <div class="modal-overlay" id="newFolderModal">
+            <div class="modal fade-in">
+                <div class="modal-header">
+                    <h2 class="modal-title">New Folder</h2>
+                    <button class="icon-button" onclick="toggleModal('newFolder')">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Folder Name</label>
+                    <input type="text" class="form-input" placeholder="my-folder">
+                </div>
+
+                <div class="modal-actions">
+                    <button class="button" onclick="toggleModal('newFolder')">Cancel</button>
+                    <button class="button primary" onclick="toggleModal('newFolder')">Create</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scope Selector Modal -->
+        <div class="modal-overlay" id="scopeModal">
+            <div class="modal fade-in">
+                <div class="modal-header">
+                    <h2 class="modal-title">Switch Scope</h2>
+                    <button class="icon-button" onclick="toggleModal('scope')">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+
+                <div class="tree-item" onclick="selectScope('user')">
+                    <i data-lucide="user"></i>
+                    <span>User (~/.claude)</span>
+                </div>
+
+                <div style="margin: 16px 0; font-size: 11px; font-weight: 700; color: hsl(var(--muted-foreground)); text-transform: uppercase; letter-spacing: 0.08em;">Projects</div>
+                
+                <div class="tree-item" onclick="selectScope('project1')">
+                    <i data-lucide="folder-git-2"></i>
+                    <span>promptstash</span>
+                </div>
+                
+                <div class="tree-item" onclick="selectScope('project2')">
+                    <i data-lucide="folder-git-2"></i>
+                    <span>taboot</span>
+                </div>
+
+                <div style="margin: 16px 0; font-size: 11px; font-weight: 700; color: hsl(var(--muted-foreground)); text-transform: uppercase; letter-spacing: 0.08em;">Plugins</div>
+                
+                <div class="tree-item" onclick="selectScope('plugin1')">
+                    <i data-lucide="puzzle"></i>
+                    <span>security-tools</span>
+                </div>
+
+                <div style="margin: 16px 0; font-size: 11px; font-weight: 700; color: hsl(var(--muted-foreground)); text-transform: uppercase; letter-spacing: 0.08em;">Marketplaces</div>
+                
+                <div class="tree-item" onclick="selectScope('marketplace')">
+                    <i data-lucide="store"></i>
+                    <span>official</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Modal -->
+        <div class="modal-overlay" id="searchModal">
+            <div class="modal fade-in" style="max-width: 600px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <input type="text" class="form-input" placeholder="Search files, folders, tags..." autofocus>
+                </div>
+                <div style="margin-top: 16px; font-size: 13px; color: hsl(var(--muted-foreground));">
+                    Recent searches will appear here
+                </div>
+            </div>
+        </div>
+
+        <!-- Editor Panel -->
+        <div class="editor-panel" id="editorPanel">
+            <div class="editor-header">
+                <div class="editor-title">
+                    <i data-lucide="user-cog"></i>
+                    security-reviewer.md
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="button primary">
+                        <i data-lucide="save"></i>
+                        Save
+                    </button>
+                    <button class="icon-button" onclick="closeEditor()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="editor-content">
+                <div class="form-group">
+                    <label class="form-label">YAML Frontmatter</label>
+                    <textarea class="code-editor">---
+description: Comprehensive security review agent that checks code for vulnerabilities
+tools: ["Read", "Edit", "Bash"]
+model: sonnet
+---</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Prompt Content</label>
+                    <textarea class="code-editor" style="min-height: 250px;">You are a security-focused code reviewer. Your role is to:
+
+1. Identify potential security vulnerabilities
+2. Check for common attack vectors (XSS, SQL injection, CSRF)
+3. Review authentication and authorization logic
+4. Validate input sanitization
+5. Check for sensitive data exposure
+
+Provide clear, actionable recommendations for each finding.</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tags</label>
+                    <div class="tag-list" style="justify-content: flex-start;">
+                        <span class="tag">agent</span>
+                        <span class="tag">security</span>
+                        <span class="tag">review</span>
+                        <button class="button" style="height: 24px; padding: 0 8px; font-size: 12px;">
+                            <i data-lucide="plus" size="14"></i>
+                            Add Tag
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JSON Editor Panel -->
+        <div class="editor-panel" id="jsonEditorPanel">
+            <div class="editor-header">
+                <div class="editor-title">
+                    <i data-lucide="braces"></i>
+                    .mcp.json
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="button">
+                        <i data-lucide="check-circle"></i>
+                        Validate
+                    </button>
+                    <button class="button primary">
+                        <i data-lucide="save"></i>
+                        Save
+                    </button>
+                    <button class="icon-button" onclick="closeEditor()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="editor-content">
+                <textarea class="code-editor" style="min-height: 400px;">{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/files"]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "your_api_key_here"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"]
+    },
+    "remote-api": {
+      "url": "https://api.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}</textarea>
+            </div>
+        </div>
+
+        <!-- Session Viewer Panel -->
+        <div class="editor-panel" id="sessionPanel">
+            <div class="editor-header">
+                <div class="editor-title">
+                    <i data-lucide="message-square"></i>
+                    session-2025-01-02.jsonl
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="button">
+                        <i data-lucide="download"></i>
+                        Export
+                    </button>
+                    <button class="icon-button" onclick="closeEditor()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="editor-content">
+                <div class="session-viewer">
+                    <div class="message">
+                        <div class="message-avatar">
+                            <i data-lucide="user"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-author">You</span>
+                                <span class="message-time">2:30 PM</span>
+                            </div>
+                            <div class="message-text">
+                                Can you review the security of my authentication system?
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message assistant">
+                        <div class="message-avatar">
+                            <i data-lucide="bot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-author">Claude</span>
+                                <span class="message-time">2:30 PM</span>
+                            </div>
+                            <div class="message-text">
+                                I'll help you review the security of your authentication system. Let me examine the relevant files.
+                            </div>
+                            <div class="tool-call">
+                                <div class="tool-call-header">
+                                    <i data-lucide="terminal"></i>
+                                    Tool: Read File
+                                </div>
+                                <div class="tool-call-content">
+                                    path: /auth/login.ts
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message assistant">
+                        <div class="message-avatar">
+                            <i data-lucide="bot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-author">Claude</span>
+                                <span class="message-time">2:31 PM</span>
+                            </div>
+                            <div class="message-text">
+                                I've reviewed your authentication system. Here are my findings:
+                                <br><br>
+                                <strong>Strengths:</strong>
+                                <ul style="margin-left: 20px; margin-top: 8px;">
+                                    <li>Password hashing using bcrypt with appropriate cost factor</li>
+                                    <li>JWT tokens with proper expiration</li>
+                                    <li>CSRF protection implemented</li>
+                                </ul>
+                                <br>
+                                <strong>Recommendations:</strong>
+                                <ul style="margin-left: 20px; margin-top: 8px;">
+                                    <li>Implement rate limiting on login attempts</li>
+                                    <li>Add multi-factor authentication support</li>
+                                    <li>Enhance session management with refresh tokens</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h2 class="modal-title">Settings</h2>
+                <button class="icon-button" onclick="toggleSettings()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="settings-content">
+                <div class="settings-section">
+                    <div class="settings-section-title">Appearance</div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Dark Mode</div>
+                            <div class="setting-description">Toggle dark mode theme</div>
+                        </div>
+                        <div class="toggle" id="darkModeToggle" onclick="toggleThemeFromSettings()">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Compact View</div>
+                            <div class="setting-description">Reduce spacing in file grid</div>
+                        </div>
+                        <div class="toggle">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Editor</div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Auto-save</div>
+                            <div class="setting-description">Automatically save changes</div>
+                        </div>
+                        <div class="toggle active">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Syntax Highlighting</div>
+                            <div class="setting-description">Enable code syntax highlighting</div>
+                        </div>
+                        <div class="toggle active">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Line Numbers</div>
+                            <div class="setting-description">Show line numbers in editor</div>
+                        </div>
+                        <div class="toggle active">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Validation</div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Real-time Validation</div>
+                            <div class="setting-description">Validate YAML and JSON as you type</div>
+                        </div>
+                        <div class="toggle active">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Show Hints</div>
+                            <div class="setting-description">Display validation hints from docs</div>
+                        </div>
+                        <div class="toggle active">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Files</div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Default View</div>
+                            <div class="setting-description">Grid or list view</div>
+                        </div>
+                        <select class="form-select" style="width: auto; height: 32px;">
+                            <option>Grid</option>
+                            <option>List</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Default Sort</div>
+                            <div class="setting-description">How to sort files</div>
+                        </div>
+                        <select class="form-select" style="width: auto; height: 32px;">
+                            <option>Name</option>
+                            <option>Date Modified</option>
+                            <option>Date Created</option>
+                            <option>Type</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Sync</div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Auto Sync</div>
+                            <div class="setting-description">Automatically sync with cloud</div>
+                        </div>
+                        <div class="toggle active">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" onclick="openFile('agent')">
+            <i data-lucide="folder-open"></i>
+            <span>Open</span>
+            <span class="context-menu-shortcut">Enter</span>
+        </div>
+        <div class="context-menu-item">
+            <i data-lucide="edit"></i>
+            <span>Rename</span>
+            <span class="context-menu-shortcut">F2</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item">
+            <i data-lucide="copy"></i>
+            <span>Copy</span>
+            <span class="context-menu-shortcut">⌘C</span>
+        </div>
+        <div class="context-menu-item">
+            <i data-lucide="scissors"></i>
+            <span>Cut</span>
+            <span class="context-menu-shortcut">⌘X</span>
+        </div>
+        <div class="context-menu-item">
+            <i data-lucide="clipboard"></i>
+            <span>Paste</span>
+            <span class="context-menu-shortcut">⌘V</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item">
+            <i data-lucide="download"></i>
+            <span>Download</span>
+        </div>
+        <div class="context-menu-item">
+            <i data-lucide="share-2"></i>
+            <span>Share</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item">
+            <i data-lucide="info"></i>
+            <span>Properties</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item danger">
+            <i data-lucide="trash-2"></i>
+            <span>Delete</span>
+            <span class="context-menu-shortcut">Del</span>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.querySelector('#themeToggle i');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                themeIcon.setAttribute('data-lucide', 'moon');
+                updateDarkModeToggle(false);
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.setAttribute('data-lucide', 'sun');
+                updateDarkModeToggle(true);
+            }
+            
+            lucide.createIcons();
+        }
+
+        function toggleThemeFromSettings() {
+            toggleTheme();
+        }
+
+        function updateDarkModeToggle(isDark) {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                if (isDark) {
+                    toggle.classList.add('active');
+                } else {
+                    toggle.classList.remove('active');
+                }
+            }
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            const themeIcon = document.querySelector('#themeToggle i');
+            if (themeIcon) {
+                themeIcon.setAttribute('data-lucide', 'sun');
+            }
+            updateDarkModeToggle(true);
+            lucide.createIcons();
+        } else {
+            updateDarkModeToggle(false);
+        }
+
+        // Initialize collapsed folders
+        document.querySelectorAll('.tree-item.folder').forEach(folder => {
+            const chevron = folder.querySelector('.chevron');
+            const children = folder.nextElementSibling;
+            if (children && children.classList.contains('tree-children')) {
+                if (!chevron || !chevron.classList.contains('expanded')) {
+                    children.style.display = 'none';
+                }
+            }
+        });
+
+        // Toggle modal visibility
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId + 'Modal');
+            if (modal) {
+                modal.classList.toggle('active');
+            }
+        }
+
+        // Toggle settings panel
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('active');
+        }
+
+        // Toggle folder in tree
+        function toggleFolder(element) {
+            const chevron = element.querySelector('.chevron');
+            if (chevron) {
+                chevron.classList.toggle('expanded');
+            }
+            const children = element.nextElementSibling;
+            if (children && children.classList.contains('tree-children')) {
+                if (children.style.display === 'none') {
+                    children.style.display = 'block';
+                } else {
+                    children.style.display = 'none';
+                }
+            }
+        }
+
+        // Open file in editor
+        function openFile(type) {
+            const editorPanel = document.getElementById('editorPanel');
+            const jsonEditorPanel = document.getElementById('jsonEditorPanel');
+            const sessionPanel = document.getElementById('sessionPanel');
+            
+            // Close all panels first
+            editorPanel.classList.remove('active');
+            jsonEditorPanel.classList.remove('active');
+            sessionPanel.classList.remove('active');
+            
+            // Open appropriate panel
+            if (type === 'json') {
+                jsonEditorPanel.classList.add('active');
+            } else {
+                editorPanel.classList.add('active');
+            }
+        }
+
+        // Open session viewer
+        function openSession() {
+            const editorPanel = document.getElementById('editorPanel');
+            const jsonEditorPanel = document.getElementById('jsonEditorPanel');
+            const sessionPanel = document.getElementById('sessionPanel');
+            
+            editorPanel.classList.remove('active');
+            jsonEditorPanel.classList.remove('active');
+            sessionPanel.classList.add('active');
+        }
+
+        // Close editor
+        function closeEditor() {
+            document.getElementById('editorPanel').classList.remove('active');
+            document.getElementById('jsonEditorPanel').classList.remove('active');
+            document.getElementById('sessionPanel').classList.remove('active');
+        }
+
+        // Select scope
+        function selectScope(scope) {
+            toggleModal('scope');
+            // Update UI to reflect selected scope
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Cmd/Ctrl + K for search
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                toggleModal('search');
+            }
+            // Escape to close modals/panels
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+                closeEditor();
+                const settingsPanel = document.getElementById('settingsPanel');
+                if (settingsPanel.classList.contains('active')) {
+                    toggleSettings();
+                }
+            }
+        });
+
+        // Toggle functionality for settings
+        document.querySelectorAll('.toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // Context Menu
+        const contextMenu = document.getElementById('contextMenu');
+        
+        // Show context menu on right click
+        document.addEventListener('contextmenu', function(e) {
+            // Only show on file cards
+            if (e.target.closest('.file-card') || e.target.closest('.tree-item')) {
+                e.preventDefault();
+                
+                const x = e.clientX;
+                const y = e.clientY;
+                
+                contextMenu.style.left = x + 'px';
+                contextMenu.style.top = y + 'px';
+                contextMenu.classList.add('active');
+            }
+        });
+        
+        // Hide context menu on click anywhere
+        document.addEventListener('click', function() {
+            contextMenu.classList.remove('active');
+        });
+        
+        // Hide context menu on scroll
+        document.addEventListener('scroll', function() {
+            contextMenu.classList.remove('active');
+        }, true);
+    </script>
+</body>
+</html>

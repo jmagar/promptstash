@@ -27,6 +27,7 @@ model User {
   sessions         Session[]
   accounts         Account[]
   twofactors       TwoFactor[]
+  stashes          Stash[]
 
   @@unique([email])
   @@map("user")
@@ -85,4 +86,137 @@ model TwoFactor {
   user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("twoFactor")
+}
+
+// PromptStash Models
+
+enum StashScope {
+  USER
+  PROJECT
+  PLUGIN
+  MARKETPLACE
+}
+
+enum FileType {
+  MARKDOWN
+  JSON
+  JSONL
+  YAML
+}
+
+enum SharePermission {
+  VIEW
+  EDIT
+  COMMENT
+}
+
+model Stash {
+  id          String     @id @default(cuid())
+  name        String
+  scope       StashScope
+  description String?
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rootFolder  Folder?    @relation("RootFolder")
+  folders     Folder[]   @relation("StashFolders")
+  files       File[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("stash")
+}
+
+model Folder {
+  id           String   @id @default(cuid())
+  name         String
+  path         String
+  parentId     String?
+  parent       Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children     Folder[] @relation("FolderHierarchy")
+  files        File[]
+  stashId      String
+  stash        Stash    @relation("StashFolders", fields: [stashId], references: [id], onDelete: Cascade)
+  rootStash    Stash?   @relation("RootFolder", fields: [rootStashId], references: [id])
+  rootStashId  String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([stashId, parentId])
+  @@index([path])
+  @@map("folder")
+}
+
+model File {
+  id            String        @id @default(cuid())
+  name          String
+  path          String
+  content       String        @db.Text
+  fileType      FileType
+  folderId      String?
+  folder        Folder?       @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  stashId       String
+  stash         Stash         @relation(fields: [stashId], references: [id], onDelete: Cascade)
+  tags          FileTag[]
+  versions      FileVersion[]
+  shares        FileShare[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([stashId, folderId])
+  @@index([path])
+  @@map("file")
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  color     String?
+  files     FileTag[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("tag")
+}
+
+model FileTag {
+  id        String   @id @default(cuid())
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([fileId, tagId])
+  @@index([fileId])
+  @@index([tagId])
+  @@map("file_tag")
+}
+
+model FileVersion {
+  id        String   @id @default(cuid())
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  version   Int
+  createdAt DateTime @default(now())
+  createdBy String
+
+  @@index([fileId])
+  @@map("file_version")
+}
+
+model FileShare {
+  id         String          @id @default(cuid())
+  fileId     String
+  file       File            @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  sharedWith String
+  permission SharePermission
+  shareToken String          @unique
+  expiresAt  DateTime?
+  createdAt  DateTime        @default(now())
+  createdBy  String
+
+  @@index([fileId])
+  @@index([sharedWith])
+  @@map("file_share")
 }

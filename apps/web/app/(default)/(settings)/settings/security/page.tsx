@@ -1,5 +1,8 @@
 'use client';
 
+// Disable static generation for this page
+export const dynamic = 'force-dynamic';
+
 import { DeleteAccountForm } from '@/components/delete-account-form';
 import { PasswordForm } from '@/components/password-form';
 import { TwoFactorSetup } from '@/components/two-factor-setup';
