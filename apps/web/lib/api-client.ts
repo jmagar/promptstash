@@ -15,6 +15,14 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
+// Helper function for void responses (delete operations)
+async function handleVoidResponse(response: Response): Promise<void> {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: response.statusText }));
+    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+  }
+}
+
 // Types
 export interface Stash {
   id: string;
@@ -155,11 +163,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/files/${id}`, {
       method: 'DELETE',
     });
-    // For void responses, just check if response is ok
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
-    }
+    return handleVoidResponse(res);
   },
 
   async getFileVersions(id: string): Promise<FileVersion[]> {
@@ -215,11 +219,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
       method: 'DELETE',
     });
-    // For void responses, just check if response is ok
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
-    }
+    return handleVoidResponse(res);
   },
 
   // Validation

@@ -22,8 +22,7 @@ export function useKeyboardShortcuts() {
       // Ctrl/Cmd + K - Search (common pattern)
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        // TODO: Open search modal when implemented
-        console.log('Search shortcut triggered');
+        // TODO: Implement search modal
       }
 
       // Ctrl/Cmd + D - Dashboard
@@ -53,8 +52,7 @@ export function useKeyboardShortcuts() {
       // ? - Show keyboard shortcuts help
       if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault();
-        // TODO: Open keyboard shortcuts help modal
-        console.log('Keyboard shortcuts help');
+        // TODO: Implement keyboard shortcuts help modal
       }
     };
 
