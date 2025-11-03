@@ -116,12 +116,18 @@ export const auth = betterAuth({
       enabled: true,
     },
   },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    },
-  },
+  socialProviders: 
+    process.env.GOOGLE_CLIENT_ID && 
+    process.env.GOOGLE_CLIENT_ID !== 'your-google-client-id.apps.googleusercontent.com' &&
+    process.env.GOOGLE_CLIENT_SECRET && 
+    process.env.GOOGLE_CLIENT_SECRET !== 'your-google-client-secret'
+      ? {
+          google: {
+            clientId: process.env.GOOGLE_CLIENT_ID as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+          },
+        }
+      : {},
   plugins: [
     twoFactor({
       issuer: 'BuildElevate',

@@ -40,6 +40,27 @@ interface UseRequiredAuthUserLoadingReturn {
  * @returns Authentication state and user data
  */
 export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
+  // AUTH BYPASS for development - remove in production!
+  if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
+    const mockUser: AuthUser = {
+      id: 'dev-user-123',
+      name: 'Dev User',
+      email: 'dev@promptstash.local',
+      emailVerified: true,
+      image: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    return {
+      user: mockUser,
+      isLoading: false,
+      isAuthenticated: true,
+      error: null,
+      refetch: async () => ({ data: null }),
+    };
+  }
+  
   const session = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -76,6 +97,27 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
 export function useRequiredAuthUser():
   | UseRequiredAuthUserReturn
   | UseRequiredAuthUserLoadingReturn {
+  
+  // AUTH BYPASS for development - remove in production!
+  if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
+    const mockUser: AuthUser = {
+      id: 'dev-user-123',
+      name: 'Dev User',
+      email: 'dev@promptstash.local',
+      emailVerified: true,
+      image: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    return {
+      user: mockUser,
+      isLoading: false,
+      error: null,
+      refetch: async () => ({ data: null }),
+    };
+  }
+  
   const { user, isLoading, isAuthenticated, error, refetch } = useAuthUser({
     redirectOnUnauthenticated: true,
   });

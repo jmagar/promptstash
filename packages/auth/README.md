@@ -41,7 +41,7 @@ GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 
 # Base URL for your application (used by auth client)
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_BASE_URL=http://localhost:3100
 
 # Database connection (inherited from @workspace/db)
 DATABASE_URL=postgresql://username:password@localhost:5432/database

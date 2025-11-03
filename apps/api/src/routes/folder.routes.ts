@@ -1,7 +1,11 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "@workspace/db";
+import { requireAuth } from "../middleware/auth";
 
 const router: Router = Router();
+
+// Apply authentication middleware to all routes
+router.use(requireAuth);
 
 /**
  * GET /api/folders/:id

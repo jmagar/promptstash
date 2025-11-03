@@ -65,7 +65,18 @@ This starts:
 
 ---
 
-## What's Working Right Now
+## 🎉 What's Working Right Now
+
+### ✅ Full End-to-End CRUD (NEW!)
+
+**You can now:**
+- ✅ View files from database in a beautiful grid
+- ✅ Click "New File" → Create files through modal
+- ✅ Click file card → Edit content in slide-out editor
+- ✅ Save changes → Auto-versioning works
+- ✅ Create folders through "New Folder" modal
+- ✅ Toggle dark/light theme
+- ✅ See loading states and toast notifications
 
 ### ✅ Backend API (Fully Functional)
 
@@ -185,12 +196,12 @@ pnpm clean            # Clear Turborepo cache
 
 **Connection String:**
 ```
-postgresql://promptstash:promptstash_dev_password@localhost:5434/promptstash
+postgresql://promptstash:promptstash_dev_password@localhost:3500/promptstash
 ```
 
 **Access with psql:**
 ```bash
-psql postgresql://promptstash:promptstash_dev_password@localhost:5434/promptstash
+psql postgresql://promptstash:promptstash_dev_password@localhost:3500/promptstash
 ```
 
 **Prisma Studio:**
@@ -207,7 +218,7 @@ pnpm --filter @workspace/db db:studio
 
 ```bash
 # Check if port 5434 is in use
-lsof -i :5434
+lsof -i :3500
 
 # Stop and restart container
 docker compose -f docker-compose.dev.yml down
@@ -278,7 +289,7 @@ docker ps | grep promptstash
 
 ---
 
-## What's Built (40% Complete)
+## What's Built (50% Complete - MVP Done! 🎉)
 
 ✅ **Backend**: 
 - Complete RESTful API with Express

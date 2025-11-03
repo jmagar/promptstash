@@ -68,4 +68,4 @@ pnpm db:migrate
 pnpm dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see the app running.
+Visit [http://localhost:3100](http://localhost:3100) to see the app running.

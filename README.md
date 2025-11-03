@@ -1,6 +1,51 @@
-# build-elevate
+# PromptStash
 
-This template is for creating a monorepo with
+**A modern web application for managing your Claude Code files** (agents, skills, commands, hooks, and MCP configurations).
+
+## 🚀 Quick Start
+
+```bash
+# 1. Start database
+docker compose -f docker-compose.dev.yml up -d
+
+# 2. Install and setup
+pnpm install
+pnpm --filter @workspace/db db:generate
+pnpm --filter @workspace/db db:seed
+
+# 3. Start dev servers
+pnpm dev
+
+# 4. Open app
+# Web: http://localhost:3100/stash
+# API: http://localhost:3300
+```
+
+📖 **[Full Quick Start Guide →](QUICKSTART.md)**  
+🎮 **[Working Demo Guide →](DEMO.md)**  
+🗄️ **[Database Setup Guide →](DATABASE_SETUP.md)**
+
+## ✨ Features (50% Complete - MVP Working!)
+
+✅ **Working Now:**
+- Create, view, edit, and save files through UI
+- Automatic versioning on every save
+- File type validation (Agent, Skill, MCP, Hooks)
+- Beautiful responsive UI with dark mode
+- Real-time updates with React Query
+- Modal-based workflows
+
+🔜 **Coming Soon:**
+- Syntax-highlighted editor (Monaco/CodeMirror)
+- Folder navigation
+- Search (Cmd+K)
+- Version history UI
+- Tag management
+- File sharing
+
+## 🏗️ Tech Stack
+
+Built on the build-elevate template - a production-ready monorepo with
 
 - [Turborepo](https://turborepo.com/) for monorepo management
 - [Next.js](https://nextjs.org/) (with Turbopack) for the web application
@@ -86,9 +131,9 @@ pnpm docker:prod
 This will:
 
 - Build the Docker image using `docker-compose.prod.yml`
-- Start the web container on `localhost:3000`
-- Start the API container on `localhost:4000`
-- Start the PostgreSQL database container on `localhost:5432`
+- Start the web container on `localhost:3100`
+- Start the API container on `localhost:3300`
+- Start the PostgreSQL database container on `localhost:3500`
 
 Make sure you have `.env.production` in `apps/web`, `apps/api`, `packages/db`.
 

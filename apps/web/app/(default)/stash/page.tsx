@@ -3,17 +3,20 @@
 import { useState } from 'react';
 import { useStashes, useFiles } from '@/hooks/use-promptstash';
 import {
-  PromptStashHeader,
-  PromptStashToolbar,
   PromptStashBreadcrumb,
   PromptStashFileGrid,
   type FileItem,
 } from '@workspace/ui';
 import { Skeleton } from '@workspace/ui';
+import { NewFileModal } from '@/components/new-file-modal';
+import { NewFolderModal } from '@/components/new-folder-modal';
+import { FileEditor } from '@/components/file-editor';
 
 export default function StashPage() {
   const [selectedStashId, setSelectedStashId] = useState<string | null>(null);
   const [currentPath, setCurrentPath] = useState<string>('/');
+  const [editorFileId, setEditorFileId] = useState<string | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
   
   // Fetch stashes
   const { data: stashes, isLoading: stashesLoading } = useStashes();
@@ -60,34 +63,13 @@ export default function StashPage() {
 
   // Handlers
   const handleFileClick = (file: FileItem) => {
-    console.log('File clicked:', file);
-    // TODO: Open file editor
-  };
-
-  const handleNewFile = () => {
-    console.log('New file clicked');
-    // TODO: Open new file modal
-  };
-
-  const handleNewFolder = () => {
-    console.log('New folder clicked');
-    // TODO: Open new folder modal
-  };
-
-  const handleSearch = () => {
-    console.log('Search clicked');
-    // TODO: Open search modal
-  };
-
-  const handleSettings = () => {
-    console.log('Settings clicked');
-    // TODO: Navigate to settings
+    setEditorFileId(file.id);
+    setEditorOpen(true);
   };
 
   if (stashesLoading) {
     return (
-      <div className="flex h-screen flex-col">
-        <div className="h-[52px] border-b" />
+      <div className="flex flex-1 flex-col">
         <div className="flex flex-1">
           <div className="w-60 border-r p-4 space-y-2">
             <Skeleton className="h-9 w-full" />
@@ -108,15 +90,8 @@ export default function StashPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col">
-      {/* Header */}
-      <PromptStashHeader
-        onSearchClick={handleSearch}
-        onSettingsClick={handleSettings}
-        userEmail="demo@promptstash.dev"
-      />
-
-      {/* Main Container */}
+    <div className="flex flex-1 flex-col">
+      {/* Main Container - Header is provided by root layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - Will be enhanced later */}
         <aside className="w-60 border-r bg-background flex flex-col overflow-hidden">
@@ -155,10 +130,19 @@ export default function StashPage() {
         {/* Content Area */}
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Toolbar */}
-          <PromptStashToolbar
-            onNewFile={handleNewFile}
-            onNewFolder={handleNewFolder}
-          />
+          <div className="border-b p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {activeStashId && (
+                <>
+                  <NewFileModal stashId={activeStashId} />
+                  <NewFolderModal stashId={activeStashId} />
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {/* Additional toolbar buttons can go here */}
+            </div>
+          </div>
 
           {/* Breadcrumb */}
           <PromptStashBreadcrumb items={breadcrumbItems} />
@@ -180,6 +164,13 @@ export default function StashPage() {
           )}
         </main>
       </div>
+
+      {/* File Editor */}
+      <FileEditor
+        fileId={editorFileId}
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+      />
     </div>
   );
 }

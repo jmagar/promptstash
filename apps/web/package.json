@@ -7,10 +7,10 @@
     "build": "next build",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf .next .turbo node_modules",
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack --port 3100",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "start": "next start"
+    "start": "next start --port 3100"
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
@@ -28,7 +28,8 @@
     "react": "catalog:web",
     "react-dom": "catalog:web",
     "react-hook-form": "catalog:web",
-    "sonner": "catalog:web"
+    "sonner": "catalog:web",
+    "zod": "catalog:core"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",

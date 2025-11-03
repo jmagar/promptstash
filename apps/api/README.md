@@ -35,7 +35,7 @@ pnpm build
 pnpm start
 ```
 
-The server will be running at `http://localhost:4000` (or the port you specified in the `.env` file).
+The server will be running at `http://localhost:3300` (or the port you specified in the `.env` file).
 
 ### 4. API Endpoints
 

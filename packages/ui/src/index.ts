@@ -22,6 +22,8 @@ export * from "./components/form";
 export * from "./components/label";
 export * from "./components/skeleton";
 export * from "./components/spinner";
+export * from "./components/select";
+export * from "./components/textarea";
 
 // Utilities
 export * from "./lib/utils";

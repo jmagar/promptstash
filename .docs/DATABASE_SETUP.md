@@ -21,7 +21,7 @@ docker compose -f docker-compose.dev.yml up -d
 
 This will:
 - Create a PostgreSQL 16 container named `promptstash-postgres-dev`
-- Expose the database on `localhost:5434`
+- Expose the database on `localhost:3500`
 - Create a database named `promptstash`
 - Set up credentials: `promptstash` / `promptstash_dev_password`
 - Create a persistent volume `promptstash_postgres_dev_data`
@@ -31,7 +31,7 @@ This will:
 The `.env` file in `packages/db/` has already been created with the correct connection string:
 
 ```env
-DATABASE_URL="postgresql://promptstash:promptstash_dev_password@localhost:5434/promptstash"
+DATABASE_URL="postgresql://promptstash:promptstash_dev_password@localhost:3500/promptstash"
 ```
 
 Run the migration to create all tables:
@@ -142,7 +142,7 @@ docker exec -it promptstash-postgres-dev psql -U promptstash -d promptstash
 - **Database**: promptstash
 - **Username**: promptstash
 - **Password**: promptstash_dev_password
-- **Connection String**: `postgresql://promptstash:promptstash_dev_password@localhost:5434/promptstash`
+- **Connection String**: `postgresql://promptstash:promptstash_dev_password@localhost:3500/promptstash`
 
 ## Troubleshooting
 

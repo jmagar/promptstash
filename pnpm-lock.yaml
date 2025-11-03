@@ -99,9 +99,6 @@ catalogs:
       specifier: ^8.39.0
       version: 8.39.0
   prettier:
-    prettier:
-      specifier: ^3.6.2
-      version: 3.6.2
     prettier-plugin-organize-imports:
       specifier: ^4.1.0
       version: 4.2.0
@@ -231,6 +228,9 @@ catalogs:
       specifier: ^1.3.6
       version: 1.4.0
 
+overrides:
+  prettier: 3.6.2
+
 importers:
 
   .:
@@ -242,7 +242,7 @@ importers:
         specifier: catalog:eslint
         version: 9.32.0(jiti@2.6.1)
       prettier:
-        specifier: catalog:prettier
+        specifier: 3.6.2
         version: 3.6.2
       prettier-plugin-organize-imports:
         specifier: catalog:prettier
@@ -417,6 +417,9 @@ importers:
       sonner:
         specifier: catalog:web
         version: 2.0.7(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      zod:
+        specifier: catalog:core
+        version: 3.25.76
     devDependencies:
       '@types/node':
         specifier: catalog:dev
@@ -576,12 +579,12 @@ importers:
     dependencies:
       jest:
         specifier: catalog:dev
-        version: 30.1.3(@types/node@22.18.3)(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
+        version: 30.1.3(@types/node@22.18.3)(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
 
   packages/prettier-config:
     dependencies:
       prettier:
-        specifier: catalog:prettier
+        specifier: 3.6.2
         version: 3.6.2
     devDependencies:
       prettier-plugin-organize-imports:
@@ -635,6 +638,9 @@ importers:
       '@radix-ui/react-label':
         specifier: catalog:web
         version: 2.1.7(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@radix-ui/react-select':
+        specifier: ^2.2.6
+        version: 2.2.6(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@radix-ui/react-separator':
         specifier: catalog:web
         version: 1.1.7(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -1791,6 +1797,9 @@ packages:
   '@radix-ui/colors@3.0.0':
     resolution: {integrity: sha512-FUOsGBkHrYJwCSEtWRCIfQbZG7q1e6DgxCIOe1SUQzDe/7rXXeA47s8yCn6fuTNQAj1Zq4oTFi9Yjp3wzElcxg==}
 
+  '@radix-ui/number@1.1.1':
+    resolution: {integrity: sha512-MkKCwxlXTgz6CFoJx3pCwn07GKp36+aZyu/u2Ln2VrA5DcdyCZkASEDBTd8x5whTQQL5CiYf4prXKLcgQdv29g==}
+
   '@radix-ui/primitive@1.1.3':
     resolution: {integrity: sha512-JTF99U/6XIjCBo0wqkU5sK10glYe27MRRsfwoiq5zzOEZLHU3A3KCMa5X/azekYRCJ0HlwI0crAXS/5dEHTzDg==}
 
@@ -2047,6 +2056,19 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@radix-ui/react-select@2.2.6':
+    resolution: {integrity: sha512-I30RydO+bnn2PQztvo25tswPH+wFBjehVGtmagkU78yMdwTwVf12wnAOF+AeP8S2N8xD+5UPbGhkUfPyvT+mwQ==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
   '@radix-ui/react-separator@1.1.7':
     resolution: {integrity: sha512-0HEb8R9E8A+jZjvmFCy/J4xhbXy3TV+9XSnGJ3KvTtjlIUy/YQ/p6UYZvi7YbeoeXdyU9+Y3scizK6hkY37baA==}
     peerDependencies:
@@ -2168,6 +2190,15 @@ packages:
 
   '@radix-ui/react-use-layout-effect@1.1.1':
     resolution: {integrity: sha512-RbJRS4UWQFkzHTTwVymMTUv8EqYhOp8dOOviLj2ugtTiXRaRQS7GLGxZTLL1jWhMeoSCf5zmcZkqTl9IiYfXcQ==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@radix-ui/react-use-previous@1.1.1':
+    resolution: {integrity: sha512-2dHfToCj/pzca2Ck724OZ5L0EVrr3eHRNsG/b3xQJLA2hZpVCS99bLAX+hm1IHXDEnzU6by5z/5MIY794/a8NQ==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
@@ -5035,7 +5066,7 @@ packages:
   prettier-plugin-organize-imports@4.2.0:
     resolution: {integrity: sha512-Zdy27UhlmyvATZi67BTnLcKTo8fm6Oik59Sz6H64PgZJVs6NJpPD1mT240mmJn62c98/QaL+r3kx9Q3gRpDajg==}
     peerDependencies:
-      prettier: '>=2.0'
+      prettier: 3.6.2
       typescript: '>=2.9'
       vue-tsc: ^2.1.0 || 3
     peerDependenciesMeta:
@@ -5045,7 +5076,7 @@ packages:
   prettier-plugin-packagejson@2.5.19:
     resolution: {integrity: sha512-Qsqp4+jsZbKMpEGZB1UP1pxeAT8sCzne2IwnKkr+QhUe665EXUo3BAvTf1kAPCqyMv9kg3ZmO0+7eOni/C6Uag==}
     peerDependencies:
-      prettier: '>= 1.16.0'
+      prettier: 3.6.2
     peerDependenciesMeta:
       prettier:
         optional: true
@@ -5061,7 +5092,7 @@ packages:
       '@shopify/prettier-plugin-liquid': '*'
       '@trivago/prettier-plugin-sort-imports': '*'
       '@zackad/prettier-plugin-twig': '*'
-      prettier: ^3.0
+      prettier: 3.6.2
       prettier-plugin-astro: '*'
       prettier-plugin-css-order: '*'
       prettier-plugin-import-sort: '*'
@@ -5110,11 +5141,6 @@ packages:
         optional: true
       prettier-plugin-svelte:
         optional: true
-
-  prettier@3.5.3:
-    resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==}
-    engines: {node: '>=14'}
-    hasBin: true
 
   prettier@3.6.2:
     resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
@@ -6806,7 +6832,7 @@ snapshots:
       - supports-color
       - ts-node
 
-  '@jest/core@30.1.3(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))':
+  '@jest/core@30.1.3(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))':
     dependencies:
       '@jest/console': 30.1.2
       '@jest/pattern': 30.0.1
@@ -6821,7 +6847,7 @@ snapshots:
       exit-x: 0.2.2
       graceful-fs: 4.2.11
       jest-changed-files: 30.0.5
-      jest-config: 30.1.3(@types/node@22.18.3)(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
+      jest-config: 30.1.3(@types/node@22.18.3)(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
       jest-haste-map: 30.1.0
       jest-message-util: 30.1.0
       jest-regex-util: 30.0.1
@@ -7239,6 +7265,8 @@ snapshots:
       '@prisma/debug': 6.16.1
 
   '@radix-ui/colors@3.0.0': {}
+
+  '@radix-ui/number@1.1.1': {}
 
   '@radix-ui/primitive@1.1.3': {}
 
@@ -7687,6 +7715,35 @@ snapshots:
       '@types/react': 19.1.9
       '@types/react-dom': 19.1.7(@types/react@19.1.9)
 
+  '@radix-ui/react-select@2.2.6(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+    dependencies:
+      '@radix-ui/number': 1.1.1
+      '@radix-ui/primitive': 1.1.3
+      '@radix-ui/react-collection': 1.1.7(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-context': 1.1.2(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-direction': 1.1.1(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-dismissable-layer': 1.1.11(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@radix-ui/react-focus-guards': 1.1.3(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-focus-scope': 1.1.7(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@radix-ui/react-id': 1.1.1(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-popper': 1.2.8(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@radix-ui/react-portal': 1.1.9(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@radix-ui/react-slot': 1.2.3(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-use-controllable-state': 1.2.2(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-use-previous': 1.1.1(@types/react@19.1.9)(react@19.2.0)
+      '@radix-ui/react-visually-hidden': 1.2.3(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      aria-hidden: 1.2.6
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      react-remove-scroll: 2.7.1(@types/react@19.1.9)(react@19.2.0)
+    optionalDependencies:
+      '@types/react': 19.1.9
+      '@types/react-dom': 19.1.7(@types/react@19.1.9)
+
   '@radix-ui/react-separator@1.1.7(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -7862,6 +7919,12 @@ snapshots:
       '@types/react': 19.0.10
 
   '@radix-ui/react-use-layout-effect@1.1.1(@types/react@19.1.9)(react@19.2.0)':
+    dependencies:
+      react: 19.2.0
+    optionalDependencies:
+      '@types/react': 19.1.9
+
+  '@radix-ui/react-use-previous@1.1.1(@types/react@19.1.9)(react@19.2.0)':
     dependencies:
       react: 19.2.0
     optionalDependencies:
@@ -8065,7 +8128,7 @@ snapshots:
   '@react-email/render@1.0.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       html-to-text: 9.0.5
-      prettier: 3.5.3
+      prettier: 3.6.2
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
       react-promise-suspense: 0.3.4
@@ -9450,14 +9513,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  esbuild-register@3.6.0(esbuild@0.25.10):
-    dependencies:
-      debug: 4.4.1(supports-color@5.5.0)
-      esbuild: 0.25.10
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
   esbuild@0.20.2:
     optionalDependencies:
       '@esbuild/aix-ppc64': 0.20.2
@@ -10289,15 +10344,15 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest-cli@30.1.3(@types/node@22.18.3)(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2)):
+  jest-cli@30.1.3(@types/node@22.18.3)(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2)):
     dependencies:
-      '@jest/core': 30.1.3(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
+      '@jest/core': 30.1.3(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
       '@jest/test-result': 30.1.3
       '@jest/types': 30.0.5
       chalk: 4.1.2
       exit-x: 0.2.2
       import-local: 3.2.0
-      jest-config: 30.1.3(@types/node@22.18.3)(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
+      jest-config: 30.1.3(@types/node@22.18.3)(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
       jest-util: 30.0.5
       jest-validate: 30.1.0
       yargs: 17.7.2
@@ -10376,7 +10431,7 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  jest-config@30.1.3(@types/node@22.18.3)(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2)):
+  jest-config@30.1.3(@types/node@22.18.3)(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2)):
     dependencies:
       '@babel/core': 7.28.4
       '@jest/get-type': 30.1.0
@@ -10404,7 +10459,6 @@ snapshots:
       strip-json-comments: 3.1.1
     optionalDependencies:
       '@types/node': 22.18.3
-      esbuild-register: 3.6.0(esbuild@0.25.10)
       ts-node: 10.9.2(@types/node@22.18.3)(typescript@5.9.2)
     transitivePeerDependencies:
       - babel-plugin-macros
@@ -10644,12 +10698,12 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest@30.1.3(@types/node@22.18.3)(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2)):
+  jest@30.1.3(@types/node@22.18.3)(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2)):
     dependencies:
-      '@jest/core': 30.1.3(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
+      '@jest/core': 30.1.3(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
       '@jest/types': 30.0.5
       import-local: 3.2.0
-      jest-cli: 30.1.3(@types/node@22.18.3)(esbuild-register@3.6.0(esbuild@0.25.10))(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
+      jest-cli: 30.1.3(@types/node@22.18.3)(ts-node@10.9.2(@types/node@22.18.3)(typescript@5.9.2))
     transitivePeerDependencies:
       - '@types/node'
       - babel-plugin-macros
@@ -11283,8 +11337,6 @@ snapshots:
       prettier: 3.6.2
     optionalDependencies:
       prettier-plugin-organize-imports: 4.2.0(prettier@3.6.2)(typescript@5.9.2)
-
-  prettier@3.5.3: {}
 
   prettier@3.6.2: {}
 

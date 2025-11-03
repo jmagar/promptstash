@@ -4,7 +4,7 @@
  * Provides typed functions for interacting with the Express API
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3300/api';
 
 // Types
 export interface Stash {
@@ -26,7 +26,10 @@ export interface File {
   name: string;
   path: string;
   content: string;
+  description?: string | null;
   fileType: 'MARKDOWN' | 'JSON' | 'JSONL' | 'YAML';
+  version?: number;
+  metadata?: Record<string, any>;
   folderId: string | null;
   stashId: string;
   createdAt: string;
@@ -71,13 +74,17 @@ export interface FileVersion {
 export const apiClient = {
   // Stashes
   async getStashes(): Promise<Stash[]> {
-    const res = await fetch(`${API_BASE_URL}/stashes`);
+    const res = await fetch(`${API_BASE_URL}/stashes`, {
+      credentials: 'include',
+    });
     if (!res.ok) throw new Error('Failed to fetch stashes');
     return res.json();
   },
 
   async getStash(id: string): Promise<Stash> {
-    const res = await fetch(`${API_BASE_URL}/stashes/${id}`);
+    const res = await fetch(`${API_BASE_URL}/stashes/${id}`, {
+      credentials: 'include',
+    });
     if (!res.ok) throw new Error('Failed to fetch stash');
     return res.json();
   },
@@ -86,6 +93,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/stashes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error('Failed to create stash');
@@ -100,22 +108,28 @@ export const apiClient = {
     folderId?: string;
   }): Promise<File[]> {
     const searchParams = new URLSearchParams(params as any);
-    const res = await fetch(`${API_BASE_URL}/stashes/${stashId}/files?${searchParams}`);
+    const res = await fetch(`${API_BASE_URL}/stashes/${stashId}/files?${searchParams}`, {
+      credentials: 'include',
+    });
     if (!res.ok) throw new Error('Failed to fetch files');
     return res.json();
   },
 
   async getFile(id: string): Promise<File> {
-    const res = await fetch(`${API_BASE_URL}/files/${id}`);
+    const res = await fetch(`${API_BASE_URL}/files/${id}`, {
+      credentials: 'include',
+    });
     if (!res.ok) throw new Error('Failed to fetch file');
     return res.json();
   },
 
   async createFile(data: {
     name: string;
-    path: string;
+    path?: string;
     content: string;
+    description?: string;
     fileType: string;
+    metadata?: Record<string, any>;
     stashId: string;
     folderId?: string;
     tags?: string[];
@@ -123,6 +137,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/files`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     if (!res.ok) {
@@ -140,6 +155,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/files/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error('Failed to update file');
@@ -149,12 +165,15 @@ export const apiClient = {
   async deleteFile(id: string): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/files/${id}`, {
       method: 'DELETE',
+      credentials: 'include',
     });
     if (!res.ok) throw new Error('Failed to delete file');
   },
 
   async getFileVersions(id: string): Promise<FileVersion[]> {
-    const res = await fetch(`${API_BASE_URL}/files/${id}/versions`);
+    const res = await fetch(`${API_BASE_URL}/files/${id}/versions`, {
+      credentials: 'include',
+    });
     if (!res.ok) throw new Error('Failed to fetch versions');
     return res.json();
   },
@@ -163,6 +182,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/files/${id}/revert`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ versionId }),
     });
     if (!res.ok) throw new Error('Failed to revert file');
@@ -171,20 +191,24 @@ export const apiClient = {
 
   // Folders
   async getFolder(id: string): Promise<Folder> {
-    const res = await fetch(`${API_BASE_URL}/folders/${id}`);
+    const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
+      credentials: 'include',
+    });
     if (!res.ok) throw new Error('Failed to fetch folder');
     return res.json();
   },
 
   async createFolder(data: {
     name: string;
-    path: string;
+    path?: string;
+    description?: string;
     stashId: string;
     parentId?: string;
   }): Promise<Folder> {
     const res = await fetch(`${API_BASE_URL}/folders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error('Failed to create folder');
@@ -198,6 +222,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error('Failed to update folder');
@@ -207,6 +232,7 @@ export const apiClient = {
   async deleteFolder(id: string): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
       method: 'DELETE',
+      credentials: 'include',
     });
     if (!res.ok) throw new Error('Failed to delete folder');
   },
@@ -216,6 +242,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/validate/agent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ content, filename }),
     });
     if (!res.ok) throw new Error('Failed to validate agent');
@@ -226,6 +253,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/validate/skill`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ content, path }),
     });
     if (!res.ok) throw new Error('Failed to validate skill');
@@ -236,6 +264,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/validate/mcp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ content }),
     });
     if (!res.ok) throw new Error('Failed to validate MCP');
@@ -246,6 +275,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/validate/hooks`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ config, language }),
     });
     if (!res.ok) throw new Error('Failed to validate hooks');

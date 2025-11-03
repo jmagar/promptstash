@@ -5,8 +5,12 @@ import {
   validateSkillFile,
   validateMCPFile,
 } from "@workspace/utils";
+import { requireAuth } from "../middleware/auth";
 
 const router: Router = Router();
+
+// Apply authentication middleware to all routes
+router.use(requireAuth);
 
 /**
  * GET /api/files/:id
@@ -106,7 +110,7 @@ router.post("/", async (req: Request, res: Response) => {
         fileId: file.id,
         content,
         version: 1,
-        createdBy: "user", // TODO: Get from auth context
+        createdBy: req.user.id,
       },
     });
 
@@ -199,7 +203,7 @@ router.put("/:id", async (req: Request, res: Response) => {
           fileId: id,
           content,
           version: (latestVersion?.version || 0) + 1,
-          createdBy: "user", // TODO: Get from auth context
+          createdBy: req.user.id,
         },
       });
     }
@@ -292,7 +296,7 @@ router.post("/:id/revert", async (req: Request, res: Response) => {
         fileId: id,
         content: version.content,
         version: (latestVersion?.version || 0) + 1,
-        createdBy: "user", // TODO: Get from auth context
+        createdBy: req.user.id,
       },
     });
 

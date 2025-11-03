@@ -1,7 +1,11 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "@workspace/db";
+import { requireAuth } from "../middleware/auth";
 
 const router: Router = Router();
+
+// Apply authentication middleware to all routes
+router.use(requireAuth);
 
 /**
  * GET /api/stashes
@@ -9,10 +13,9 @@ const router: Router = Router();
  */
 router.get("/", async (req: Request, res: Response) => {
   try {
-    // TODO: Get userId from auth context
-    const userId = "user-id-placeholder";
+    const userId = req.user.id;
 
-    const stashes = await prisma.stash.findMany({
+    let stashes = await prisma.stash.findMany({
       where: { userId },
       include: {
         _count: {
@@ -24,6 +27,27 @@ router.get("/", async (req: Request, res: Response) => {
       },
       orderBy: { createdAt: "desc" },
     });
+
+    // Auto-create default stash for new users
+    if (stashes.length === 0) {
+      const defaultStash = await prisma.stash.create({
+        data: {
+          name: "My PromptStash",
+          scope: "USER",
+          description: "Default stash for organizing prompts, agents, and skills",
+          userId,
+        },
+        include: {
+          _count: {
+            select: {
+              files: true,
+              folders: true,
+            },
+          },
+        },
+      });
+      stashes = [defaultStash];
+    }
 
     res.json(stashes);
   } catch (error) {
@@ -86,8 +110,7 @@ router.post("/", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Name and scope are required" });
     }
 
-    // TODO: Get userId from auth context
-    const userId = "user-id-placeholder";
+    const userId = req.user.id;
 
     const stash = await prisma.stash.create({
       data: {
