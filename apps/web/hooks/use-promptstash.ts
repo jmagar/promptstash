@@ -5,11 +5,30 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
+// Types for query parameters
+export interface FileQueryParams {
+  search?: string;
+  fileType?: string;
+  tags?: string;
+  folderId?: string;
+}
+
+export interface FileUpdateData {
+  name?: string;
+  content?: string;
+  tags?: string[];
+}
+
+export interface FolderUpdateData {
+  name?: string;
+  path?: string;
+}
+
 // Query Keys
 export const queryKeys = {
   stashes: ['stashes'] as const,
   stash: (id: string) => ['stashes', id] as const,
-  files: (stashId: string, params?: any) => ['files', stashId, params] as const,
+  files: (stashId: string, params?: FileQueryParams) => ['files', stashId, params] as const,
   file: (id: string) => ['files', id] as const,
   fileVersions: (id: string) => ['files', id, 'versions'] as const,
   folder: (id: string) => ['folders', id] as const,
@@ -43,12 +62,7 @@ export function useCreateStash() {
 }
 
 // File Hooks
-export function useFiles(stashId: string, params?: {
-  search?: string;
-  fileType?: string;
-  tags?: string;
-  folderId?: string;
-}) {
+export function useFiles(stashId: string, params?: FileQueryParams) {
   return useQuery({
     queryKey: queryKeys.files(stashId, params),
     queryFn: () => apiClient.getFiles(stashId, params),
@@ -81,7 +95,7 @@ export function useUpdateFile() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => 
+    mutationFn: ({ id, data }: { id: string; data: FileUpdateData }) => 
       apiClient.updateFile(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.file(data.id) });
@@ -151,7 +165,7 @@ export function useUpdateFolder() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: FolderUpdateData }) =>
       apiClient.updateFolder(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.folder(data.id) });

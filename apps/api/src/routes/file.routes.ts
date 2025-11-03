@@ -6,6 +6,13 @@ import {
   validateMCPFile,
 } from "@workspace/utils";
 
+// Validation result type
+interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
 const router: Router = Router();
 
 /**
@@ -56,7 +63,7 @@ router.post("/", async (req: Request, res: Response) => {
     }
 
     // Validate file content based on type
-    let validation: any = { valid: true, errors: [], warnings: [] };
+    let validation: ValidationResult = { valid: true, errors: [], warnings: [] };
 
     if (fileType === "MARKDOWN" && path.includes("/agents/")) {
       validation = validateAgentFile(content, name);
@@ -161,7 +168,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 
     // Validate content if provided
     if (content) {
-      let validation: any = { valid: true, errors: [], warnings: [] };
+      let validation: ValidationResult = { valid: true, errors: [], warnings: [] };
 
       if (existingFile.fileType === "MARKDOWN" && existingFile.path.includes("/agents/")) {
         validation = validateAgentFile(content, name || existingFile.name);

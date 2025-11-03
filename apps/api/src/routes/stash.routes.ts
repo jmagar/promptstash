@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { prisma } from "@workspace/db";
+import { prisma, type Prisma } from "@workspace/db";
 
 const router: Router = Router();
 
@@ -176,20 +176,20 @@ router.get("/:id/files", async (req: Request, res: Response) => {
     const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10)));
     const skip = (pageNum - 1) * limitNum;
 
-    const where: any = {
+    const where: Prisma.FileWhereInput = {
       stashId: id,
     };
 
     // Filter by folder
     if (folderId === "root") {
       where.folderId = null;
-    } else if (folderId) {
+    } else if (folderId && typeof folderId === "string") {
       where.folderId = folderId;
     }
 
     // Filter by file type
-    if (fileType) {
-      where.fileType = fileType;
+    if (fileType && typeof fileType === "string") {
+      where.fileType = fileType as Prisma.FileWhereInput['fileType'];
     }
 
     // Filter by tags

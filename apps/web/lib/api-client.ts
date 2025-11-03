@@ -99,7 +99,7 @@ export const apiClient = {
     tags?: string;
     folderId?: string;
   }): Promise<File[]> {
-    const searchParams = new URLSearchParams(params as any);
+    const searchParams = new URLSearchParams(params as Record<string, string>);
     const res = await fetch(`${API_BASE_URL}/stashes/${stashId}/files?${searchParams}`);
     if (!res.ok) throw new Error('Failed to fetch files');
     return res.json();
@@ -242,7 +242,7 @@ export const apiClient = {
     return res.json();
   },
 
-  async validateHooks(config: any, language?: 'typescript' | 'python') {
+  async validateHooks(config: unknown, language?: 'typescript' | 'python') {
     const res = await fetch(`${API_BASE_URL}/validate/hooks`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
