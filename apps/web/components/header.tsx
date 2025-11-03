@@ -13,9 +13,10 @@ function Header() {
         'bg-background h-12 w-screen items-center justify-between px-4 py-2',
         isMobile ? 'flex' : 'hidden',
       )}
+      role="banner"
     >
-      <SidebarTrigger />
-      <Link href="/">
+      <SidebarTrigger aria-label="Toggle navigation menu" />
+      <Link href="/" aria-label="Go to home page">
         <Logo variant="header" />
       </Link>
       <div className="flex items-center gap-2"></div>

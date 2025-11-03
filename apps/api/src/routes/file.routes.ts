@@ -2,6 +2,7 @@ import { prisma, type Prisma } from '@workspace/db';
 import { validateAgentFile, validateMCPFile, validateSkillFile } from '@workspace/utils';
 import { Request, Response, Router } from 'express';
 import { requireAuth } from '../middleware/auth';
+import { fileOperationRateLimit, fileUploadRateLimit } from '../middleware/rate-limit';
 import type { AuthenticatedRequest } from '../types/express';
 
 // Validation result type
@@ -15,6 +16,9 @@ const router: Router = Router();
 
 // Apply authentication middleware to all routes
 router.use(requireAuth);
+
+// Apply file operation rate limiting to all routes
+router.use(fileOperationRateLimit);
 
 /**
  * GET /api/files/:id
@@ -112,7 +116,7 @@ function mapToPrismaFileType(fileType: string): 'MARKDOWN' | 'JSON' | 'JSONL' | 
  * POST /api/files
  * Create a new file
  */
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', fileUploadRateLimit, async (req: Request, res: Response) => {
   try {
     const { name, content, fileType, stashId, folderId, tags } = req.body;
     let { path } = req.body;

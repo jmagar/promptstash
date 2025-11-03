@@ -4,15 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**build-elevate** is a production-ready, full-stack TypeScript monorepo template for building modern SaaS applications. It combines Next.js 16 (with React 19) for the frontend and Express v5 for the backend API, featuring complete authentication, database integration, email services, and Docker deployment support.
+**PromptStash** is a modern web application for managing Claude Code files (agents, skills, commands, hooks, and MCP configurations). Built on a production-ready, full-stack TypeScript monorepo, it combines Next.js 16 (with React 19) for the frontend and Express v5 for the backend API, featuring complete authentication, database integration, automatic versioning, and Docker deployment support.
 
 ## Technology Stack
 
 ### Core Frameworks
 
-- **Next.js 16.0.0** with App Router and Turbopack (port 3000)
+- **Next.js 16.0.0** with App Router and Turbopack (port 3100)
 - **React 19.2.0** with modern hooks and Server Components
-- **Express 5.1.0** API server (port 4000)
+- **Express 5.1.0** API server (port 3300)
 - **TypeScript 5.9.2** with strict type checking throughout
 
 ### Build System
@@ -55,8 +55,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```
 /
 ├── apps/                      # Deployable applications
-│   ├── web/                   # Next.js web app (port 3000)
-│   ├── api/                   # Express API server (port 4000)
+│   ├── web/                   # Next.js web app (port 3100)
+│   ├── api/                   # Express API server (port 3300)
 │   ├── email/                 # React Email preview server
 │   └── studio/                # Prisma Studio
 ├── packages/                  # Shared libraries
@@ -65,7 +65,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   ├── email/                 # Email templates and sender
 │   ├── rate-limit/            # Rate limiting utilities
 │   ├── ui/                    # Shared UI components
-│   ├── utils/                 # Common utilities and types
+│   ├── utils/                 # Common utilities and types (file validation)
 │   ├── eslint-config/         # ESLint configurations
 │   ├── prettier-config/       # Prettier config
 │   ├── typescript-config/     # TypeScript base configs
@@ -109,8 +109,9 @@ app/
 │   ├── reset-password/
 │   └── two-factor/
 ├── (default)/           # Protected routes (grouped)
-│   ├── dashboard/
-│   ├── profile/
+│   ├── dashboard/       # Dashboard (currently redirects to /stash)
+│   ├── profile/         # User profile management
+│   ├── stash/           # Main PromptStash interface (file management)
 │   └── (settings)/
 │       └── settings/
 │           ├── general/
@@ -120,6 +121,12 @@ app/
 ```
 
 **Important**: Routes are organized by feature, not by visibility. The `(groupName)` syntax creates logical groupings without affecting the URL structure.
+
+**PromptStash-Specific Routes:**
+
+- `/stash`: Main file management interface
+- `/stash?stashId={id}`: View specific stash contents
+- Files and folders are managed through modals (not separate routes)
 
 ### 2. Provider Pattern
 
@@ -233,14 +240,14 @@ pnpm dlx shadcn@latest add button -c apps/web
 
 ```bash
 # Web app (Next.js)
-pnpm --filter @workspace/web dev     # Development server (port 3000)
+pnpm --filter @workspace/web dev     # Development server (port 3100)
 pnpm --filter @workspace/web build   # Production build
-pnpm --filter @workspace/web start   # Start production server
+pnpm --filter @workspace/web start   # Start production server (port 3100)
 
 # API server (Express)
-pnpm --filter @workspace/api dev     # Development server (port 4000)
+pnpm --filter @workspace/api dev     # Development server (port 3300)
 pnpm --filter @workspace/api build   # Build TypeScript to dist/
-pnpm --filter @workspace/api start   # Start production server
+pnpm --filter @workspace/api start   # Start production server (port 3300)
 pnpm --filter @workspace/api test    # Run Jest tests with coverage
 ```
 
@@ -252,24 +259,24 @@ pnpm --filter @workspace/api test    # Run Jest tests with coverage
 
 ```env
 # Database
-DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+DATABASE_URL=postgresql://promptstash:promptstash123@localhost:5432/promptstash
 
 # Better Auth
 BETTER_AUTH_SECRET=<random-32-byte-hex>
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=http://localhost:3100
 GOOGLE_CLIENT_ID=<your-google-client-id>
 GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 
-# Email (Resend)
+# Email (Resend) - Optional for local development
 RESEND_API_KEY=<your-resend-api-key>
-RESEND_FROM_EMAIL=noreply@yourdomain.com
+RESEND_FROM_EMAIL=noreply@localhost
 
-# Rate Limiting (Upstash Redis)
+# Rate Limiting (Upstash Redis) - Optional for local development
 UPSTASH_REDIS_REST_URL=<your-upstash-url>
 UPSTASH_REDIS_REST_TOKEN=<your-upstash-token>
 
 # Next.js
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_BASE_URL=http://localhost:3100
 NODE_ENV=development
 ```
 
@@ -277,12 +284,13 @@ NODE_ENV=development
 
 ```env
 NODE_ENV=development
-PORT=4000
-ALLOWED_ORIGINS=http://localhost:3000
+PORT=3300
+DATABASE_URL=postgresql://promptstash:promptstash123@localhost:5432/promptstash
+ALLOWED_ORIGINS=http://localhost:3100
 
 # Better Auth (same as web app)
 BETTER_AUTH_SECRET=<same-as-web-app>
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=http://localhost:3100
 GOOGLE_CLIENT_ID=<same-as-web-app>
 GOOGLE_CLIENT_SECRET=<same-as-web-app>
 ```
@@ -290,7 +298,7 @@ GOOGLE_CLIENT_SECRET=<same-as-web-app>
 **Database Package** (`packages/db/.env`):
 
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+DATABASE_URL=postgresql://promptstash:promptstash123@localhost:5432/promptstash
 ```
 
 ### Generating Secrets
@@ -395,35 +403,86 @@ Ensure these exist before running `pnpm docker:prod`:
 
 ## Prisma Schema Key Models
 
-### User Model
+### Authentication Models
+
+#### User Model
 
 - Email/password authentication with hashing
 - Email verification status
 - Image URL for profile picture
+- Two-factor authentication support
 - Created/updated timestamps
+- Relations: sessions, accounts, twofactors, stashes
 
-### Session Model
+#### Session Model
 
 - User relationship (one-to-many)
 - Token and expiration
 - IP address and user agent tracking
 
-### Account Model
+#### Account Model
 
 - OAuth provider integration
 - Links social accounts to users
 
-### Verification Model
+#### Verification Model
 
 - Email verification codes
 - Password reset tokens
 - Expiration handling
 
-### TwoFactor Model
+#### TwoFactor Model
 
 - TOTP secrets
 - Backup codes (hashed)
 - User relationship
+
+### PromptStash Models
+
+#### Stash Model
+
+- Top-level container for files and folders
+- Scopes: USER, PROJECT, PLUGIN, MARKETPLACE
+- User ownership
+- Relations: folders, files
+
+#### Folder Model
+
+- Hierarchical folder structure
+- Full path for quick lookups
+- Parent-child relationships
+- Belongs to a stash
+
+#### File Model
+
+- Individual files (agents, skills, configs, etc.)
+- Content stored as text
+- File types: MARKDOWN, JSON, JSONL, YAML
+- Optional folder association
+- Relations: tags, versions, shares
+- Auto-generated paths based on type
+
+#### Tag Model
+
+- Tags for categorizing files
+- Unique names with optional colors
+- Many-to-many relationship with files
+
+#### FileVersion Model
+
+- Immutable version history
+- Sequential version numbering
+- Tracks who created each version
+- Content snapshots for time travel
+
+#### FileShare Model
+
+- File sharing with permissions (VIEW, EDIT, COMMENT)
+- Unique share tokens
+- Optional expiry
+- Tracks who shared with whom
+
+**See [DATABASE_SETUP.md](DATABASE_SETUP.md) for complete schema documentation.**
 
 ## Code Quality & Linting
 
@@ -687,17 +746,155 @@ import { useSession } from "@workspace/auth/client";
 
 ### Port Configuration
 
-- **Web**: 3000 (configurable via `NEXT_PUBLIC_BASE_URL`)
-- **API**: 4000 (configurable via `PORT` in `apps/api/.env`)
+- **Web**: 3100 (configurable via `NEXT_PUBLIC_BASE_URL` and package.json)
+- **API**: 3300 (configurable via `PORT` in `apps/api/.env`)
 - **Database**: 5432 (standard PostgreSQL)
 - **Prisma Studio**: 5555
+
+**Why these ports?**
+
+- Default ports (3000/4000) are often in use
+- 3100/3300 provide consistent spacing and easy memory
 
 ### CORS Configuration
 
 The API server allows requests from origins specified in `apps/api/src/config/allowedOrigins.ts`:
 
 ```typescript
-const allowedOrigins = ["http://localhost:3000", "https://yourdomain.com"];
+const allowedOrigins = ["http://localhost:3100", "https://yourdomain.com"];
 ```
 
 Update this list when deploying to production or adding new frontends.
+
+## PromptStash-Specific Features
+
+### File Validation
+
+The `@workspace/utils` package provides validation for different file types:
+
+```typescript
+import {
+  validateAgentFile,
+  validateSkillFile,
+  validateMCPFile,
+} from "@workspace/utils";
+
+// Validate agent files
+const result = validateAgentFile(content, filename);
+if (!result.valid) {
+  console.error(result.errors);
+}
+
+// Validate MCP configuration
+const mcpResult = validateMCPFile(jsonContent);
+```
+
+**Supported Validators:**
+
+- `validateAgentFile()`: Agent markdown files
+- `validateSkillFile()`: Skill markdown files
+- `validateMCPFile()`: MCP JSON configurations
+- `validateHooksConfig()`: Hooks JSON configurations
+- `validateHookOutput()`: Hook output validation
+
+### Automatic Versioning
+
+Every file update creates a new version automatically:
+
+```typescript
+// In file.routes.ts
+await prisma.$transaction(async (tx) => {
+  // Update file
+  const updatedFile = await tx.file.update({
+    /* ... */
+  });
+
+  // Create new version if content changed
+  if (content && content !== existingFile.content) {
+    await tx.fileVersion.create({
+      data: {
+        fileId,
+        content,
+        version: (latestVersion?.version || 0) + 1,
+        createdBy: userId,
+      },
+    });
+  }
+});
+```
+
+### File Path Generation
+
+Paths are auto-generated based on file type:
+
+```typescript
+function generateFilePath(name: string, fileType: string): string {
+  const cleanName = name.replace(/\s+/g, "-").toLowerCase();
+
+  switch (fileType) {
+    case "AGENT":
+      return `.claude/agents/${cleanName}.md`;
+    case "SKILL":
+      return `.claude/skills/${cleanName}/SKILL.md`;
+    case "MCP":
+      return `.mcp.json`;
+    case "HOOKS":
+      return `.claude/hooks.json`;
+    // ... more types
+  }
+}
+```
+
+### API Routes
+
+See [API.md](API.md) for complete API documentation.
+
+**Main Routes:**
+
+- `/api/users` - User session management
+- `/api/stashes` - Stash CRUD operations
+- `/api/files` - File CRUD and versioning
+- `/api/folders` - Folder management
+- `/api/validate` - File validation endpoints
+
+## Quick Reference
+
+### Getting Started
+
+```bash
+# 1. Start database
+docker compose -f docker-compose.dev.yml up -d
+
+# 2. Install and setup
+pnpm install
+pnpm --filter @workspace/db db:generate
+pnpm --filter @workspace/db db:seed
+
+# 3. Start dev servers
+pnpm dev
+
+# 4. Open app
+# Web: http://localhost:3100/stash
+# API: http://localhost:3300
+```
+
+See **[QUICKSTART.md](QUICKSTART.md)** for detailed setup instructions.
+
+### Working with PromptStash
+
+See **[DEMO.md](DEMO.md)** for a complete walkthrough of:
+
+- Creating agents and skills
+- Managing MCP configurations
+- Using version history
+- Organizing with folders and tags
+
+### Database Management
+
+See **[DATABASE_SETUP.md](DATABASE_SETUP.md)** for:
+
+- Database schema details
+- Migration management
+- Production setup
+- Backup and restore
+- Performance optimization

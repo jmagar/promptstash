@@ -1,3 +1,127 @@
 {
-  "tailwindCSS.experimental.configFile": "packages/ui/src/styles/globals.css"
+  // Editor
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.rulers": [100],
+  "editor.wordWrap": "on",
+  "editor.linkedEditing": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.inlineSuggest.enabled": true,
+
+  // Files
+  "files.exclude": {
+    "**/.turbo": true,
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/.cache": true
+  },
+  "files.watcherExclude": {
+    "**/.turbo/**": true,
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+
+  // TypeScript
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+  // JavaScript
+  "javascript.updateImportsOnFileMove.enabled": "always",
+
+  // Prettier
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ESLint
+  "eslint.enable": true,
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  // Tailwind CSS
+  "tailwindCSS.experimental.configFile": "packages/ui/src/styles/globals.css",
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+
+  // Git
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+
+  // Search
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.turbo": true,
+    "**/.next": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "pnpm-lock.yaml": true
+  },
+
+  // Emmet
+  "emmet.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascriptreact"
+  },
+
+  // Terminal
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.scrollback": 10000,
+
+  // Monorepo specific
+  "npm.packageManager": "pnpm",
+  "npm.enableRunFromFolder": true,
+
+  // Testing
+  "jest.autoRun": "off",
+  "jest.jestCommandLine": "pnpm test"
 }

@@ -25,17 +25,26 @@
     "check-types": "tsc --noEmit",
     "clean": "rm -rf dist .turbo node_modules",
     "dev": "tsc --build --watch",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "test": "jest --detectOpenHandles --coverage"
   },
   "prettier": "@workspace/prettier-config",
+  "jest": {
+    "preset": "@workspace/jest-presets/node"
+  },
   "dependencies": {
     "date-fns": "catalog:core",
     "zod": "catalog:core"
   },
   "devDependencies": {
+    "@jest/globals": "catalog:dev",
+    "@types/node": "catalog:dev",
     "@workspace/eslint-config": "workspace:^",
+    "@workspace/jest-presets": "workspace:*",
     "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "jest": "catalog:dev",
+    "ts-jest": "catalog:dev",
     "typescript": "5.9.2"
   }
 }

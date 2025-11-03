@@ -96,115 +96,113 @@ export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
   return (
     <>
       <Sheet open={open} onOpenChange={handleCloseRequest}>
-      <SheetContent side="right" className="w-full sm:w-[55%] sm:max-w-none">
-        <SheetHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <SheetTitle className="flex items-center gap-2">
-                {isLoading ? (
-                  <Spinner className="h-4 w-4" />
+        <SheetContent side="right" className="w-full sm:w-[55%] sm:max-w-none">
+          <SheetHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <SheetTitle className="flex items-center gap-2">
+                  {isLoading ? (
+                    <Spinner className="h-4 w-4" />
+                  ) : (
+                    <>
+                      {file?.name}
+                      {hasChanges && (
+                        <Badge variant="outline" className="ml-2">
+                          <AlertCircle className="mr-1 h-3 w-3" />
+                          Unsaved
+                        </Badge>
+                      )}
+                    </>
+                  )}
+                </SheetTitle>
+                {file && (
+                  <SheetDescription className="mt-1 flex items-center gap-4">
+                    <span className="flex items-center gap-1">
+                      <Badge variant="secondary">{file.fileType}</Badge>
+                    </span>
+                    <span className="flex items-center gap-1 text-xs">
+                      <Clock className="h-3 w-3" />
+                      Updated {new Date(file.updatedAt).toLocaleDateString()}
+                    </span>
+                  </SheetDescription>
+                )}
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => handleCloseRequest(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </SheetHeader>
+
+          <div className="mt-6 flex h-[calc(100vh-12rem)] flex-col gap-4">
+            {/* File Description */}
+            {file?.description && (
+              <div className="bg-muted/50 rounded-lg p-4">
+                <p className="text-muted-foreground text-sm">{file.description}</p>
+              </div>
+            )}
+
+            {/* Editor */}
+            <div className="flex flex-1 flex-col gap-2">
+              <label className="text-sm font-medium">Content</label>
+              <Textarea
+                value={content}
+                onChange={(e) => handleContentChange(e.target.value)}
+                placeholder="Start typing..."
+                className="flex-1 resize-none font-mono text-sm"
+                disabled={isLoading}
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <Button
+                onClick={handleSave}
+                disabled={!hasChanges || updateFile.isPending}
+                className="flex-1"
+              >
+                {updateFile.isPending ? (
+                  <>
+                    <Spinner />
+                    Saving...
+                  </>
                 ) : (
                   <>
-                    {file?.name}
-                    {hasChanges && (
-                      <Badge variant="outline" className="ml-2">
-                        <AlertCircle className="mr-1 h-3 w-3" />
-                        Unsaved
-                      </Badge>
-                    )}
+                    <Save className="h-4 w-4" />
+                    Save Changes
                   </>
                 )}
-              </SheetTitle>
-              {file && (
-                <SheetDescription className="mt-1 flex items-center gap-4">
-                  <span className="flex items-center gap-1">
-                    <Badge variant="secondary">{file.fileType}</Badge>
-                  </span>
-                  <span className="flex items-center gap-1 text-xs">
-                    <Clock className="h-3 w-3" />
-                    Updated {new Date(file.updatedAt).toLocaleDateString()}
-                  </span>
-                </SheetDescription>
-              )}
+              </Button>
+              <Button variant="outline" onClick={() => handleCloseRequest(false)}>
+                Close
+              </Button>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => handleCloseRequest(false)}>
-              <X className="h-4 w-4" />
-            </Button>
+
+            {/* Version Info */}
+            {file && (
+              <div className="text-muted-foreground border-t pt-2 text-xs">
+                <p>Version: {file.version || 1}</p>
+                <p className="mt-1">Created: {new Date(file.createdAt).toLocaleString()}</p>
+              </div>
+            )}
           </div>
-        </SheetHeader>
+        </SheetContent>
+      </Sheet>
 
-        <div className="mt-6 flex h-[calc(100vh-12rem)] flex-col gap-4">
-          {/* File Description */}
-          {file?.description && (
-            <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-muted-foreground text-sm">{file.description}</p>
-            </div>
-          )}
-
-          {/* Editor */}
-          <div className="flex flex-1 flex-col gap-2">
-            <label className="text-sm font-medium">Content</label>
-            <Textarea
-              value={content}
-              onChange={(e) => handleContentChange(e.target.value)}
-              placeholder="Start typing..."
-              className="flex-1 resize-none font-mono text-sm"
-              disabled={isLoading}
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <Button
-              onClick={handleSave}
-              disabled={!hasChanges || updateFile.isPending}
-              className="flex-1"
-            >
-              {updateFile.isPending ? (
-                <>
-                  <Spinner />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  Save Changes
-                </>
-              )}
-            </Button>
-            <Button variant="outline" onClick={() => handleCloseRequest(false)}>
-              Close
-            </Button>
-          </div>
-
-          {/* Version Info */}
-          {file && (
-            <div className="text-muted-foreground border-t pt-2 text-xs">
-              <p>Version: {file.version || 1}</p>
-              <p className="mt-1">Created: {new Date(file.createdAt).toLocaleString()}</p>
-            </div>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
-
-    {/* Confirmation Dialog for Unsaved Changes */}
-    <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
-          <AlertDialogDescription>
-            You have unsaved changes. Are you sure you want to close without saving?
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirmClose}>
-            Close Without Saving
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      {/* Confirmation Dialog for Unsaved Changes */}
+      <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. Are you sure you want to close without saving?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmClose}>Close Without Saving</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

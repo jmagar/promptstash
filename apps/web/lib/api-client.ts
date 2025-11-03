@@ -24,6 +24,18 @@ async function handleVoidResponse(response: Response): Promise<void> {
 }
 
 // Types
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+  files: T[];
+  pagination: PaginationMeta;
+}
+
 export interface Stash {
   id: string;
   name: string;
@@ -64,6 +76,9 @@ export interface Tag {
   id: string;
   name: string;
   color: string | null;
+  _count?: {
+    files: number;
+  };
 }
 
 export interface Folder {
@@ -117,11 +132,23 @@ export const apiClient = {
       fileType?: string;
       tags?: string;
       folderId?: string;
+      page?: number;
+      limit?: number;
     },
-  ): Promise<File[]> {
-    const searchParams = new URLSearchParams(params as Record<string, string>);
+  ): Promise<PaginatedResponse<File>> {
+    const searchParams = new URLSearchParams();
+
+    // Add all parameters to search params
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, value.toString());
+        }
+      });
+    }
+
     const res = await fetch(`${API_BASE_URL}/stashes/${stashId}/files?${searchParams}`);
-    return handleResponse<File[]>(res);
+    return handleResponse<PaginatedResponse<File>>(res);
   },
 
   async getFile(id: string): Promise<File> {
@@ -264,5 +291,41 @@ export const apiClient = {
       body: JSON.stringify({ config, language }),
     });
     return handleResponse(res);
+  },
+
+  // Tags
+  async getTags(): Promise<Tag[]> {
+    const res = await fetch(`${API_BASE_URL}/tags`);
+    return handleResponse<Tag[]>(res);
+  },
+
+  async getTag(id: string): Promise<Tag> {
+    const res = await fetch(`${API_BASE_URL}/tags/${id}`);
+    return handleResponse<Tag>(res);
+  },
+
+  async createTag(data: { name: string; color?: string }): Promise<Tag> {
+    const res = await fetch(`${API_BASE_URL}/tags`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return handleResponse<Tag>(res);
+  },
+
+  async updateTag(id: string, data: { name?: string; color?: string }): Promise<Tag> {
+    const res = await fetch(`${API_BASE_URL}/tags/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return handleResponse<Tag>(res);
+  },
+
+  async deleteTag(id: string): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/tags/${id}`, {
+      method: 'DELETE',
+    });
+    return handleVoidResponse(res);
   },
 };

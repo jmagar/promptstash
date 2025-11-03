@@ -167,7 +167,9 @@ model File {
   @@index([stashId, folderId])
   @@index([stashId, updatedAt(sort: Desc)])
   @@index([stashId, fileType])
+  @@index([stashId, folderId, updatedAt(sort: Desc)])
   @@index([path])
+  @@index([name])
   @@map("file")
 }
 
@@ -179,6 +181,7 @@ model Tag {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  @@index([name])
   @@map("tag")
 }
 

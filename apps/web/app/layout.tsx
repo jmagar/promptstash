@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import Header from '@/components/header';
 import { Providers } from '@/components/providers';
 import { SkipToContent } from '@/components/skip-to-content';
+import { WebVitals } from '@/components/web-vitals';
 import { siteConfig } from '@/config/site';
 import { viewportConfig } from '@/config/viewport';
 import '@workspace/ui/globals.css';
@@ -31,6 +32,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}>
         <SkipToContent />
+        <WebVitals />
         <Providers>
           <main id="main-content" className="flex h-screen w-screen flex-col">
             <Header />

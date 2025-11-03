@@ -1,22 +1,38 @@
 {
-  "name": "build-elevate",
+  "name": "promptstash",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "turbo build",
     "clean": "turbo clean",
     "dev": "turbo dev",
+    "dev:debug": "NODE_OPTIONS='--inspect' turbo dev",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
     "lint": "turbo lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check-types": "turbo check-types",
     "start": "turbo start",
-    "test": "turbo test"
+    "test": "turbo test",
+    "test:watch": "turbo test -- --watch",
+    "prepare": "husky",
+    "db:generate": "pnpm --filter @workspace/db db:generate",
+    "db:migrate": "pnpm --filter @workspace/db db:migrate",
+    "db:migrate:create": "pnpm --filter @workspace/db db:migrate:create",
+    "db:reset": "pnpm --filter @workspace/db db:reset",
+    "db:seed": "pnpm --filter @workspace/db db:seed",
+    "db:studio": "pnpm --filter @workspace/db db:studio",
+    "storybook": "pnpm --filter web storybook",
+    "build-storybook": "pnpm --filter web build-storybook"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:eslint",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
     "prettier": "catalog:prettier",
     "prettier-plugin-organize-imports": "catalog:prettier",
     "prettier-plugin-packagejson": "catalog:prettier",
@@ -26,7 +42,7 @@
   },
   "packageManager": "pnpm@10.4.1",
   "engines": {
-    "node": ">=20"
+    "node": ">=20.6.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -37,6 +53,15 @@
       "prisma",
       "sharp",
       "unrs-resolver"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
     ]
   }
 }
