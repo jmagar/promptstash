@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   PromptStashHeader,
   PromptStashToolbar,
@@ -10,8 +9,6 @@ import {
 } from '@workspace/ui';
 
 export default function DemoUIPage() {
-  const [currentPath, setCurrentPath] = useState<string>('/');
-  
   // Sample files to display
   const fileItems: FileItem[] = [
     { id: '1', name: 'agents', type: 'folder', meta: '2 files' },
@@ -38,7 +35,9 @@ export default function DemoUIPage() {
   const breadcrumbItems = [
     {
       label: 'User',
-      onClick: () => setCurrentPath('/'),
+      onClick: () => {
+        // TODO: Navigate to root
+      },
     },
     {
       label: '.claude',

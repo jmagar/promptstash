@@ -49,7 +49,9 @@ export default function StashPage() {
   const breadcrumbItems = [
     {
       label: stashes?.find(s => s.id === activeStashId)?.name || 'User',
-      onClick: () => setCurrentPath('/'),
+      onClick: () => {
+        // TODO: Navigate to root
+      },
     },
     {
       label: '.claude',
