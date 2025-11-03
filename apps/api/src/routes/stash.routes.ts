@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { prisma } from "@workspace/db";
+import { prisma, type Prisma } from "@workspace/db";
 
 const router: Router = Router();
 
@@ -44,20 +44,33 @@ router.get("/:id", async (req: Request, res: Response) => {
       where: { id },
       include: {
         files: {
+          where: {
+            folderId: null, // Root level files
+          },
           include: {
             tags: {
               include: {
-                tag: true,
+                tag: {
+                  select: {
+                    id: true,
+                    name: true,
+                    color: true,
+                  },
+                },
               },
             },
-          },
-          where: {
-            folderId: null, // Root level files
           },
         },
         folders: {
           where: {
             parentId: null, // Root level folders
+          },
+          select: {
+            id: true,
+            name: true,
+            path: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
@@ -151,27 +164,36 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
 /**
  * GET /api/stashes/:id/files
- * Get all files in a stash with optional filtering
+ * Get all files in a stash with optional filtering and pagination
  */
 router.get("/:id/files", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { search, fileType, tags, folderId } = req.query;
+    const { search, fileType, tags, folderId, page = "1", limit = "50" } = req.query;
 
-    const where: any = {
+    // Parse pagination params
+    const pageNum = Math.max(1, parseInt(page as string, 10));
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10)));
+    const skip = (pageNum - 1) * limitNum;
+
+    const where: Prisma.FileWhereInput = {
       stashId: id,
     };
 
     // Filter by folder
     if (folderId === "root") {
       where.folderId = null;
-    } else if (folderId) {
+    } else if (folderId && typeof folderId === "string") {
       where.folderId = folderId;
     }
 
     // Filter by file type
-    if (fileType) {
-      where.fileType = fileType;
+    if (fileType && typeof fileType === "string") {
+      // Validate fileType is a valid enum value
+      const validFileTypes = ["MARKDOWN", "JSON", "JSONL", "YAML"];
+      if (validFileTypes.includes(fileType.toUpperCase())) {
+        where.fileType = fileType.toUpperCase() as Prisma.FileWhereInput['fileType'];
+      }
     }
 
     // Filter by tags
@@ -196,20 +218,40 @@ router.get("/:id/files", async (req: Request, res: Response) => {
       ];
     }
 
-    const files = await prisma.file.findMany({
-      where,
-      include: {
-        tags: {
-          include: {
-            tag: true,
+    // Execute query with pagination
+    const [files, total] = await Promise.all([
+      prisma.file.findMany({
+        where,
+        include: {
+          tags: {
+            include: {
+              tag: true,
+            },
+          },
+          folder: {
+            select: {
+              id: true,
+              name: true,
+              path: true,
+            },
           },
         },
-        folder: true,
-      },
-      orderBy: { updatedAt: "desc" },
-    });
+        orderBy: { updatedAt: "desc" },
+        skip,
+        take: limitNum,
+      }),
+      prisma.file.count({ where }),
+    ]);
 
-    res.json(files);
+    res.json({
+      files,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
+    });
   } catch (error) {
     console.error("Error fetching files:", error);
     res.status(500).json({ error: "Failed to fetch files" });

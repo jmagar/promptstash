@@ -4,7 +4,6 @@ import * as React from "react";
 import { Search, Bell, Moon, Sun, HelpCircle, Settings, Layers } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "./button";
-import { Input } from "./input";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import {
   DropdownMenu,

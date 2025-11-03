@@ -12,8 +12,7 @@ import {
 import { Skeleton } from '@workspace/ui';
 
 export default function StashPage() {
-  const [selectedStashId, setSelectedStashId] = useState<string | null>(null);
-  const [currentPath, setCurrentPath] = useState<string>('/');
+  const [selectedStashId] = useState<string | null>(null);
   
   // Fetch stashes
   const { data: stashes, isLoading: stashesLoading } = useStashes();

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { parseSimpleYaml } from "./yaml-parser";
 
 /**
  * Agent YAML Frontmatter Schema
@@ -133,79 +134,4 @@ export function validateAgentFile(content: string, filename: string): {
   }
 }
 
-/**
- * Simple YAML parser for frontmatter (basic implementation)
- * In production, use a library like js-yaml
- */
-function parseSimpleYaml(yaml: string): Record<string, any> {
-  const result: Record<string, any> = {};
-  const lines = yaml.split("\n").filter((line) => line.trim());
 
-  let currentKey: string | null = null;
-  let arrayMode = false;
-  let currentArray: string[] = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    // Skip comments
-    if (trimmed.startsWith("#")) continue;
-
-    // Array item
-    if (trimmed.startsWith("- ")) {
-      if (arrayMode && currentKey) {
-        const value = trimmed.substring(2).trim().replace(/['"]/g, "");
-        currentArray.push(value);
-      }
-      continue;
-    }
-
-    // Key-value pair
-    if (trimmed.includes(":")) {
-      // Save previous array if exists
-      if (arrayMode && currentKey) {
-        result[currentKey] = currentArray;
-        arrayMode = false;
-        currentArray = [];
-      }
-
-      const [key, ...valueParts] = trimmed.split(":");
-      const value = valueParts.join(":").trim();
-
-      if (key) {
-        currentKey = key.trim();
-
-        if (value === "") {
-          // Array starts on next line
-          arrayMode = true;
-        } else {
-          // Inline value
-          result[currentKey] = parseYamlValue(value);
-        }
-      }
-    }
-  }
-
-  // Save final array if exists
-  if (arrayMode && currentKey) {
-    result[currentKey] = currentArray;
-  }
-
-  return result;
-}
-
-function parseYamlValue(value: string): any {
-  const trimmed = value.trim();
-
-  // Boolean
-  if (trimmed === "true") return true;
-  if (trimmed === "false") return false;
-
-  // Number
-  if (!isNaN(Number(trimmed)) && trimmed !== "") {
-    return Number(trimmed);
-  }
-
-  // String (remove quotes)
-  return trimmed.replace(/^["']|["']$/g, "");
-}

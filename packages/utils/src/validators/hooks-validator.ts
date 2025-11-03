@@ -199,20 +199,22 @@ export function validateHooksConfig(
     // Additional validation
     for (const [eventType, matchers] of Object.entries(result.data)) {
       // Check Python SDK compatibility
-      if (
-        language === "python" &&
-        !PYTHON_SUPPORTED_EVENTS.includes(eventType as any)
-      ) {
-        errors.push(
-          `Event type '${eventType}' is not supported in Python SDK`
+      if (language === "python") {
+        const isPythonSupported = PYTHON_SUPPORTED_EVENTS.includes(
+          eventType as (typeof PYTHON_SUPPORTED_EVENTS)[number]
         );
+        if (!isPythonSupported) {
+          errors.push(
+            `Event type '${eventType}' is not supported in Python SDK`
+          );
+        }
       }
 
       // Validate matchers
       for (const matcherConfig of matchers) {
         // Check if matcher is required for this event type
         const matcherRequired = MATCHER_REQUIRED_EVENTS.includes(
-          eventType as any
+          eventType as (typeof MATCHER_REQUIRED_EVENTS)[number]
         );
 
         if (matcherRequired && !matcherConfig.matcher) {
