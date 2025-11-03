@@ -92,7 +92,7 @@ router.post("/", async (req: Request, res: Response) => {
         folderId: folderId || null,
         tags: tags
           ? {
-              create: tags.map((tagId: string) => ({
+              create: tags.filter((tagId: unknown): tagId is string => typeof tagId === "string").map((tagId: string) => ({
                 tagId,
               })),
             }
@@ -200,7 +200,7 @@ router.put("/:id", async (req: Request, res: Response) => {
           ...(tags && {
             tags: {
               deleteMany: {},
-              create: tags.map((tagId: string) => ({
+              create: tags.filter((tagId: unknown): tagId is string => typeof tagId === "string").map((tagId: string) => ({
                 tagId,
               })),
             },

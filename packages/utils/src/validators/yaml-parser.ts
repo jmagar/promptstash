@@ -84,8 +84,8 @@ export function parseYamlValue(value: string): string | number | boolean {
   if (trimmed === "true") return true;
   if (trimmed === "false") return false;
 
-  // Number
-  if (!isNaN(Number(trimmed)) && trimmed !== "") {
+  // Number - only parse if it matches numeric pattern
+  if (trimmed !== "" && /^-?\d+(\.\d+)?$/.test(trimmed)) {
     return Number(trimmed);
   }
 

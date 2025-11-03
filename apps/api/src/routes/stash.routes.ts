@@ -189,7 +189,11 @@ router.get("/:id/files", async (req: Request, res: Response) => {
 
     // Filter by file type
     if (fileType && typeof fileType === "string") {
-      where.fileType = fileType as Prisma.FileWhereInput['fileType'];
+      // Validate fileType is a valid enum value
+      const validFileTypes = ["MARKDOWN", "JSON", "JSONL", "YAML"];
+      if (validFileTypes.includes(fileType.toUpperCase())) {
+        where.fileType = fileType.toUpperCase() as Prisma.FileWhereInput['fileType'];
+      }
     }
 
     // Filter by tags
