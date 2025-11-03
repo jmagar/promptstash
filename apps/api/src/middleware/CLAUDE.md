@@ -1,6 +1,7 @@
 # Middleware Architecture & Design
 
 ## Middleware Philosophy
+
 - Modular, composable middleware design
 - Clear separation of concerns
 - Minimal side effects
@@ -8,6 +9,7 @@
 - Environment-aware configurations
 
 ## Middleware Types
+
 1. **Authentication Middleware**
    - Validates user sessions
    - Attaches user context to request
@@ -29,10 +31,11 @@
    - Secure origin management
 
 ## Rate Limiting Design Pattern
+
 ```typescript
 const createRateLimitMiddleware = (
   limiter: Ratelimit,
-  getIdentifier?: (req: Request) => string
+  getIdentifier?: (req: Request) => string,
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -48,7 +51,7 @@ const createRateLimitMiddleware = (
       if (!success) {
         return res.status(429).json({
           error: 'Too many requests',
-          retryAfter: Math.ceil((reset - Date.now()) / 1000)
+          retryAfter: Math.ceil((reset - Date.now()) / 1000),
         });
       }
 
@@ -63,59 +66,69 @@ const createRateLimitMiddleware = (
 ```
 
 ## Authentication Strategy
+
 - JWT or session-based authentication
 - Secure token validation
 - User context enrichment
 - Role-based access control preparation
 
 ## Error Handling Principles
+
 - Standardized error response format
 - Detailed but secure error messages
 - Log errors for debugging
 - Prevent sensitive information exposure
 
 ## Middleware Composition Example
+
 ```typescript
-router.get('/protected-route',
-  requireAuth,           // Authentication
-  userRateLimit,         // User-specific rate limiting
-  globalRateLimit,       // Global rate limiting
+router.get(
+  '/protected-route',
+  requireAuth, // Authentication
+  userRateLimit, // User-specific rate limiting
+  globalRateLimit, // Global rate limiting
   (req, res) => {
     // Route handler
-  }
+  },
 );
 ```
 
 ## Performance Considerations
+
 - Minimal middleware overhead
 - Efficient identifier extraction
 - Fail-open rate limiting
 - Low-latency middleware execution
 
 ## Security Best Practices
+
 - Validate and sanitize all inputs
 - Use secure default configurations
 - Implement least-privilege access
 - Protect against common web vulnerabilities
 
 ## Debugging & Monitoring
+
 - Comprehensive logging
 - Detailed rate limit headers
 - Error tracking
 - Performance metrics
 
 ## TODO & Improvements
+
 - [ ] Implement more granular permissions
 - [ ] Add distributed rate limiting support
 - [ ] Enhanced logging and tracing
 - [ ] Implement circuit breaker pattern
 
 ## Advanced Configuration
+
 - Dynamic middleware configuration
 - Environment-specific middleware chains
 - Pluggable middleware architecture
 
 ## Gotchas & Best Practices
+
 - Always use `next()` in middleware
 - Handle potential errors gracefully
 - Be mindful of middleware order

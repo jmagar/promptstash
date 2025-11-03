@@ -4,6 +4,7 @@ import express, { type Express, json, urlencoded } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import corsOptions from './config/corsOptions';
+import { getSession } from './middleware/auth';
 import credentials from './middleware/credentials';
 import { errorHandler } from './middleware/error';
 import routes from './routes';
@@ -32,6 +33,9 @@ export const createServer = (): Express => {
 
   // CORS
   app.use(cors(corsOptions));
+
+  // Session extraction - makes req.user available to all routes
+  app.use(getSession);
 
   // Health check route
   app.get('/health', (_, res) => {

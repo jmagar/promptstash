@@ -47,3 +47,18 @@ export default async function proxy(req: NextRequest) {
 
   return NextResponse.next();
 }
+
+// Exclude Next.js internals, static files, and API routes from middleware
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - api routes
+     * - files with extensions (e.g., .png, .jpg, .css, .js)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|api|.*\\..*).*)',
+  ],
+};

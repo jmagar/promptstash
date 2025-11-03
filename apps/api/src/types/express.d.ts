@@ -1,4 +1,5 @@
 import { type Session } from '@workspace/auth';
+import type { Request } from 'express';
 
 declare global {
   namespace Express {
@@ -9,4 +10,11 @@ declare global {
   }
 }
 
-export {};
+/**
+ * Type for Request objects after requireAuth middleware
+ * This ensures TypeScript knows that user is guaranteed to exist
+ */
+export interface AuthenticatedRequest extends Request {
+  user: NonNullable<Session['user']>;
+  session: Session;
+}

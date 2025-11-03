@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -10,11 +8,11 @@ services:
       POSTGRES_PASSWORD: promptstash_dev_password
       POSTGRES_DB: promptstash
     ports:
-      - '5434:5432'
+      - "3500:5432"
     volumes:
       - promptstash_postgres_dev_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U promptstash -d promptstash']
+      test: ["CMD-SHELL", "pg_isready -U promptstash -d promptstash"]
       interval: 10s
       timeout: 5s
       retries: 5

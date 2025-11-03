@@ -5,6 +5,7 @@ Welcome to PromptStash! This guide will get you up and running in 5 minutes.
 ## What is PromptStash?
 
 PromptStash is a web application for managing your Claude Code files (agents, skills, commands, hooks, and settings) with:
+
 - ✅ Real-time validation
 - ✅ Automatic versioning
 - ✅ Beautiful UI with dark mode
@@ -16,7 +17,7 @@ PromptStash is a web application for managing your Claude Code files (agents, sk
 ## Prerequisites
 
 - Node.js 20+ installed
-- pnpm 10.4.1+ installed  
+- pnpm 10.4.1+ installed
 - Docker and Docker Compose installed
 - Git
 
@@ -60,12 +61,25 @@ pnpm dev
 ```
 
 This starts:
+
 - **Web App**: http://localhost:3000
 - **API Server**: http://localhost:4000
 
 ---
 
-## What's Working Right Now
+## 🎉 What's Working Right Now
+
+### ✅ Full End-to-End CRUD (NEW!)
+
+**You can now:**
+
+- ✅ View files from database in a beautiful grid
+- ✅ Click "New File" → Create files through modal
+- ✅ Click file card → Edit content in slide-out editor
+- ✅ Save changes → Auto-versioning works
+- ✅ Create folders through "New Folder" modal
+- ✅ Toggle dark/light theme
+- ✅ See loading states and toast notifications
 
 ### ✅ Backend API (Fully Functional)
 
@@ -80,7 +94,7 @@ curl http://localhost:4000/api/files
 curl -X POST http://localhost:4000/api/validate/agent \
   -H "Content-Type: application/json" \
   -d '{
-    "content": "---\ndescription: Test agent\n---\nContent", 
+    "content": "---\ndescription: Test agent\n---\nContent",
     "filename": "test-agent.md"
   }'
 ```
@@ -96,9 +110,11 @@ curl -X POST http://localhost:4000/api/validate/agent \
 ### ✅ UI Components
 
 Navigate to:
+
 - http://localhost:3000/stash - Main stash page (NEW!)
 
 Components built:
+
 - Header with search and theme toggle
 - Toolbar with action buttons
 - File grid with type-specific icons
@@ -160,12 +176,14 @@ pnpm clean            # Clear Turborepo cache
 ## API Endpoints
 
 ### Stashes
+
 - `GET /api/stashes` - List all stashes
 - `GET /api/stashes/:id` - Get stash with contents
 - `POST /api/stashes` - Create new stash
 - `GET /api/stashes/:id/files` - List files (with search/filter)
 
 ### Files
+
 - `GET /api/files/:id` - Get file with tags
 - `POST /api/files` - Create file (with validation)
 - `PUT /api/files/:id` - Update file (auto-versioning)
@@ -174,6 +192,7 @@ pnpm clean            # Clear Turborepo cache
 - `POST /api/files/:id/revert` - Revert to version
 
 ### Validation
+
 - `POST /api/validate/agent` - Validate agent files
 - `POST /api/validate/skill` - Validate skill files
 - `POST /api/validate/mcp` - Validate MCP config
@@ -184,16 +203,19 @@ pnpm clean            # Clear Turborepo cache
 ## Database Connection
 
 **Connection String:**
+
 ```
-postgresql://promptstash:promptstash_dev_password@localhost:5434/promptstash
+postgresql://promptstash:promptstash_dev_password@localhost:3500/promptstash
 ```
 
 **Access with psql:**
+
 ```bash
-psql postgresql://promptstash:promptstash_dev_password@localhost:5434/promptstash
+psql postgresql://promptstash:promptstash_dev_password@localhost:3500/promptstash
 ```
 
 **Prisma Studio:**
+
 ```bash
 pnpm --filter @workspace/db db:studio
 # Opens at http://localhost:5555
@@ -207,7 +229,7 @@ pnpm --filter @workspace/db db:studio
 
 ```bash
 # Check if port 5434 is in use
-lsof -i :5434
+lsof -i :3500
 
 # Stop and restart container
 docker compose -f docker-compose.dev.yml down
@@ -270,6 +292,7 @@ docker ps | grep promptstash
 ## Support
 
 **Issues?** Check:
+
 1. All services running: `docker ps` and `pnpm dev`
 2. Database seeded: `pnpm --filter @workspace/db db:seed`
 3. Environment files exist: `apps/web/.env.local`, `apps/api/.env`, `packages/db/.env`
@@ -278,15 +301,17 @@ docker ps | grep promptstash
 
 ---
 
-## What's Built (40% Complete)
+## What's Built (50% Complete - MVP Done! 🎉)
 
-✅ **Backend**: 
+✅ **Backend**:
+
 - Complete RESTful API with Express
 - PostgreSQL database with Prisma ORM
 - Comprehensive validators (Agent, Skill, MCP, Hooks)
 - Automatic file versioning
 
 ✅ **Frontend**:
+
 - Modern React 19 + Next.js 16
 - Custom UI components (Header, Toolbar, FileCard, FileGrid, Breadcrumb)
 - API client with TypeScript types
@@ -294,6 +319,7 @@ docker ps | grep promptstash
 - Dark mode support
 
 ✅ **Developer Experience**:
+
 - One-command startup (`pnpm dev`)
 - Hot reload for API and web
 - Docker-based database

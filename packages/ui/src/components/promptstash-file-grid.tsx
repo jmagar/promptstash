@@ -1,7 +1,6 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { PromptStashFileCard, FileType } from "./promptstash-file-card";
+import { FileType, PromptStashFileCard } from './promptstash-file-card';
 
 export interface FileItem {
   id: string;
@@ -17,14 +16,10 @@ export interface PromptStashFileGridProps {
   className?: string;
 }
 
-export function PromptStashFileGrid({
-  files,
-  onFileClick,
-  className,
-}: PromptStashFileGridProps) {
+export function PromptStashFileGrid({ files, onFileClick, className }: PromptStashFileGridProps) {
   return (
-    <div className={`flex-1 overflow-y-auto bg-muted/30 dark:bg-muted/30 p-5 ${className || ""}`}>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3 animate-in fade-in duration-300">
+    <div className={`bg-muted/30 dark:bg-muted/30 flex-1 overflow-y-auto p-5 ${className || ''}`}>
+      <div className="animate-in fade-in grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3 duration-300">
         {files.map((file) => (
           <PromptStashFileCard
             key={file.id}

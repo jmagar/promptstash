@@ -16,10 +16,12 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-avatar": "catalog:web",
     "@radix-ui/react-dialog": "catalog:web",
     "@radix-ui/react-dropdown-menu": "catalog:web",
     "@radix-ui/react-label": "catalog:web",
+    "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "catalog:web",
     "@radix-ui/react-slot": "catalog:web",
     "@radix-ui/react-tooltip": "catalog:web",

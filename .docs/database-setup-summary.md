@@ -16,7 +16,7 @@
    - Created `packages/db/.env` with DATABASE_URL
    - Created `apps/web/.env.local` with DATABASE_URL and other configs
    - Created `apps/api/.env` with DATABASE_URL and other configs
-   - Connection string: `postgresql://promptstash:promptstash_dev_password@localhost:5434/promptstash`
+   - Connection string: `postgresql://promptstash:promptstash_dev_password@localhost:3500/promptstash`
 
 3. **Initial Migration**
    - Created migration: `20251102074234_init_promptstash_schema`

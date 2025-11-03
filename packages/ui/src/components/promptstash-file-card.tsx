@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import * as React from "react";
 import {
-  Folder,
-  FileText,
-  UserCog,
-  Lightbulb,
-  Terminal,
   Braces,
+  FileText,
+  Folder,
+  Lightbulb,
   MessageSquare,
-} from "lucide-react";
-import { Card } from "./card";
-import { Badge } from "./badge";
+  Terminal,
+  UserCog,
+} from 'lucide-react';
+import * as React from 'react';
+import { Badge } from './badge';
+import { Card } from './card';
 
-export type FileType = "folder" | "agent" | "skill" | "command" | "json" | "session" | "markdown";
+export type FileType = 'folder' | 'agent' | 'skill' | 'command' | 'json' | 'session' | 'markdown';
 
 export interface PromptStashFileCardProps {
   name: string;
@@ -24,37 +24,34 @@ export interface PromptStashFileCardProps {
   className?: string;
 }
 
-const fileTypeConfig: Record<
-  FileType,
-  { icon: React.ReactNode; gradient: string }
-> = {
+const fileTypeConfig: Record<FileType, { icon: React.ReactNode; gradient: string }> = {
   folder: {
     icon: <Folder className="h-6 w-6" />,
-    gradient: "from-[#03A9F4] to-[#0288D1]",
+    gradient: 'from-[#03A9F4] to-[#0288D1]',
   },
   agent: {
     icon: <UserCog className="h-6 w-6" />,
-    gradient: "from-[#FF5722] to-[#E64A19]",
+    gradient: 'from-[#FF5722] to-[#E64A19]',
   },
   skill: {
     icon: <Lightbulb className="h-6 w-6" />,
-    gradient: "from-[#00BCD4] to-[#0097A7]",
+    gradient: 'from-[#00BCD4] to-[#0097A7]',
   },
   command: {
     icon: <Terminal className="h-6 w-6" />,
-    gradient: "from-[#4CAF50] to-[#388E3C]",
+    gradient: 'from-[#4CAF50] to-[#388E3C]',
   },
   json: {
     icon: <Braces className="h-6 w-6" />,
-    gradient: "from-[#FF9800] to-[#F57C00]",
+    gradient: 'from-[#FF9800] to-[#F57C00]',
   },
   session: {
     icon: <MessageSquare className="h-6 w-6" />,
-    gradient: "from-[#9C27B0] to-[#7B1FA2]",
+    gradient: 'from-[#9C27B0] to-[#7B1FA2]',
   },
   markdown: {
     icon: <FileText className="h-6 w-6" />,
-    gradient: "from-[#03A9F4] to-[#0288D1]",
+    gradient: 'from-[#03A9F4] to-[#0288D1]',
   },
 };
 
@@ -70,7 +67,7 @@ export function PromptStashFileCard({
 
   return (
     <Card
-      className={`group aspect-square cursor-pointer border bg-card dark:bg-card p-4 transition-all hover:-translate-y-0.5 hover:bg-accent dark:hover:bg-accent hover:border-muted-foreground/20 rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_2px_8px_rgba(0,0,0,0.3)] dark:border-border ${className || ""}`}
+      className={`bg-card dark:bg-card hover:bg-accent dark:hover:bg-accent hover:border-muted-foreground/20 dark:border-border group aspect-square cursor-pointer rounded-lg border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_2px_8px_rgba(0,0,0,0.3)] ${className || ''}`}
       onClick={onClick}
     >
       <div className="flex h-full flex-col items-center justify-center gap-2.5">
@@ -87,11 +84,7 @@ export function PromptStashFileCard({
         </div>
 
         {/* Meta */}
-        {meta && (
-          <div className="text-[11px] font-medium text-muted-foreground">
-            {meta}
-          </div>
-        )}
+        {meta && <div className="text-muted-foreground text-[11px] font-medium">{meta}</div>}
 
         {/* Tags */}
         {tags.length > 0 && (

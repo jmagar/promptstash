@@ -3,7 +3,7 @@ import { createServer } from './server';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3300;
 
 // Create Express app
 const server = createServer();

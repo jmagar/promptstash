@@ -43,7 +43,10 @@ export interface File {
   name: string;
   path: string;
   content: string;
+  description?: string | null;
   fileType: 'MARKDOWN' | 'JSON' | 'JSONL' | 'YAML';
+  version?: number;
+  metadata?: Record<string, unknown>;
   folderId: string | null;
   stashId: string;
   createdAt: string;
@@ -128,9 +131,11 @@ export const apiClient = {
 
   async createFile(data: {
     name: string;
-    path: string;
+    path?: string;
     content: string;
+    description?: string;
     fileType: string;
+    metadata?: Record<string, unknown>;
     stashId: string;
     folderId?: string;
     tags?: string[];
@@ -138,6 +143,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/files`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     return handleResponse<File>(res);
@@ -188,7 +194,8 @@ export const apiClient = {
 
   async createFolder(data: {
     name: string;
-    path: string;
+    path?: string;
+    description?: string;
     stashId: string;
     parentId?: string;
   }): Promise<Folder> {
