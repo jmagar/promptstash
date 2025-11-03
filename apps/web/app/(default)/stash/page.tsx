@@ -169,7 +169,7 @@ export default function StashPage() {
 
           {/* File Grid */}
           {filesLoading ? (
-            <div className="flex-1 bg-muted/30 light:bg-[hsl(35_20%_95%)] p-5">
+            <div className="flex-1 bg-muted/30 dark:bg-muted/30 p-5">
               <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
                 {[...Array(12)].map((_, i) => (
                   <Skeleton key={i} className="aspect-square" />

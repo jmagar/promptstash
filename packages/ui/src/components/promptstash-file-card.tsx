@@ -70,7 +70,7 @@ export function PromptStashFileCard({
 
   return (
     <Card
-      className={`group aspect-square cursor-pointer border bg-card dark:bg-card light:bg-[hsl(30_25%_98%)] p-4 transition-all hover:-translate-y-0.5 hover:bg-accent light:hover:bg-[hsl(35_15%_92%)] hover:border-muted-foreground/20 rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_2px_8px_rgba(0,0,0,0.3)] light:border-border/40 ${className || ""}`}
+      className={`group aspect-square cursor-pointer border bg-card dark:bg-card p-4 transition-all hover:-translate-y-0.5 hover:bg-accent dark:hover:bg-accent hover:border-muted-foreground/20 rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_2px_8px_rgba(0,0,0,0.3)] dark:border-border ${className || ""}`}
       onClick={onClick}
     >
       <div className="flex h-full flex-col items-center justify-center gap-2.5">
