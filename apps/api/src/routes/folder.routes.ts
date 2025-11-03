@@ -14,17 +14,37 @@ router.get("/:id", async (req: Request, res: Response) => {
     const folder = await prisma.folder.findUnique({
       where: { id },
       include: {
-        children: true,
+        children: {
+          select: {
+            id: true,
+            name: true,
+            path: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
         files: {
           include: {
             tags: {
               include: {
-                tag: true,
+                tag: {
+                  select: {
+                    id: true,
+                    name: true,
+                    color: true,
+                  },
+                },
               },
             },
           },
         },
-        parent: true,
+        parent: {
+          select: {
+            id: true,
+            name: true,
+            path: true,
+          },
+        },
       },
     });
 

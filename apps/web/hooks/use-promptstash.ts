@@ -95,7 +95,10 @@ export function useDeleteFile() {
   
   return useMutation({
     mutationFn: apiClient.deleteFile,
-    onSuccess: () => {
+    onSuccess: (_, deletedFileId) => {
+      // Invalidate specific file query
+      queryClient.invalidateQueries({ queryKey: queryKeys.file(deletedFileId) });
+      // Invalidate all files queries (to update lists)
       queryClient.invalidateQueries({ queryKey: ['files'] });
     },
   });
@@ -161,7 +164,10 @@ export function useDeleteFolder() {
   
   return useMutation({
     mutationFn: apiClient.deleteFolder,
-    onSuccess: () => {
+    onSuccess: (_, deletedFolderId) => {
+      // Invalidate specific folder query
+      queryClient.invalidateQueries({ queryKey: queryKeys.folder(deletedFolderId) });
+      // Invalidate all files queries (folder deletion affects file lists)
       queryClient.invalidateQueries({ queryKey: ['files'] });
     },
   });

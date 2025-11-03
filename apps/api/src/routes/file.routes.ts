@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { prisma } from "@workspace/db";
+import { prisma, type Prisma } from "@workspace/db";
 import {
   validateAgentFile,
   validateSkillFile,
@@ -131,13 +131,26 @@ router.put("/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, content, tags } = req.body;
 
+    // Validate id parameter
+    if (!id) {
+      return res.status(400).json({ error: "File ID is required" });
+    }
+
     // Get existing file
     const existingFile = await prisma.file.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        content: true,
+        path: true,
+        fileType: true,
         versions: {
           orderBy: { version: "desc" },
           take: 1,
+          select: {
+            version: true,
+          },
         },
       },
     });
@@ -167,44 +180,51 @@ router.put("/:id", async (req: Request, res: Response) => {
       }
     }
 
-    // Update file
-    const updatedFile = await prisma.file.update({
-      where: { id },
-      data: {
-        ...(name && { name }),
-        ...(content && { content }),
-        ...(tags && {
-          tags: {
-            deleteMany: {},
-            create: tags.map((tagId: string) => ({
-              tagId,
-            })),
-          },
-        }),
-      },
-      include: {
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
-      },
-    });
+    const fileId = id; // Store in const to ensure type safety
 
-    // Create new version if content changed
-    if (content && content !== existingFile.content && id) {
-      const latestVersion = existingFile.versions[0];
-      await prisma.fileVersion.create({
+    // Use transaction to update file and create version atomically
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      // Update file
+      const updatedFile = await tx.file.update({
+        where: { id: fileId },
         data: {
-          fileId: id,
-          content,
-          version: (latestVersion?.version || 0) + 1,
-          createdBy: "user", // TODO: Get from auth context
+          ...(name && { name }),
+          ...(content && { content }),
+          ...(tags && {
+            tags: {
+              deleteMany: {},
+              create: tags.map((tagId: string) => ({
+                tagId,
+              })),
+            },
+          }),
+        },
+        include: {
+          tags: {
+            include: {
+              tag: true,
+            },
+          },
         },
       });
-    }
 
-    res.json(updatedFile);
+      // Create new version if content changed
+      if (content && content !== existingFile.content) {
+        const latestVersion = existingFile.versions[0];
+        await tx.fileVersion.create({
+          data: {
+            fileId,
+            content,
+            version: (latestVersion?.version || 0) + 1,
+            createdBy: "user", // TODO: Get from auth context
+          },
+        });
+      }
+
+      return updatedFile;
+    });
+
+    res.json(result);
   } catch (error) {
     console.error("Error updating file:", error);
     res.status(500).json({ error: "Failed to update file" });
