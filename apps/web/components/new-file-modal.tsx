@@ -37,7 +37,24 @@ import { Spinner } from '@workspace/ui/components/spinner';
 import { useCreateFile } from '@/hooks/use-promptstash';
 import { FilePlus } from 'lucide-react';
 
-const fileTypes = [
+// Define file types as a constant array for single source of truth
+const FILE_TYPES = [
+  'AGENT',
+  'SKILL',
+  'COMMAND',
+  'MCP',
+  'HOOKS',
+  'MARKDOWN',
+  'JSON',
+  'JSONL',
+  'SESSION',
+] as const;
+
+// Type derived from the constant array
+type FileType = typeof FILE_TYPES[number];
+
+// UI display options for file types
+const fileTypes: Array<{ value: FileType; label: string }> = [
   { value: 'AGENT', label: 'Agent (.claude/agents/*.md)' },
   { value: 'SKILL', label: 'Skill (.claude/skills/*/SKILL.md)' },
   { value: 'COMMAND', label: 'Command (.claude/commands/*.sh)' },
@@ -46,21 +63,11 @@ const fileTypes = [
   { value: 'MARKDOWN', label: 'Markdown Document' },
   { value: 'JSON', label: 'JSON File' },
   { value: 'SESSION', label: 'Session Log (.jsonl)' },
-] as const;
+];
 
 const formSchema = z.object({
   name: z.string().min(1, 'File name is required').max(255),
-  fileType: z.enum([
-    'AGENT',
-    'SKILL',
-    'COMMAND',
-    'MCP',
-    'HOOKS',
-    'MARKDOWN',
-    'JSON',
-    'JSONL',
-    'SESSION',
-  ]),
+  fileType: z.enum(FILE_TYPES),
   description: z.string().optional(),
   content: z.string().optional(),
 });

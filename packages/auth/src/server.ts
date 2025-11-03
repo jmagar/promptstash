@@ -15,6 +15,27 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { twoFactor } from 'better-auth/plugins';
 import { prisma } from '../../db/src/client';
 
+/**
+ * Validates Google OAuth configuration
+ * @returns true if Google OAuth is properly configured with valid credentials
+ */
+function isValidGoogleOAuthConfig(): boolean {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  
+  if (!clientId || !clientSecret) {
+    return false;
+  }
+  
+  // Check if values are not placeholder strings
+  const isValidClientId = clientId.trim().length > 0 && 
+    clientId !== 'your-google-client-id.apps.googleusercontent.com';
+  const isValidSecret = clientSecret.trim().length > 0 && 
+    clientSecret !== 'your-google-client-secret';
+  
+  return isValidClientId && isValidSecret;
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
@@ -116,18 +137,14 @@ export const auth = betterAuth({
       enabled: true,
     },
   },
-  socialProviders: 
-    process.env.GOOGLE_CLIENT_ID && 
-    process.env.GOOGLE_CLIENT_ID !== 'your-google-client-id.apps.googleusercontent.com' &&
-    process.env.GOOGLE_CLIENT_SECRET && 
-    process.env.GOOGLE_CLIENT_SECRET !== 'your-google-client-secret'
-      ? {
-          google: {
-            clientId: process.env.GOOGLE_CLIENT_ID as string,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-          },
-        }
-      : {},
+  socialProviders: isValidGoogleOAuthConfig()
+    ? {
+        google: {
+          clientId: process.env.GOOGLE_CLIENT_ID as string,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+        },
+      }
+    : {},
   plugins: [
     twoFactor({
       issuer: 'BuildElevate',

@@ -29,7 +29,11 @@ router.get("/", async (req: Request, res: Response) => {
       orderBy: { createdAt: "desc" },
     });
 
-    // Auto-create default stash for new users
+    // Auto-create default stash for users who don't have one yet
+    // NOTE: This check happens on every GET request, which is inefficient.
+    // Ideally, this should be handled during user registration/onboarding,
+    // but requires deeper integration with Better Auth lifecycle hooks.
+    // For now, this ensures every user has at least one stash to work with.
     if (stashes.length === 0) {
       const defaultStash = await prisma.stash.create({
         data: {

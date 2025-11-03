@@ -9,6 +9,16 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@workspace/ui/components/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@workspace/ui/components/alert-dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { Badge } from '@workspace/ui/components/badge';
@@ -25,6 +35,7 @@ interface FileEditorProps {
 export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
   const [content, setContent] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
 
   const { data: file, isLoading } = useFile(fileId || '');
   const updateFile = useUpdateFile();
@@ -63,21 +74,28 @@ export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
     }
   }
 
-  // Warn before closing with unsaved changes
-  const handleClose = () => {
-    if (hasChanges) {
-      const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to close?'
-      );
-      if (!confirmed) return;
+  // Handle close request
+  const handleCloseRequest = (shouldOpen: boolean) => {
+    if (!shouldOpen && hasChanges) {
+      // Show confirmation dialog if there are unsaved changes
+      setShowCloseConfirm(true);
+    } else {
+      // Close directly if no unsaved changes
+      onOpenChange(shouldOpen);
     }
+  };
+
+  // Confirm close with unsaved changes
+  const handleConfirmClose = () => {
+    setShowCloseConfirm(false);
     onOpenChange(false);
   };
 
   if (!fileId) return null;
 
   return (
-    <Sheet open={open} onOpenChange={handleClose}>
+    <>
+      <Sheet open={open} onOpenChange={handleCloseRequest}>
       <SheetContent side="right" className="w-full sm:w-[55%] sm:max-w-none">
         <SheetHeader>
           <div className="flex items-center justify-between">
@@ -109,7 +127,7 @@ export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
                 </SheetDescription>
               )}
             </div>
-            <Button variant="ghost" size="icon" onClick={handleClose}>
+            <Button variant="ghost" size="icon" onClick={() => handleCloseRequest(false)}>
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -154,7 +172,7 @@ export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
                 </>
               )}
             </Button>
-            <Button variant="outline" onClick={handleClose}>
+            <Button variant="outline" onClick={() => handleCloseRequest(false)}>
               Close
             </Button>
           </div>
@@ -171,5 +189,24 @@ export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
         </div>
       </SheetContent>
     </Sheet>
+
+    {/* Confirmation Dialog for Unsaved Changes */}
+    <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+          <AlertDialogDescription>
+            You have unsaved changes. Are you sure you want to close without saving?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirmClose}>
+            Close Without Saving
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
