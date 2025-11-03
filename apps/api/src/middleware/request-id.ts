@@ -17,10 +17,10 @@ declare global {
  * The request ID can be used for tracing requests across services and logs
  */
 export const requestIdMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  // Check if request already has an ID (forwarded from another service)
-  const existingId = req.headers['x-request-id'] as string;
+  // Get existing ID from header (normalize if multiple headers sent)
+  const existingId = req.get('x-request-id')?.trim();
 
-  // Generate a new UUID if no existing ID
+  // Generate a new UUID if no existing ID or if empty
   const requestId = existingId || randomUUID();
 
   // Attach to request object

@@ -76,6 +76,9 @@ export interface Tag {
   id: string;
   name: string;
   color: string | null;
+  _count?: {
+    files: number;
+  };
 }
 
 export interface Folder {

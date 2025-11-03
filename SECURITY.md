@@ -428,7 +428,7 @@ Before deploying to production:
 
 ## Reporting Security Issues
 
-If you discover a security vulnerability, please email security@yourdomain.com. Do not create public GitHub issues for security vulnerabilities.
+If you discover a security vulnerability, please report it via [GitHub Security Advisories](https://github.com/jmagar/promptstash/security/advisories/new). Do not create public GitHub issues for security vulnerabilities.
 
 ### Response Time
 

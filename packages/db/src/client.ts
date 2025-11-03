@@ -1,3 +1,4 @@
+import { logger } from '@workspace/observability/logger';
 import { PrismaClient } from '../generated/prisma';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -41,21 +42,9 @@ if (enableQueryLogging || logLevel === 'debug') {
       };
 
       if (isSlow) {
-        console.warn(
-          JSON.stringify({
-            ...logData,
-            level: 'warn',
-            message: `Slow query detected (${e.duration}ms)`,
-          }),
-        );
+        logger.warn(logData, `Slow query detected (${e.duration}ms)`);
       } else {
-        console.debug(
-          JSON.stringify({
-            ...logData,
-            level: 'debug',
-            message: `Query executed (${e.duration}ms)`,
-          }),
-        );
+        logger.debug(logData, `Query executed (${e.duration}ms)`);
       }
     }
   });

@@ -6,7 +6,6 @@ import type { NextFunction, Request, Response } from 'express';
  * Uses double-submit cookie pattern for CSRF protection
  */
 const {
-  invalidCsrfTokenError, // The error type that is thrown when CSRF validation fails
   generateToken, // Used to generate a CSRF token
   doubleCsrfProtection, // The CSRF protection middleware
 } = doubleCsrf({

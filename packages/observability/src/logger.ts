@@ -11,6 +11,12 @@ export interface LoggerConfig {
 /**
  * Creates a structured logger instance using Pino
  * @param config - Logger configuration options
+ * @param config.level - Log level (default: 'info')
+ * @param config.service - Service name for context (default: 'unknown')
+ * @param config.pretty - Enable pretty printing with colorized output and human-readable formatting.
+ *                        When true, uses pino-pretty for development-friendly logs.
+ *                        When false, outputs JSON for production parsing.
+ *                        (default: true for non-production, false for production)
  * @returns Configured Pino logger instance
  */
 export function createLogger(config: LoggerConfig = {}): Logger {

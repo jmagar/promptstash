@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
+
+// Load environment variables FIRST
+dotenv.config();
+
 import { env } from './config/env';
 import { createServer } from './server';
-
-// Load environment variables
-dotenv.config();
 
 // Validate environment variables on startup
 // This will throw an error and prevent server start if validation fails

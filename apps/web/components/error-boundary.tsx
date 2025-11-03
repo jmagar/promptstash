@@ -3,18 +3,18 @@
 import { Button } from '@workspace/ui/components/button';
 import { AlertCircle, Bug, Home, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Component, ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 interface State {
   hasError: boolean;
   error?: Error;
-  errorInfo?: React.ErrorInfo;
+  errorInfo?: ErrorInfo;
   errorCount: number;
 }
 
@@ -22,7 +22,7 @@ interface State {
  * Error logging function
  * In production, this should send errors to a logging service like Sentry, LogRocket, etc.
  */
-function logError(error: Error, errorInfo: React.ErrorInfo, errorCount: number) {
+function logError(error: Error, errorInfo: ErrorInfo, errorCount: number) {
   const errorData = {
     message: error.message,
     stack: error.stack,
@@ -68,7 +68,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const newErrorCount = this.state.errorCount + 1;
 
     this.setState({

@@ -11,6 +11,10 @@ jest.mock('@/config/site', () => ({
   config: { name: 'PromptStash' },
 }));
 
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
 describe('Logo', () => {
   describe('Sidebar variant', () => {
     it('should render logo with text when sidebar is expanded', () => {

@@ -403,4 +403,4 @@ Set `ENABLE_QUERY_LOGGING=true` or `LOG_LEVEL=debug` and ensure `SLOW_QUERY_THRE
 
 ## License
 
-Private - Part of the build-elevate monorepo.
+Private - Part of the promptstash monorepo.

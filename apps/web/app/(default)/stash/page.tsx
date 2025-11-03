@@ -1,9 +1,11 @@
 'use client';
 
-import { FileEditor } from '@/components/file-editor';
-import { NewFileModal } from '@/components/new-file-modal';
-import { NewFolderModal } from '@/components/new-folder-modal';
-import { SearchModal } from '@/components/search-modal';
+import {
+  FileEditor,
+  NewFileModal,
+  NewFolderModal,
+  SearchModal,
+} from '@/components/lazy-components';
 import { useFiles, useStashes } from '@/hooks/use-promptstash';
 import {
   PromptStashBreadcrumb,
@@ -35,6 +37,7 @@ export default function StashPage() {
   const {
     data: filesData,
     isLoading: filesLoading,
+    error: filesError,
     refetch: refetchFiles,
   } = useFiles(activeStashId || '', {
     folderId: 'root',
@@ -139,6 +142,22 @@ export default function StashPage() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (filesError) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-destructive mb-4">Failed to load files</p>
+          <button
+            onClick={() => refetchFiles()}
+            className="bg-primary text-primary-foreground rounded px-4 py-2"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );

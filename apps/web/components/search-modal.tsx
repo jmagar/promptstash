@@ -68,6 +68,14 @@ export function SearchModal({ open, onOpenChange, onFileSelect }: SearchModalPro
     }
   }, [open]);
 
+  const handleSelect = useCallback(
+    (file: File) => {
+      onFileSelect(file.id);
+      onOpenChange(false);
+    },
+    [onFileSelect, onOpenChange],
+  );
+
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -108,14 +116,6 @@ export function SearchModal({ open, onOpenChange, onFileSelect }: SearchModalPro
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [open, onOpenChange]);
 
-  const handleSelect = useCallback(
-    (file: File) => {
-      onFileSelect(file.id);
-      onOpenChange(false);
-    },
-    [onFileSelect, onOpenChange],
-  );
-
   const getFileIcon = (file: File) => {
     if (file.path.includes('/agents/')) return '🤖';
     if (file.path.includes('/skills/')) return '⚡';
@@ -128,12 +128,15 @@ export function SearchModal({ open, onOpenChange, onFileSelect }: SearchModalPro
   const highlightMatch = (text: string, query: string) => {
     if (!query.trim()) return text;
 
-    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const parts = text.split(new RegExp(`(${escapedQuery})`, 'gi'));
     return parts.map((part, i) => (
       <span
         key={i}
         className={
-          part.toLowerCase() === query.toLowerCase() ? 'bg-yellow-200 dark:bg-yellow-800' : ''
+          part.toLowerCase() === escapedQuery.toLowerCase()
+            ? 'bg-yellow-200 dark:bg-yellow-800'
+            : ''
         }
       >
         {part}
@@ -185,6 +188,7 @@ export function SearchModal({ open, onOpenChange, onFileSelect }: SearchModalPro
                 {searchResults.map((file, index) => (
                   <button
                     key={file.id}
+                    type="button"
                     onClick={() => handleSelect(file)}
                     className={`hover:bg-accent flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors ${
                       index === selectedIndex ? 'bg-accent' : ''

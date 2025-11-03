@@ -213,6 +213,7 @@ export function TagManager({ open, onOpenChange, onSelectTag }: TagManagerProps)
                   {PRESET_COLORS.map((color) => (
                     <button
                       key={color}
+                      type="button"
                       onClick={() => setNewTagColor(color)}
                       className={`h-8 w-8 rounded-md transition-all ${
                         newTagColor === color
@@ -319,6 +320,7 @@ export function TagManager({ open, onOpenChange, onSelectTag }: TagManagerProps)
                               {PRESET_COLORS.map((color) => (
                                 <button
                                   key={color}
+                                  type="button"
                                   onClick={() => setEditTagColor(color)}
                                   className={`h-6 w-6 rounded transition-all ${
                                     editTagColor === color
@@ -365,8 +367,7 @@ export function TagManager({ open, onOpenChange, onSelectTag }: TagManagerProps)
                               {tag.name}
                             </Badge>
                             <span className="text-muted-foreground text-xs">
-                              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                              {(tag as any)._count?.files || 0} files
+                              {tag._count?.files || 0} files
                             </span>
                           </div>
 
