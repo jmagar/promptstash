@@ -29,7 +29,7 @@ export interface File {
   description?: string | null;
   fileType: 'MARKDOWN' | 'JSON' | 'JSONL' | 'YAML';
   version?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   folderId: string | null;
   stashId: string;
   createdAt: string;
@@ -129,7 +129,7 @@ export const apiClient = {
     content: string;
     description?: string;
     fileType: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     stashId: string;
     folderId?: string;
     tags?: string[];

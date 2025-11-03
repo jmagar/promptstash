@@ -10,7 +10,7 @@ import {
 } from '@workspace/ui';
 
 export default function DemoUIPage() {
-  const [currentPath, setCurrentPath] = useState<string>('/');
+  const [, setCurrentPath] = useState<string>('/');
   
   // Sample files to display
   const fileItems: FileItem[] = [

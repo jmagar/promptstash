@@ -52,7 +52,6 @@ export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
         id: file.id,
         data: {
           content,
-          metadata: file.metadata || {},
         },
       });
 

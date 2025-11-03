@@ -40,8 +40,30 @@ interface UseRequiredAuthUserLoadingReturn {
  * @returns Authentication state and user data
  */
 export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
+  const session = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const shouldRedirect = options?.redirectOnUnauthenticated ?? false;
+  const redirectTo = options?.redirectTo ?? '/';
+
   // AUTH BYPASS for development - remove in production!
-  if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
+  const isBypassEnabled = process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true';
+  
+  // Only redirect if explicitly enabled and not on auth pages (skip if bypass is enabled)
+  useEffect(() => {
+    if (isBypassEnabled) return;
+    
+    if (shouldRedirect && !session.isPending && !session.data?.user) {
+      // Don't redirect if already on auth pages
+      if (!pathname.startsWith('/sign-in') && !pathname.startsWith('/sign-up')) {
+        router.push(redirectTo);
+      }
+    }
+  }, [isBypassEnabled, shouldRedirect, session.isPending, session.data?.user, router, pathname, redirectTo]);
+
+  // Return mock user if bypass is enabled
+  if (isBypassEnabled) {
     const mockUser: AuthUser = {
       id: 'dev-user-123',
       name: 'Dev User',
@@ -50,6 +72,7 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
       image: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      twoFactorEnabled: false,
     };
     
     return {
@@ -60,23 +83,6 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
       refetch: async () => ({ data: null }),
     };
   }
-  
-  const session = useSession();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const shouldRedirect = options?.redirectOnUnauthenticated ?? false;
-  const redirectTo = options?.redirectTo ?? '/';
-
-  // Only redirect if explicitly enabled and not on auth pages
-  useEffect(() => {
-    if (shouldRedirect && !session.isPending && !session.data?.user) {
-      // Don't redirect if already on auth pages
-      if (!pathname.startsWith('/sign-in') && !pathname.startsWith('/sign-up')) {
-        router.push(redirectTo);
-      }
-    }
-  }, [shouldRedirect, session.isPending, session.data?.user, router, pathname, redirectTo]);
 
   return {
     user: session.data?.user || null,
@@ -98,8 +104,14 @@ export function useRequiredAuthUser():
   | UseRequiredAuthUserReturn
   | UseRequiredAuthUserLoadingReturn {
   
+  const { user, isLoading, isAuthenticated, error, refetch } = useAuthUser({
+    redirectOnUnauthenticated: true,
+  });
+
   // AUTH BYPASS for development - remove in production!
-  if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
+  const isBypassEnabled = process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true';
+  
+  if (isBypassEnabled) {
     const mockUser: AuthUser = {
       id: 'dev-user-123',
       name: 'Dev User',
@@ -108,6 +120,7 @@ export function useRequiredAuthUser():
       image: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      twoFactorEnabled: false,
     };
     
     return {
@@ -117,10 +130,6 @@ export function useRequiredAuthUser():
       refetch: async () => ({ data: null }),
     };
   }
-  
-  const { user, isLoading, isAuthenticated, error, refetch } = useAuthUser({
-    redirectOnUnauthenticated: true,
-  });
 
   if (isLoading) {
     return {

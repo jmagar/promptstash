@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Home, ChevronRight, Folder } from "lucide-react";
+import { Home, ChevronRight } from "lucide-react";
 
 export interface BreadcrumbItem {
   label: string;
