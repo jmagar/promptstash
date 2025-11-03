@@ -1,9 +1,10 @@
-import { Home, FolderKanban, User, Settings } from 'lucide-react';
+import { FolderKanban, Home, Settings, User } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const siteConfig: Metadata = {
   title: 'PromptStash',
-  description: 'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
+  description:
+    'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
   icons: {
     icon: [{ url: '/favicon.ico' }],
     apple: '/apple-touch-icon.png',
@@ -26,7 +27,8 @@ export const siteConfig: Metadata = {
   ],
   openGraph: {
     title: 'PromptStash',
-    description: 'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
+    description:
+      'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
     url: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://promptstash.dev',
     siteName: 'PromptStash',
     images: [
@@ -43,7 +45,8 @@ export const siteConfig: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'PromptStash',
-    description: 'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
+    description:
+      'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
     images: ['/og-image.png'],
   },
 };

@@ -23,7 +23,7 @@
    - All 13 tables created successfully:
      - Authentication: user, session, account, verification, twoFactor
      - PromptStash: stash, folder, file, tag, file_tag, file_version, file_share
-     - System: _prisma_migrations
+     - System: \_prisma_migrations
 
 4. **Database Seeding**
    - Created `packages/db/prisma/seed.ts`
@@ -44,6 +44,7 @@
 ### 🎯 Database Schema Overview
 
 **Authentication Models**
+
 - User: Email, password, OAuth, 2FA support
 - Session: Token-based sessions with expiration
 - Account: OAuth provider integration (Google)
@@ -51,6 +52,7 @@
 - Verification: Email verification and password reset
 
 **PromptStash Models**
+
 - Stash: Top-level containers (USER, PROJECT, PLUGIN, MARKETPLACE scopes)
 - Folder: Hierarchical folder structure with path tracking
 - File: Context files (MARKDOWN, JSON, JSONL, YAML types)
@@ -84,7 +86,7 @@ docker compose -f docker-compose.dev.yml down
 -- User table
 demo-user-id | Demo User | demo@promptstash.dev
 
--- Stash table  
+-- Stash table
 demo-stash-id | My PromptStash | USER
 
 -- File table
@@ -97,6 +99,7 @@ Button.md | /components/Button.md | MARKDOWN
 ### 🔧 Configuration Details
 
 **Database Connection**
+
 - Host: localhost
 - Port: 5434 (chosen to avoid conflicts with ports 5432, 5433 already in use)
 - Database: promptstash
@@ -104,12 +107,14 @@ Button.md | /components/Button.md | MARKDOWN
 - Password: promptstash_dev_password
 
 **Container Health Check**
+
 - Command: `pg_isready -U promptstash -d promptstash`
 - Interval: 10s
 - Timeout: 5s
 - Retries: 5
 
 **Environment Files Created**
+
 - `packages/db/.env` - Prisma CLI
 - `apps/web/.env.local` - Next.js app with full config
 - `apps/api/.env` - Express API with full config
@@ -117,6 +122,7 @@ Button.md | /components/Button.md | MARKDOWN
 ### 📝 Next Steps for Developers
 
 1. **First Time Setup**
+
    ```bash
    docker compose -f docker-compose.dev.yml up -d
    pnpm --filter @workspace/db db:seed
@@ -129,6 +135,7 @@ Button.md | /components/Button.md | MARKDOWN
    - Get Upstash Redis credentials for rate limiting
 
 3. **Start Development**
+
    ```bash
    pnpm dev  # Starts web, api, and email preview
    ```
@@ -149,15 +156,18 @@ Button.md | /components/Button.md | MARKDOWN
 ### 🐛 Troubleshooting
 
 **If port 5434 is taken:**
+
 - Edit `docker-compose.dev.yml` and change port mapping
 - Update DATABASE_URL in all three .env files
 
 **If connection fails:**
+
 - Check container: `docker ps | grep promptstash-postgres`
 - Check logs: `docker compose -f docker-compose.dev.yml logs postgres`
 - Verify health: `docker inspect promptstash-postgres-dev | grep Health`
 
 **If migration conflicts:**
+
 ```bash
 cd packages/db
 pnpm db:reset  # ⚠️ Deletes all data
@@ -167,6 +177,7 @@ pnpm db:seed   # Restore demo data
 ### 📚 Additional Resources
 
 See `DATABASE_SETUP.md` in the project root for:
+
 - Detailed schema documentation
 - All available commands
 - Production deployment guide

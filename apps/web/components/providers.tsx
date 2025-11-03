@@ -1,6 +1,7 @@
 'use client';
 
 import { AppSidebar } from '@/components/app-sidebar';
+import { ErrorBoundary } from '@/components/error-boundary';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SidebarProvider } from '@workspace/ui/components/sidebar';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';
@@ -20,22 +21,24 @@ const queryClient = new QueryClient({
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-      enableColorScheme
-    >
-      <QueryClientProvider client={queryClient}>
-        <SidebarProvider>
-          <TooltipProvider>
-            <AppSidebar />
-            <Toaster richColors />
-            {children}
-          </TooltipProvider>
-        </SidebarProvider>
-      </QueryClientProvider>
-    </NextThemesProvider>
+    <ErrorBoundary>
+      <NextThemesProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+        enableColorScheme
+      >
+        <QueryClientProvider client={queryClient}>
+          <SidebarProvider>
+            <TooltipProvider>
+              <AppSidebar />
+              <Toaster richColors />
+              {children}
+            </TooltipProvider>
+          </SidebarProvider>
+        </QueryClientProvider>
+      </NextThemesProvider>
+    </ErrorBoundary>
   );
 }

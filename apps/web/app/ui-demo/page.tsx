@@ -1,10 +1,10 @@
 'use client';
 
 import {
-  PromptStashHeader,
-  PromptStashToolbar,
   PromptStashBreadcrumb,
   PromptStashFileGrid,
+  PromptStashHeader,
+  PromptStashToolbar,
   type FileItem,
 } from '@workspace/ui';
 
@@ -78,9 +78,9 @@ export default function DemoUIPage() {
       {/* Main Container */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-60 border-r bg-background flex flex-col overflow-hidden">
-          <div className="p-3 border-b">
-            <div className="h-9 px-3 flex items-center justify-between rounded-md border bg-secondary text-[13px] font-semibold cursor-pointer hover:bg-accent hover:border-muted-foreground/20 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+        <aside className="bg-background flex w-60 flex-col overflow-hidden border-r">
+          <div className="border-b p-3">
+            <div className="bg-secondary hover:bg-accent hover:border-muted-foreground/20 flex h-9 cursor-pointer items-center justify-between rounded-md border px-3 text-[13px] font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all">
               <span className="flex items-center gap-2">
                 <span>👤</span>
                 <span>User</span>
@@ -90,24 +90,33 @@ export default function DemoUIPage() {
           </div>
           <div className="flex-1 overflow-y-auto p-1.5">
             <div className="space-y-0.5">
-              {['agents', 'commands', 'docs', 'hooks', 'plugins', 'prompts', 'sessions', 'skills'].map((folder) => (
+              {[
+                'agents',
+                'commands',
+                'docs',
+                'hooks',
+                'plugins',
+                'prompts',
+                'sessions',
+                'skills',
+              ].map((folder) => (
                 <div
                   key={folder}
-                  className="px-2.5 py-1.5 rounded-[5px] text-[13px] font-medium hover:bg-accent cursor-pointer transition-all flex items-center gap-2"
+                  className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all"
                 >
                   <span className="text-[#03A9F4]">📁</span>
                   <span>{folder}</span>
                 </div>
               ))}
-              <div className="px-2.5 py-1.5 rounded-[5px] text-[13px] font-medium hover:bg-accent cursor-pointer transition-all flex items-center gap-2">
+              <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all">
                 <span>📄</span>
                 <span>CLAUDE.md</span>
               </div>
-              <div className="px-2.5 py-1.5 rounded-[5px] text-[13px] font-medium hover:bg-accent cursor-pointer transition-all flex items-center gap-2">
+              <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all">
                 <span>📄</span>
                 <span>AGENTS.md</span>
               </div>
-              <div className="px-2.5 py-1.5 rounded-[5px] text-[13px] font-medium hover:bg-accent cursor-pointer transition-all flex items-center gap-2">
+              <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all">
                 <span>⚙️</span>
                 <span>.mcp.json</span>
               </div>
@@ -116,21 +125,15 @@ export default function DemoUIPage() {
         </aside>
 
         {/* Content Area */}
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex flex-1 flex-col overflow-hidden">
           {/* Toolbar */}
-          <PromptStashToolbar
-            onNewFile={handleNewFile}
-            onNewFolder={handleNewFolder}
-          />
+          <PromptStashToolbar onNewFile={handleNewFile} onNewFolder={handleNewFolder} />
 
           {/* Breadcrumb */}
           <PromptStashBreadcrumb items={breadcrumbItems} />
 
           {/* File Grid */}
-          <PromptStashFileGrid
-            files={fileItems}
-            onFileClick={handleFileClick}
-          />
+          <PromptStashFileGrid files={fileItems} onFileClick={handleFileClick} />
         </main>
       </div>
     </div>

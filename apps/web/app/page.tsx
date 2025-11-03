@@ -14,7 +14,8 @@ export default function Page() {
           Fullstack • Monorepo • TypeScript • Next.js • shadcn/ui
         </span>
         <p className="text-muted-foreground max-w-md">
-          Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings in a centralized web app with validation and documentation integration.
+          Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and
+          settings in a centralized web app with validation and documentation integration.
         </p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <Button asChild size="sm">
