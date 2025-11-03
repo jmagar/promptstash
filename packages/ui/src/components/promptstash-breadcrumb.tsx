@@ -26,17 +26,13 @@ export function PromptStashBreadcrumb({
           <button
             onClick={item.onClick}
             disabled={item.active}
-            className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors ${
               item.active
                 ? "text-foreground font-semibold cursor-default"
                 : "text-muted-foreground hover:text-foreground cursor-pointer"
             }`}
           >
-            {index === 0 ? (
-              <Home className="h-4 w-4" />
-            ) : (
-              <Folder className="h-4 w-4" />
-            )}
+            {index === 0 && <Home className="h-4 w-4" />}
             <span>{item.label}</span>
           </button>
         </React.Fragment>

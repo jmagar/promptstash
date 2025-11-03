@@ -30,31 +30,31 @@ const fileTypeConfig: Record<
 > = {
   folder: {
     icon: <Folder className="h-6 w-6" />,
-    gradient: "from-blue-500 to-blue-600",
+    gradient: "from-[#03A9F4] to-[#0288D1]",
   },
   agent: {
     icon: <UserCog className="h-6 w-6" />,
-    gradient: "from-orange-500 to-orange-600",
+    gradient: "from-[#FF5722] to-[#E64A19]",
   },
   skill: {
     icon: <Lightbulb className="h-6 w-6" />,
-    gradient: "from-cyan-500 to-cyan-600",
+    gradient: "from-[#00BCD4] to-[#0097A7]",
   },
   command: {
     icon: <Terminal className="h-6 w-6" />,
-    gradient: "from-green-500 to-green-600",
+    gradient: "from-[#4CAF50] to-[#388E3C]",
   },
   json: {
     icon: <Braces className="h-6 w-6" />,
-    gradient: "from-amber-500 to-amber-600",
+    gradient: "from-[#FF9800] to-[#F57C00]",
   },
   session: {
     icon: <MessageSquare className="h-6 w-6" />,
-    gradient: "from-purple-500 to-purple-600",
+    gradient: "from-[#9C27B0] to-[#7B1FA2]",
   },
   markdown: {
     icon: <FileText className="h-6 w-6" />,
-    gradient: "from-blue-500 to-blue-600",
+    gradient: "from-[#03A9F4] to-[#0288D1]",
   },
 };
 
@@ -70,7 +70,7 @@ export function PromptStashFileCard({
 
   return (
     <Card
-      className={`group aspect-square cursor-pointer border bg-card p-4 transition-all hover:-translate-y-0.5 hover:bg-accent hover:border-muted-foreground/20 ${className || ""}`}
+      className={`group aspect-square cursor-pointer border bg-card dark:bg-card light:bg-[hsl(30_25%_98%)] p-4 transition-all hover:-translate-y-0.5 hover:bg-accent light:hover:bg-[hsl(35_15%_92%)] hover:border-muted-foreground/20 rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_2px_8px_rgba(0,0,0,0.3)] light:border-border/40 ${className || ""}`}
       onClick={onClick}
     >
       <div className="flex h-full flex-col items-center justify-center gap-2.5">
