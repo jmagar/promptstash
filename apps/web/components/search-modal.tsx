@@ -13,7 +13,7 @@ import { Input } from '@workspace/ui/components/input';
 import { Spinner } from '@workspace/ui/components/spinner';
 import Fuse from 'fuse.js';
 import { Search } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface SearchModalProps {
   open: boolean;
@@ -31,7 +31,7 @@ export function SearchModal({ open, onOpenChange, onFileSelect }: SearchModalPro
   const { data: filesResponse, isLoading } = useFiles(activeStashId || '', {});
 
   // Extract files from paginated response
-  const files = filesResponse?.files || [];
+  const files = useMemo(() => filesResponse?.files || [], [filesResponse?.files]);
 
   // Configure Fuse.js for fuzzy search
   const fuse = useMemo(() => {
@@ -93,7 +93,7 @@ export function SearchModal({ open, onOpenChange, onFileSelect }: SearchModalPro
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, searchResults, selectedIndex]);
+  }, [open, searchResults, selectedIndex, handleSelect]);
 
   // Add Cmd+K / Ctrl+K keyboard shortcut
   useEffect(() => {
@@ -108,10 +108,13 @@ export function SearchModal({ open, onOpenChange, onFileSelect }: SearchModalPro
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [open, onOpenChange]);
 
-  const handleSelect = (file: File) => {
-    onFileSelect(file.id);
-    onOpenChange(false);
-  };
+  const handleSelect = useCallback(
+    (file: File) => {
+      onFileSelect(file.id);
+      onOpenChange(false);
+    },
+    [onFileSelect, onOpenChange],
+  );
 
   const getFileIcon = (file: File) => {
     if (file.path.includes('/agents/')) return '🤖';

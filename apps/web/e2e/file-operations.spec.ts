@@ -88,11 +88,11 @@ test.describe('File Editor', () => {
     // We would need to create a file first or have test data
   });
 
-  test.skip('should allow editing file content', async ({ page }) => {
+  test.skip('should allow editing file content', async () => {
     // Test file editing functionality
   });
 
-  test.skip('should save file changes', async ({ page }) => {
+  test.skip('should save file changes', async () => {
     // Test save functionality
   });
 });

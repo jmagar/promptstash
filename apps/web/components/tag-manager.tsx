@@ -365,6 +365,7 @@ export function TagManager({ open, onOpenChange, onSelectTag }: TagManagerProps)
                               {tag.name}
                             </Badge>
                             <span className="text-muted-foreground text-xs">
+                              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                               {(tag as any)._count?.files || 0} files
                             </span>
                           </div>

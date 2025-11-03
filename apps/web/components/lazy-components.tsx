@@ -81,6 +81,7 @@ export const KeyboardShortcutsModal = dynamic(
  * @param importFn - Dynamic import function
  * @param fallback - Loading fallback component
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function lazyLoad<T extends ComponentType<any>>(
   importFn: () => Promise<{ default: T }>,
   fallback: React.ReactNode = <Spinner />,

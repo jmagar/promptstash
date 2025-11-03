@@ -19,6 +19,7 @@ describe('Logo', () => {
     });
 
     it('should not show text when sidebar is collapsed', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const useSidebar = require('@workspace/ui/components/sidebar').useSidebar;
       useSidebar.mockReturnValue({ state: 'collapsed' });
 

@@ -53,6 +53,7 @@ describe('useAuthUser', () => {
       twoFactorEnabled: false,
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mockSession.data = { user: mockUser, session: {} as any };
 
     const { result } = renderHook(() => useAuthUser());
@@ -130,6 +131,7 @@ describe('useAuthUser', () => {
   });
 
   it('should not redirect if already on auth pages', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const usePathname = require('next/navigation').usePathname;
     usePathname.mockReturnValue('/sign-in');
 
@@ -173,6 +175,7 @@ describe('useRequiredAuthUser', () => {
       twoFactorEnabled: false,
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mockSession.data = { user: mockUser, session: {} as any };
 
     const { result } = renderHook(() => useRequiredAuthUser());

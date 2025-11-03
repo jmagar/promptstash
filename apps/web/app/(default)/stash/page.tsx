@@ -26,7 +26,7 @@ export default function StashPage() {
   const [searchModalOpen, setSearchModalOpen] = useState(false);
 
   // Fetch stashes
-  const { data: stashes, isLoading: stashesLoading, refetch: refetchStashes } = useStashes();
+  const { data: stashes, isLoading: stashesLoading } = useStashes();
 
   // Select first stash by default
   const activeStashId = selectedStashId || stashes?.[0]?.id;

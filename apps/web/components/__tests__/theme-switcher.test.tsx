@@ -37,6 +37,7 @@ describe('ThemeSwitcher', () => {
   });
 
   it('should render dark theme icon when theme is dark', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const useTheme = require('next-themes').useTheme;
     useTheme.mockReturnValue({
       theme: 'dark',
@@ -48,6 +49,7 @@ describe('ThemeSwitcher', () => {
   });
 
   it('should render system theme icon when theme is system', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const useTheme = require('next-themes').useTheme;
     useTheme.mockReturnValue({
       theme: 'system',
@@ -88,6 +90,7 @@ describe('ThemeSwitcher', () => {
   });
 
   it('should not render when not mounted', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const useMounted = require('@/hooks/useMounted').default;
     useMounted.mockReturnValue(false);
 
@@ -96,12 +99,11 @@ describe('ThemeSwitcher', () => {
   });
 
   it('should adjust button size based on sidebar state', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const useSidebar = require('@workspace/ui/components/sidebar').useSidebar;
     useSidebar.mockReturnValue({ state: 'collapsed' });
 
     render(<ThemeSwitcher />);
-    const button = screen.getByRole('button', { name: /select theme/i });
-
     // When collapsed, text shouldn't be visible
     expect(screen.queryByText('light')).not.toBeInTheDocument();
   });

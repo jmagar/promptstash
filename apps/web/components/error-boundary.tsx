@@ -53,7 +53,7 @@ function logError(error: Error, errorInfo: React.ErrorInfo, errorCount: number) 
     // Keep only last 10 errors
     if (errors.length > 10) errors.shift();
     sessionStorage.setItem('error-log', JSON.stringify(errors));
-  } catch (e) {
+  } catch {
     // Ignore if sessionStorage is unavailable
   }
 }
