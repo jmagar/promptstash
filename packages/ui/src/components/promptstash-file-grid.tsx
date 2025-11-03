@@ -23,7 +23,7 @@ export function PromptStashFileGrid({
   className,
 }: PromptStashFileGridProps) {
   return (
-    <div className={`flex-1 overflow-y-auto bg-muted/30 p-5 ${className || ""}`}>
+    <div className={`flex-1 overflow-y-auto bg-muted/30 dark:bg-muted/30 p-5 ${className || ""}`}>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3 animate-in fade-in duration-300">
         {files.map((file) => (
           <PromptStashFileCard

@@ -54,7 +54,7 @@ export function PromptStashToolbar({
               variant="default"
               size="icon"
               onClick={onNewFile}
-              className="h-9 w-9 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-sm"
+              className="h-9 w-9 bg-gradient-to-br from-[#03A9F4] to-[#0288D1] hover:from-[#03A9F4] hover:to-[#0288D1] hover:opacity-90 hover:-translate-y-px shadow-[0_1px_3px_rgba(3,169,244,0.3)] hover:shadow-[0_2px_5px_rgba(3,169,244,0.4)] transition-all text-white"
             >
               <FilePlus className="h-4 w-4" />
               <span className="sr-only">New File</span>
@@ -72,7 +72,7 @@ export function PromptStashToolbar({
               variant="ghost"
               size="icon"
               onClick={onNewFolder}
-              className="h-9 w-9"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
             >
               <FolderPlus className="h-4 w-4" />
               <span className="sr-only">New Folder</span>
@@ -92,7 +92,7 @@ export function PromptStashToolbar({
               variant="ghost"
               size="icon"
               onClick={onUpload}
-              className="h-9 w-9"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
             >
               <Upload className="h-4 w-4" />
               <span className="sr-only">Upload</span>
@@ -110,7 +110,7 @@ export function PromptStashToolbar({
               variant="ghost"
               size="icon"
               onClick={onDownload}
-              className="h-9 w-9"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
             >
               <Download className="h-4 w-4" />
               <span className="sr-only">Download</span>
@@ -130,7 +130,7 @@ export function PromptStashToolbar({
               variant="ghost"
               size="icon"
               onClick={onSort}
-              className="h-9 w-9"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
             >
               <ArrowUpDown className="h-4 w-4" />
               <span className="sr-only">Sort</span>
@@ -148,7 +148,7 @@ export function PromptStashToolbar({
               variant="ghost"
               size="icon"
               onClick={onFilter}
-              className="h-9 w-9"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
             >
               <Filter className="h-4 w-4" />
               <span className="sr-only">Filter</span>
@@ -166,7 +166,7 @@ export function PromptStashToolbar({
               variant="ghost"
               size="icon"
               onClick={onSelectMultiple}
-              className="h-9 w-9"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
             >
               <CheckSquare className="h-4 w-4" />
               <span className="sr-only">Select Multiple</span>
@@ -186,7 +186,7 @@ export function PromptStashToolbar({
               variant="ghost"
               size="icon"
               onClick={onShare}
-              className="h-9 w-9"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
             >
               <Share2 className="h-4 w-4" />
               <span className="sr-only">Share</span>
@@ -204,7 +204,7 @@ export function PromptStashToolbar({
               variant="ghost"
               size="icon"
               onClick={onMore}
-              className="h-9 w-9"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
             >
               <MoreHorizontal className="h-4 w-4" />
               <span className="sr-only">More Options</span>
