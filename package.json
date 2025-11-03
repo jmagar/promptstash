@@ -1,7 +1,8 @@
 {
-  "name": "build-elevate",
+  "name": "promptstash",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "turbo build",
     "clean": "turbo clean",
