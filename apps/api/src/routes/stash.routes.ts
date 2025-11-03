@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "@workspace/db";
 import { requireAuth } from "../middleware/auth";
+import type { AuthenticatedRequest } from "../types/express";
 
 const router: Router = Router();
 
@@ -13,7 +14,7 @@ router.use(requireAuth);
  */
 router.get("/", async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = (req as AuthenticatedRequest).user.id;
 
     let stashes = await prisma.stash.findMany({
       where: { userId },
@@ -63,6 +64,7 @@ router.get("/", async (req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = (req as AuthenticatedRequest).user.id;
 
     const stash = await prisma.stash.findUnique({
       where: { id },
@@ -91,6 +93,11 @@ router.get("/:id", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Stash not found" });
     }
 
+    // Verify ownership
+    if (stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
     res.json(stash);
   } catch (error) {
     console.error("Error fetching stash:", error);
@@ -110,7 +117,7 @@ router.post("/", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Name and scope are required" });
     }
 
-    const userId = req.user.id;
+    const userId = (req as AuthenticatedRequest).user.id;
 
     const stash = await prisma.stash.create({
       data: {
@@ -136,6 +143,21 @@ router.put("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, description, scope } = req.body;
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    // Verify ownership before updating
+    const existingStash = await prisma.stash.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!existingStash) {
+      return res.status(404).json({ error: "Stash not found" });
+    }
+
+    if (existingStash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
 
     const stash = await prisma.stash.update({
       where: { id },
@@ -160,6 +182,21 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    // Verify ownership before deleting
+    const stash = await prisma.stash.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!stash) {
+      return res.status(404).json({ error: "Stash not found" });
+    }
+
+    if (stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
 
     await prisma.stash.delete({
       where: { id },
@@ -180,6 +217,21 @@ router.get("/:id/files", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { search, fileType, tags, folderId } = req.query;
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    // Verify stash ownership before returning files
+    const stash = await prisma.stash.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!stash) {
+      return res.status(404).json({ error: "Stash not found" });
+    }
+
+    if (stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
 
     const where: any = {
       stashId: id,

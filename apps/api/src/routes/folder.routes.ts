@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "@workspace/db";
 import { requireAuth } from "../middleware/auth";
+import type { AuthenticatedRequest } from "../types/express";
 
 const router: Router = Router();
 
@@ -14,10 +15,14 @@ router.use(requireAuth);
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = (req as AuthenticatedRequest).user.id;
 
     const folder = await prisma.folder.findUnique({
       where: { id },
       include: {
+        stash: {
+          select: { userId: true },
+        },
         children: true,
         files: {
           include: {
@@ -36,6 +41,11 @@ router.get("/:id", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Folder not found" });
     }
 
+    // Verify ownership via stash
+    if (folder.stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
     res.json(folder);
   } catch (error) {
     console.error("Error fetching folder:", error);
@@ -49,12 +59,57 @@ router.get("/:id", async (req: Request, res: Response) => {
  */
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const { name, path, stashId, parentId } = req.body;
+    const { name, stashId, parentId } = req.body;
+    let { path } = req.body;
+    const userId = (req as AuthenticatedRequest).user.id;
 
-    if (!name || !path || !stashId) {
+    if (!name || !stashId) {
       return res.status(400).json({
-        error: "Name, path, and stashId are required",
+        error: "Name and stashId are required",
       });
+    }
+
+    // Verify stash ownership
+    const stash = await prisma.stash.findUnique({
+      where: { id: stashId },
+      select: { userId: true },
+    });
+
+    if (!stash) {
+      return res.status(404).json({ error: "Stash not found" });
+    }
+
+    if (stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // If parentId is provided, verify the parent folder belongs to the same stash
+    // and build path from parent path
+    if (parentId) {
+      const parentFolder = await prisma.folder.findUnique({
+        where: { id: parentId },
+        select: { stashId: true, path: true },
+      });
+
+      if (!parentFolder) {
+        return res.status(404).json({ error: "Parent folder not found" });
+      }
+
+      if (parentFolder.stashId !== stashId) {
+        return res.status(400).json({ error: "Parent folder must belong to the same stash" });
+      }
+
+      // Auto-generate path if not provided
+      if (!path) {
+        const cleanName = name.replace(/\s+/g, '-').toLowerCase();
+        path = `${parentFolder.path}/${cleanName}`;
+      }
+    } else {
+      // Root level folder - use simple path
+      if (!path) {
+        const cleanName = name.replace(/\s+/g, '-').toLowerCase();
+        path = `/${cleanName}`;
+      }
     }
 
     const folder = await prisma.folder.create({
@@ -81,6 +136,25 @@ router.put("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, path } = req.body;
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    // Verify ownership before updating
+    const existingFolder = await prisma.folder.findUnique({
+      where: { id },
+      include: {
+        stash: {
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (!existingFolder) {
+      return res.status(404).json({ error: "Folder not found" });
+    }
+
+    if (existingFolder.stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
 
     const folder = await prisma.folder.update({
       where: { id },
@@ -104,6 +178,25 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    // Verify ownership before deleting
+    const folder = await prisma.folder.findUnique({
+      where: { id },
+      include: {
+        stash: {
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (!folder) {
+      return res.status(404).json({ error: "Folder not found" });
+    }
+
+    if (folder.stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
 
     // Prisma will cascade delete files and subfolders
     await prisma.folder.delete({

@@ -6,6 +6,7 @@ import {
   validateMCPFile,
 } from "@workspace/utils";
 import { requireAuth } from "../middleware/auth";
+import type { AuthenticatedRequest } from "../types/express";
 
 const router: Router = Router();
 
@@ -19,6 +20,7 @@ router.use(requireAuth);
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = (req as AuthenticatedRequest).user.id;
 
     const file = await prisma.file.findUnique({
       where: { id },
@@ -29,12 +31,19 @@ router.get("/:id", async (req: Request, res: Response) => {
           },
         },
         folder: true,
-        stash: true,
+        stash: {
+          select: { userId: true },
+        },
       },
     });
 
     if (!file) {
       return res.status(404).json({ error: "File not found" });
+    }
+
+    // Verify ownership via stash
+    if (file.stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
     }
 
     res.json(file);
@@ -45,28 +54,130 @@ router.get("/:id", async (req: Request, res: Response) => {
 });
 
 /**
+ * Helper function to generate file path based on type
+ */
+function generateFilePath(name: string, fileType: string): string {
+  const cleanName = name.replace(/\s+/g, '-').toLowerCase();
+
+  switch (fileType) {
+    case 'AGENT':
+      return `.claude/agents/${cleanName}.md`;
+    case 'SKILL':
+      return `.claude/skills/${cleanName}/SKILL.md`;
+    case 'COMMAND':
+      return `.claude/commands/${cleanName}.sh`;
+    case 'MCP':
+      return `.mcp.json`;
+    case 'HOOKS':
+      return `.claude/hooks.json`;
+    case 'SESSION':
+    case 'JSONL':
+      return `.docs/sessions/${cleanName}.jsonl`;
+    case 'JSON':
+      return `${cleanName}.json`;
+    case 'MARKDOWN':
+    default:
+      return `${cleanName}.md`;
+  }
+}
+
+/**
+ * Helper function to map frontend fileType to Prisma FileType enum
+ */
+function mapToPrismaFileType(fileType: string): 'MARKDOWN' | 'JSON' | 'JSONL' | 'YAML' {
+  switch (fileType) {
+    case 'AGENT':
+    case 'SKILL':
+    case 'COMMAND':
+    case 'MARKDOWN':
+      return 'MARKDOWN';
+    case 'SESSION':
+    case 'JSONL':
+      return 'JSONL';
+    case 'MCP':
+    case 'HOOKS':
+    case 'JSON':
+      return 'JSON';
+    case 'YAML':
+      return 'YAML';
+    default:
+      return 'MARKDOWN';
+  }
+}
+
+/**
  * POST /api/files
  * Create a new file
  */
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const { name, path, content, fileType, stashId, folderId, tags } = req.body;
+    const { name, content, fileType, stashId, folderId, tags } = req.body;
+    let { path } = req.body;
+
+    // Safe user ID extraction with detailed error logging
+    const user = (req as AuthenticatedRequest).user;
+    if (!user || !user.id) {
+      console.error('User authentication failed:', { user, hasSession: !!req.session });
+      return res.status(401).json({
+        error: "Authentication failed",
+        message: "User ID not found in session",
+      });
+    }
+    const userId = user.id;
 
     // Validate required fields
-    if (!name || !path || !content || !fileType || !stashId) {
+    if (!name || !content || !fileType || !stashId) {
       return res.status(400).json({
-        error: "Missing required fields: name, path, content, fileType, stashId",
+        error: "Missing required fields: name, content, fileType, stashId",
       });
+    }
+
+    // Auto-generate path if not provided
+    if (!path) {
+      path = generateFilePath(name, fileType);
+    }
+
+    // Map frontend fileType to Prisma FileType enum
+    const prismaFileType = mapToPrismaFileType(fileType);
+
+    // Verify stash ownership
+    const stash = await prisma.stash.findUnique({
+      where: { id: stashId },
+      select: { userId: true },
+    });
+
+    if (!stash) {
+      return res.status(404).json({ error: "Stash not found" });
+    }
+
+    if (stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // If folderId is provided, verify the folder belongs to the same stash
+    if (folderId) {
+      const folder = await prisma.folder.findUnique({
+        where: { id: folderId },
+        select: { stashId: true },
+      });
+
+      if (!folder) {
+        return res.status(404).json({ error: "Folder not found" });
+      }
+
+      if (folder.stashId !== stashId) {
+        return res.status(400).json({ error: "Folder must belong to the same stash" });
+      }
     }
 
     // Validate file content based on type
     let validation: any = { valid: true, errors: [], warnings: [] };
 
-    if (fileType === "MARKDOWN" && path.includes("/agents/")) {
+    if (fileType === "AGENT") {
       validation = validateAgentFile(content, name);
-    } else if (fileType === "MARKDOWN" && path.includes("/skills/")) {
+    } else if (fileType === "SKILL") {
       validation = validateSkillFile(content, path);
-    } else if (fileType === "JSON" && name === ".mcp.json") {
+    } else if (fileType === "MCP") {
       validation = validateMCPFile(content);
     }
 
@@ -84,7 +195,7 @@ router.post("/", async (req: Request, res: Response) => {
         name,
         path,
         content,
-        fileType,
+        fileType: prismaFileType,
         stashId,
         folderId: folderId || null,
         tags: tags
@@ -110,7 +221,7 @@ router.post("/", async (req: Request, res: Response) => {
         fileId: file.id,
         content,
         version: 1,
-        createdBy: req.user.id,
+        createdBy: userId,
       },
     });
 
@@ -122,7 +233,15 @@ router.post("/", async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error creating file:", error);
-    res.status(500).json({ error: "Failed to create file" });
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      requestBody: req.body,
+    });
+    res.status(500).json({
+      error: "Failed to create file",
+      details: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 });
 
@@ -134,11 +253,15 @@ router.put("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, content, tags } = req.body;
+    const userId = (req as AuthenticatedRequest).user.id;
 
-    // Get existing file
+    // Get existing file with stash for ownership verification
     const existingFile = await prisma.file.findUnique({
       where: { id },
       include: {
+        stash: {
+          select: { userId: true },
+        },
         versions: {
           orderBy: { version: "desc" },
           take: 1,
@@ -148,6 +271,11 @@ router.put("/:id", async (req: Request, res: Response) => {
 
     if (!existingFile) {
       return res.status(404).json({ error: "File not found" });
+    }
+
+    // Verify ownership via stash
+    if (existingFile.stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
     }
 
     // Validate content if provided
@@ -203,7 +331,7 @@ router.put("/:id", async (req: Request, res: Response) => {
           fileId: id,
           content,
           version: (latestVersion?.version || 0) + 1,
-          createdBy: req.user.id,
+          createdBy: userId,
         },
       });
     }
@@ -222,6 +350,25 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    // Verify ownership before deleting
+    const file = await prisma.file.findUnique({
+      where: { id },
+      include: {
+        stash: {
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    if (file.stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
 
     await prisma.file.delete({
       where: { id },
@@ -241,6 +388,25 @@ router.delete("/:id", async (req: Request, res: Response) => {
 router.get("/:id/versions", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    // Verify file ownership before returning versions
+    const file = await prisma.file.findUnique({
+      where: { id },
+      include: {
+        stash: {
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    if (file.stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
 
     const versions = await prisma.fileVersion.findMany({
       where: { fileId: id },
@@ -262,9 +428,28 @@ router.post("/:id/revert", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { versionId } = req.body;
+    const userId = (req as AuthenticatedRequest).user.id;
 
     if (!versionId) {
       return res.status(400).json({ error: "Version ID is required" });
+    }
+
+    // Verify file ownership before reverting
+    const file = await prisma.file.findUnique({
+      where: { id },
+      include: {
+        stash: {
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    if (file.stash.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden" });
     }
 
     // Get the version
@@ -296,7 +481,7 @@ router.post("/:id/revert", async (req: Request, res: Response) => {
         fileId: id,
         content: version.content,
         version: (latestVersion?.version || 0) + 1,
-        createdBy: req.user.id,
+        createdBy: userId,
       },
     });
 
