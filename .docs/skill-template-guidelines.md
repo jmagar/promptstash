@@ -47,12 +47,14 @@ Example usage and output.
 For simple skills, use this minimal structure:
 
 **Directory Structure**:
+
 ```
 skill-name/
 └── SKILL.md
 ```
 
 **SKILL.md Content**:
+
 ```markdown
 ---
 name: "Simple Skill"
@@ -77,6 +79,7 @@ Instructions for using this skill.
 For comprehensive skills with multiple sections:
 
 **Directory Structure**:
+
 ```
 complex-skill/
 ├── SKILL.md
@@ -95,7 +98,8 @@ complex-skill/
 ```
 
 **SKILL.md Content**:
-```markdown
+
+````markdown
 ---
 name: "Complex Skill"
 description: "Comprehensive description of the skill"
@@ -135,39 +139,44 @@ Simple example to get started.
 // Example code
 const result = skill.process(input);
 ```
+````
 
 ## Capabilities
 
 Detailed list of what the skill can do:
 
 ### Data Processing
+
 - Parse various formats
 - Transform data structures
 - Validate schemas
 
 ### Analysis
+
 - Generate reports
 - Identify patterns
 - Provide recommendations
 
 ### Integration
+
 - Connect to external services
 - Stream data
 - Support webhooks
 
 ## Parameters
 
-| Parameter | Type | Required | Description | Example |
-|-----------|------|----------|-------------|---------|
-| `input` | string | Yes | Input data to process | `"raw data"` |
-| `format` | enum | No | Output format | `"json"` or `"csv"` |
-| `options` | object | No | Additional options | `{ verbose: true }` |
+| Parameter | Type   | Required | Description           | Example             |
+| --------- | ------ | -------- | --------------------- | ------------------- |
+| `input`   | string | Yes      | Input data to process | `"raw data"`        |
+| `format`  | enum   | No       | Output format         | `"json"` or `"csv"` |
+| `options` | object | No       | Additional options    | `{ verbose: true }` |
 
 ## Examples
 
 ### Basic Example
 
 Input:
+
 ```json
 {
   "data": "sample data"
@@ -175,6 +184,7 @@ Input:
 ```
 
 Output:
+
 ```json
 {
   "result": "processed data"
@@ -215,6 +225,7 @@ Common issues and solutions. See [Troubleshooting Guide](./docs/troubleshooting.
 ## Dependencies
 
 This skill depends on:
+
 - `other-skill`: Required for extended functionality
 
 ## Configuration
@@ -237,7 +248,8 @@ For questions or issues, see the troubleshooting guide or open an issue.
 ## Version History
 
 - **1.0.0** (2025-11-02): Initial release
-```
+
+````
 
 ---
 
@@ -255,9 +267,10 @@ author: "Your Name"              # Optional: who created it
 version: "1.0.0"                 # Optional: semantic version
 dependencies: []                 # Optional: other skills needed
 ---
-```
+````
 
 **Guidelines**:
+
 - `name`: 2-50 characters, should be clear and descriptive
 - `description`: 10-500 characters, explains the main purpose
 - `category`: One primary category (e.g., "development", "data", "analysis")
@@ -275,6 +288,7 @@ Keep to 2-4 sentences maximum.
 ```
 
 **Good Example**:
+
 ```markdown
 ## Overview
 
@@ -285,6 +299,7 @@ to work with data in different formats or migrate data between systems.
 ```
 
 **Bad Example**:
+
 ```markdown
 ## Overview
 
@@ -302,6 +317,7 @@ This skill is useful.
 ```
 
 **Guidelines**:
+
 - Use bullet points
 - Keep descriptions under 10 words
 - Group related capabilities
@@ -334,10 +350,10 @@ Simple example showing how to use the skill.
 ```markdown
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `input` | string | Yes | Description of input |
-| `options` | object | No | Optional configuration |
+| Parameter | Type   | Required | Description            |
+| --------- | ------ | -------- | ---------------------- |
+| `input`   | string | Yes      | Description of input   |
+| `options` | object | No       | Optional configuration |
 
 ### Input Format
 
@@ -372,7 +388,9 @@ Output:
 Description of what this example shows.
 
 \`\`\`python
+
 # Code example
+
 \`\`\`
 ```
 
@@ -392,6 +410,7 @@ Description of what this example shows.
 ```
 
 **Guidelines**:
+
 - Be honest about limitations
 - Provide workarounds if possible
 - Note any performance constraints
@@ -449,12 +468,12 @@ Convert data between JSON, CSV, and XML formats with automatic validation.
 
 ## Parameters
 
-| Parameter | Type | Required |
-|-----------|------|----------|
-| `input` | string | Yes |
-| `inputFormat` | enum | Yes |
-| `outputFormat` | enum | Yes |
-| `options` | object | No |
+| Parameter      | Type   | Required |
+| -------------- | ------ | -------- |
+| `input`        | string | Yes      |
+| `inputFormat`  | enum   | Yes      |
+| `outputFormat` | enum   | Yes      |
+| `options`      | object | No       |
 
 ## Examples
 
@@ -463,8 +482,8 @@ Convert data between JSON, CSV, and XML formats with automatic validation.
 Input:
 \`\`\`json
 [
-  { "name": "Alice", "age": 30 },
-  { "name": "Bob", "age": 25 }
+{ "name": "Alice", "age": 30 },
+{ "name": "Bob", "age": 25 }
 ]
 \`\`\`
 
@@ -478,7 +497,7 @@ Bob,25
 
 ### Code Analysis Skill
 
-```markdown
+````markdown
 ---
 name: "Code Analyzer"
 description: "Analyze code for quality, security, and performance issues"
@@ -495,12 +514,15 @@ Comprehensive code analysis for identifying issues and improvements.
 ## Analysis Types
 
 ### Security Analysis
+
 Identify potential vulnerabilities and security risks.
 
 ### Quality Analysis
+
 Check for code quality issues and anti-patterns.
 
 ### Performance Analysis
+
 Find performance bottlenecks and optimization opportunities.
 
 ## Supported Languages
@@ -517,6 +539,7 @@ Find performance bottlenecks and optimization opportunities.
 const analyzer = new CodeAnalyzer();
 const result = analyzer.analyze(code, language, checks);
 ```
+````
 
 ## Output
 
@@ -532,7 +555,8 @@ const result = analyzer.analyze(code, language, checks);
   ]
 }
 ```
-```
+
+````
 
 ### Utility Function Skill
 
@@ -571,7 +595,8 @@ camelCase("hello world")           // "helloWorld"
 kebabCase("hello world")           // "hello-world"
 snakeCase("hello world")           // "hello_world"
 titleCase("hello world")           // "Hello World"
-```
+````
+
 ```
 
 ---
@@ -609,8 +634,10 @@ titleCase("hello world")           // "Hello World"
 Single `SKILL.md` file is sufficient.
 
 ```
+
 skill-name/
 └── SKILL.md
+
 ```
 
 ### For Skills with Examples
@@ -618,12 +645,14 @@ skill-name/
 Add examples in subdirectory.
 
 ```
+
 skill-name/
 ├── SKILL.md
 └── examples/
-    ├── example1.md
-    ├── example2.md
-    └── README.md
+├── example1.md
+├── example2.md
+└── README.md
+
 ```
 
 ### For Skills with Templates
@@ -631,15 +660,17 @@ skill-name/
 Add reusable templates.
 
 ```
+
 skill-name/
 ├── SKILL.md
 ├── templates/
-│   ├── basic.txt
-│   ├── advanced.txt
-│   └── README.md
+│ ├── basic.txt
+│ ├── advanced.txt
+│ └── README.md
 └── samples/
-    ├── input.json
-    └── output.json
+├── input.json
+└── output.json
+
 ```
 
 ### For Complex Skills
@@ -647,18 +678,20 @@ skill-name/
 Organize into logical sections.
 
 ```
+
 skill-name/
 ├── SKILL.md
 ├── docs/
-│   ├── getting-started.md
-│   ├── api-reference.md
-│   ├── examples.md
-│   ├── troubleshooting.md
-│   └── best-practices.md
+│ ├── getting-started.md
+│ ├── api-reference.md
+│ ├── examples.md
+│ ├── troubleshooting.md
+│ └── best-practices.md
 ├── templates/
-│   └── ...
+│ └── ...
 └── presets/
-    └── configurations.json
+└── configurations.json
+
 ```
 
 ---
@@ -739,3 +772,4 @@ Before submitting a skill, verify:
 - [Skills Subdirectory Structure Guide](./skills-subdirectory-structure.md)
 - [Validation Rules Reference](./validation-rules-reference.md)
 - [Claude Code Skills Documentation](https://docs.claude.com/en/docs/claude-code/skills.md)
+```

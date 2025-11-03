@@ -1,7 +1,7 @@
-import { Router, Request, Response } from "express";
-import { prisma } from "@workspace/db";
-import { requireAuth } from "../middleware/auth";
-import type { AuthenticatedRequest } from "../types/express";
+import { prisma } from '@workspace/db';
+import { Request, Response, Router } from 'express';
+import { requireAuth } from '../middleware/auth';
+import type { AuthenticatedRequest } from '../types/express';
 
 const router: Router = Router();
 
@@ -12,7 +12,7 @@ router.use(requireAuth);
  * GET /api/folders/:id
  * Get a specific folder with its contents
  */
-router.get("/:id", async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as AuthenticatedRequest).user.id;
@@ -58,18 +58,18 @@ router.get("/:id", async (req: Request, res: Response) => {
     });
 
     if (!folder) {
-      return res.status(404).json({ error: "Folder not found" });
+      return res.status(404).json({ error: 'Folder not found' });
     }
 
     // Verify ownership via stash
     if (folder.stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     res.json(folder);
   } catch (error) {
-    console.error("Error fetching folder:", error);
-    res.status(500).json({ error: "Failed to fetch folder" });
+    console.error('Error fetching folder:', error);
+    res.status(500).json({ error: 'Failed to fetch folder' });
   }
 });
 
@@ -77,7 +77,7 @@ router.get("/:id", async (req: Request, res: Response) => {
  * POST /api/folders
  * Create a new folder
  */
-router.post("/", async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const { name, stashId, parentId } = req.body;
     let { path } = req.body;
@@ -85,7 +85,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     if (!name || !stashId) {
       return res.status(400).json({
-        error: "Name and stashId are required",
+        error: 'Name and stashId are required',
       });
     }
 
@@ -96,11 +96,11 @@ router.post("/", async (req: Request, res: Response) => {
     });
 
     if (!stash) {
-      return res.status(404).json({ error: "Stash not found" });
+      return res.status(404).json({ error: 'Stash not found' });
     }
 
     if (stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     // If parentId is provided, verify the parent folder belongs to the same stash
@@ -112,11 +112,11 @@ router.post("/", async (req: Request, res: Response) => {
       });
 
       if (!parentFolder) {
-        return res.status(404).json({ error: "Parent folder not found" });
+        return res.status(404).json({ error: 'Parent folder not found' });
       }
 
       if (parentFolder.stashId !== stashId) {
-        return res.status(400).json({ error: "Parent folder must belong to the same stash" });
+        return res.status(400).json({ error: 'Parent folder must belong to the same stash' });
       }
 
       // Auto-generate path if not provided
@@ -143,8 +143,8 @@ router.post("/", async (req: Request, res: Response) => {
 
     res.status(201).json(folder);
   } catch (error) {
-    console.error("Error creating folder:", error);
-    res.status(500).json({ error: "Failed to create folder" });
+    console.error('Error creating folder:', error);
+    res.status(500).json({ error: 'Failed to create folder' });
   }
 });
 
@@ -152,7 +152,7 @@ router.post("/", async (req: Request, res: Response) => {
  * PUT /api/folders/:id
  * Update a folder (rename)
  */
-router.put("/:id", async (req: Request, res: Response) => {
+router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, path } = req.body;
@@ -169,11 +169,11 @@ router.put("/:id", async (req: Request, res: Response) => {
     });
 
     if (!existingFolder) {
-      return res.status(404).json({ error: "Folder not found" });
+      return res.status(404).json({ error: 'Folder not found' });
     }
 
     if (existingFolder.stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     const folder = await prisma.folder.update({
@@ -186,8 +186,8 @@ router.put("/:id", async (req: Request, res: Response) => {
 
     res.json(folder);
   } catch (error) {
-    console.error("Error updating folder:", error);
-    res.status(500).json({ error: "Failed to update folder" });
+    console.error('Error updating folder:', error);
+    res.status(500).json({ error: 'Failed to update folder' });
   }
 });
 
@@ -195,7 +195,7 @@ router.put("/:id", async (req: Request, res: Response) => {
  * DELETE /api/folders/:id
  * Delete a folder and all its contents
  */
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as AuthenticatedRequest).user.id;
@@ -211,11 +211,11 @@ router.delete("/:id", async (req: Request, res: Response) => {
     });
 
     if (!folder) {
-      return res.status(404).json({ error: "Folder not found" });
+      return res.status(404).json({ error: 'Folder not found' });
     }
 
     if (folder.stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     // Prisma will cascade delete files and subfolders
@@ -225,8 +225,8 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting folder:", error);
-    res.status(500).json({ error: "Failed to delete folder" });
+    console.error('Error deleting folder:', error);
+    res.status(500).json({ error: 'Failed to delete folder' });
   }
 });
 

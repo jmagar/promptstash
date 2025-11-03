@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { globalRateLimit } from '../middleware/rate-limit';
-import userRoutes from './user.routes';
 import fileRoutes from './file.routes';
-import stashRoutes from './stash.routes';
 import folderRoutes from './folder.routes';
+import stashRoutes from './stash.routes';
+import userRoutes from './user.routes';
 import validateRoutes from './validate.routes';
 
 /**

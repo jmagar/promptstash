@@ -1,10 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useCreateFile } from '@/hooks/use-promptstash';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { toast } from 'sonner';
+import { Button } from '@workspace/ui/components/button';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@workspace/ui/components/form';
+import { Input } from '@workspace/ui/components/input';
 import {
   Select,
   SelectContent,
@@ -30,12 +29,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
-import { Input } from '@workspace/ui/components/input';
-import { Textarea } from '@workspace/ui/components/textarea';
-import { Button } from '@workspace/ui/components/button';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { useCreateFile } from '@/hooks/use-promptstash';
+import { Textarea } from '@workspace/ui/components/textarea';
 import { FilePlus } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
 // Define file types as a constant array for single source of truth
 const FILE_TYPES = [

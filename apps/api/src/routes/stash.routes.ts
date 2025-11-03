@@ -1,7 +1,7 @@
-import { Router, Request, Response } from "express";
-import { prisma, type Prisma } from "@workspace/db";
-import { requireAuth } from "../middleware/auth";
-import type { AuthenticatedRequest } from "../types/express";
+import { prisma, type Prisma } from '@workspace/db';
+import { Request, Response, Router } from 'express';
+import { requireAuth } from '../middleware/auth';
+import type { AuthenticatedRequest } from '../types/express';
 
 const router: Router = Router();
 
@@ -12,7 +12,7 @@ router.use(requireAuth);
  * GET /api/stashes
  * Get all stashes for the authenticated user
  */
-router.get("/", async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const userId = (req as AuthenticatedRequest).user.id;
 
@@ -26,7 +26,7 @@ router.get("/", async (req: Request, res: Response) => {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
 
     // Auto-create default stash for users who don't have one yet
@@ -37,9 +37,9 @@ router.get("/", async (req: Request, res: Response) => {
     if (stashes.length === 0) {
       const defaultStash = await prisma.stash.create({
         data: {
-          name: "My PromptStash",
-          scope: "USER",
-          description: "Default stash for organizing prompts, agents, and skills",
+          name: 'My PromptStash',
+          scope: 'USER',
+          description: 'Default stash for organizing prompts, agents, and skills',
           userId,
         },
         include: {
@@ -56,8 +56,8 @@ router.get("/", async (req: Request, res: Response) => {
 
     res.json(stashes);
   } catch (error) {
-    console.error("Error fetching stashes:", error);
-    res.status(500).json({ error: "Failed to fetch stashes" });
+    console.error('Error fetching stashes:', error);
+    res.status(500).json({ error: 'Failed to fetch stashes' });
   }
 });
 
@@ -65,7 +65,7 @@ router.get("/", async (req: Request, res: Response) => {
  * GET /api/stashes/:id
  * Get a specific stash with its contents
  */
-router.get("/:id", async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as AuthenticatedRequest).user.id;
@@ -107,18 +107,18 @@ router.get("/:id", async (req: Request, res: Response) => {
     });
 
     if (!stash) {
-      return res.status(404).json({ error: "Stash not found" });
+      return res.status(404).json({ error: 'Stash not found' });
     }
 
     // Verify ownership
     if (stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     res.json(stash);
   } catch (error) {
-    console.error("Error fetching stash:", error);
-    res.status(500).json({ error: "Failed to fetch stash" });
+    console.error('Error fetching stash:', error);
+    res.status(500).json({ error: 'Failed to fetch stash' });
   }
 });
 
@@ -126,12 +126,12 @@ router.get("/:id", async (req: Request, res: Response) => {
  * POST /api/stashes
  * Create a new stash
  */
-router.post("/", async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const { name, scope, description } = req.body;
 
     if (!name || !scope) {
-      return res.status(400).json({ error: "Name and scope are required" });
+      return res.status(400).json({ error: 'Name and scope are required' });
     }
 
     const userId = (req as AuthenticatedRequest).user.id;
@@ -147,8 +147,8 @@ router.post("/", async (req: Request, res: Response) => {
 
     res.status(201).json(stash);
   } catch (error) {
-    console.error("Error creating stash:", error);
-    res.status(500).json({ error: "Failed to create stash" });
+    console.error('Error creating stash:', error);
+    res.status(500).json({ error: 'Failed to create stash' });
   }
 });
 
@@ -156,7 +156,7 @@ router.post("/", async (req: Request, res: Response) => {
  * PUT /api/stashes/:id
  * Update a stash
  */
-router.put("/:id", async (req: Request, res: Response) => {
+router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, description, scope } = req.body;
@@ -169,11 +169,11 @@ router.put("/:id", async (req: Request, res: Response) => {
     });
 
     if (!existingStash) {
-      return res.status(404).json({ error: "Stash not found" });
+      return res.status(404).json({ error: 'Stash not found' });
     }
 
     if (existingStash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     const stash = await prisma.stash.update({
@@ -187,8 +187,8 @@ router.put("/:id", async (req: Request, res: Response) => {
 
     res.json(stash);
   } catch (error) {
-    console.error("Error updating stash:", error);
-    res.status(500).json({ error: "Failed to update stash" });
+    console.error('Error updating stash:', error);
+    res.status(500).json({ error: 'Failed to update stash' });
   }
 });
 
@@ -196,7 +196,7 @@ router.put("/:id", async (req: Request, res: Response) => {
  * DELETE /api/stashes/:id
  * Delete a stash
  */
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as AuthenticatedRequest).user.id;
@@ -208,11 +208,11 @@ router.delete("/:id", async (req: Request, res: Response) => {
     });
 
     if (!stash) {
-      return res.status(404).json({ error: "Stash not found" });
+      return res.status(404).json({ error: 'Stash not found' });
     }
 
     if (stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     await prisma.stash.delete({
@@ -221,8 +221,8 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting stash:", error);
-    res.status(500).json({ error: "Failed to delete stash" });
+    console.error('Error deleting stash:', error);
+    res.status(500).json({ error: 'Failed to delete stash' });
   }
 });
 
@@ -230,10 +230,10 @@ router.delete("/:id", async (req: Request, res: Response) => {
  * GET /api/stashes/:id/files
  * Get all files in a stash with optional filtering and pagination
  */
-router.get("/:id/files", async (req: Request, res: Response) => {
+router.get('/:id/files', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { search, fileType, tags, folderId, page = "1", limit = "50" } = req.query;
+    const { search, fileType, tags, folderId, page = '1', limit = '50' } = req.query;
     const userId = (req as AuthenticatedRequest).user.id;
 
     // Verify stash ownership before returning files
@@ -243,11 +243,11 @@ router.get("/:id/files", async (req: Request, res: Response) => {
     });
 
     if (!stash) {
-      return res.status(404).json({ error: "Stash not found" });
+      return res.status(404).json({ error: 'Stash not found' });
     }
 
     if (stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     // Parse pagination params
@@ -260,16 +260,16 @@ router.get("/:id/files", async (req: Request, res: Response) => {
     };
 
     // Filter by folder
-    if (folderId === "root") {
+    if (folderId === 'root') {
       where.folderId = null;
-    } else if (folderId && typeof folderId === "string") {
+    } else if (folderId && typeof folderId === 'string') {
       where.folderId = folderId;
     }
 
     // Filter by file type
-    if (fileType && typeof fileType === "string") {
+    if (fileType && typeof fileType === 'string') {
       // Validate fileType is a valid enum value
-      const validFileTypes = ["MARKDOWN", "JSON", "JSONL", "YAML"];
+      const validFileTypes = ['MARKDOWN', 'JSON', 'JSONL', 'YAML'];
       if (validFileTypes.includes(fileType.toUpperCase())) {
         where.fileType = fileType.toUpperCase() as Prisma.FileWhereInput['fileType'];
       }
@@ -277,7 +277,7 @@ router.get("/:id/files", async (req: Request, res: Response) => {
 
     // Filter by tags
     if (tags) {
-      const tagArray = (tags as string).split(",");
+      const tagArray = (tags as string).split(',');
       where.tags = {
         some: {
           tag: {
@@ -292,8 +292,8 @@ router.get("/:id/files", async (req: Request, res: Response) => {
     // Search by name or content
     if (search) {
       where.OR = [
-        { name: { contains: search as string, mode: "insensitive" } },
-        { content: { contains: search as string, mode: "insensitive" } },
+        { name: { contains: search as string, mode: 'insensitive' } },
+        { content: { contains: search as string, mode: 'insensitive' } },
       ];
     }
 
@@ -315,7 +315,7 @@ router.get("/:id/files", async (req: Request, res: Response) => {
             },
           },
         },
-        orderBy: { updatedAt: "desc" },
+        orderBy: { updatedAt: 'desc' },
         skip,
         take: limitNum,
       }),
@@ -332,8 +332,8 @@ router.get("/:id/files", async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching files:", error);
-    res.status(500).json({ error: "Failed to fetch files" });
+    console.error('Error fetching files:', error);
+    res.status(500).json({ error: 'Failed to fetch files' });
   }
 });
 

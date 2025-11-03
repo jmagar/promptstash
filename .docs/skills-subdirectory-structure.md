@@ -142,12 +142,11 @@ This skill provides utilities for processing and transforming various data struc
 - Export to multiple formats
 
 ## Usage
-
 ```
 
 ### Complete Example
 
-```markdown
+````markdown
 ---
 name: "Code Analyzer"
 description: "Analyzes code for quality, security, and performance issues"
@@ -165,6 +164,7 @@ Comprehensive code analysis skill for identifying issues and improvements.
 ## Overview
 
 Analyzes code written in JavaScript, TypeScript, Python, and Go for:
+
 - Security vulnerabilities
 - Performance anti-patterns
 - Code quality issues
@@ -173,40 +173,46 @@ Analyzes code written in JavaScript, TypeScript, Python, and Go for:
 ## Capabilities
 
 ### Security Analysis
+
 - SQL injection detection
 - XSS vulnerability identification
 - Credential leakage detection
 
 ### Performance Analysis
+
 - Inefficient loops
 - Memory leak detection
 - N+1 query patterns
 
 ### Code Quality
+
 - Complexity metrics
 - Dead code detection
 - Naming convention violations
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| code | string | Yes | Source code to analyze |
-| language | string | Yes | Programming language (js, ts, py, go) |
-| checks | array | No | Specific checks to run (default: all) |
+| Parameter | Type   | Required | Description                           |
+| --------- | ------ | -------- | ------------------------------------- |
+| code      | string | Yes      | Source code to analyze                |
+| language  | string | Yes      | Programming language (js, ts, py, go) |
+| checks    | array  | No       | Specific checks to run (default: all) |
 
 ## Examples
 
 ### Basic Usage
 
 Input:
+
 ```javascript
 function analyze(code) {
   // Implementation
 }
 ```
+````
 
 Output:
+
 ```json
 {
   "issues": [
@@ -231,6 +237,7 @@ Output:
 - Supports JavaScript, TypeScript, Python, Go only
 - Requires valid syntax (cannot parse incomplete code)
 - Performance analysis is heuristic-based
+
 ```
 
 ---
@@ -242,48 +249,56 @@ Skills can include optional reference files alongside `SKILL.md` to provide addi
 ### Examples Structure
 
 ```
+
 skill-name/
 ├── SKILL.md
-├── examples.md              # Practical usage examples
-├── advanced-usage.md        # Advanced techniques
-├── troubleshooting.md       # Common issues and solutions
-└── faq.md                   # Frequently asked questions
+├── examples.md # Practical usage examples
+├── advanced-usage.md # Advanced techniques
+├── troubleshooting.md # Common issues and solutions
+└── faq.md # Frequently asked questions
+
 ```
 
 ### Templates Subdirectory
 
 ```
+
 skill-name/
 ├── SKILL.md
 └── templates/
-    ├── basic-template.txt
-    ├── advanced-template.txt
-    └── README.md            # Guide to using templates
+├── basic-template.txt
+├── advanced-template.txt
+└── README.md # Guide to using templates
+
 ```
 
 ### Configuration Files
 
 ```
+
 skill-name/
 ├── SKILL.md
-├── presets.json             # Preset configurations
-├── rules.yaml               # Configuration rules
-└── config-schema.json       # Configuration schema
+├── presets.json # Preset configurations
+├── rules.yaml # Configuration rules
+└── config-schema.json # Configuration schema
+
 ```
 
 ### Documentation Structure
 
 ```
+
 skill-name/
 ├── SKILL.md
 ├── docs/
-    ├── getting-started.md
-    ├── api-reference.md
-    ├── examples.md
-    └── troubleshooting.md
+├── getting-started.md
+├── api-reference.md
+├── examples.md
+└── troubleshooting.md
 └── samples/
-    ├── input-sample.txt
-    └── output-sample.txt
+├── input-sample.txt
+└── output-sample.txt
+
 ```
 
 ---
@@ -295,19 +310,21 @@ skill-name/
 Use `kebab-case` for skill directory names:
 
 ```
+
 ✅ CORRECT:
-  data-processor/
-  code-analyzer/
-  document-formatter/
-  rest-api-client/
-  file-validator/
+data-processor/
+code-analyzer/
+document-formatter/
+rest-api-client/
+file-validator/
 
 ❌ INCORRECT:
-  DataProcessor/           # PascalCase
-  data_processor/          # snake_case
-  dataProcessor/           # camelCase
-  data-Processor/          # Mixed case
-  processor (data)/        # Spaces and parentheses
+DataProcessor/ # PascalCase
+data_processor/ # snake_case
+dataProcessor/ # camelCase
+data-Processor/ # Mixed case
+processor (data)/ # Spaces and parentheses
+
 ```
 
 ### Nested Directory Names
@@ -315,20 +332,22 @@ Use `kebab-case` for skill directory names:
 For optional subdirectories within skills, use `kebab-case` consistently:
 
 ```
+
 ✅ CORRECT:
-  skill-name/
-  ├── reference-docs/
-  ├── code-samples/
-  ├── pre-built-templates/
-  └── config-presets/
+skill-name/
+├── reference-docs/
+├── code-samples/
+├── pre-built-templates/
+└── config-presets/
 
 ❌ INCORRECT:
-  skill-name/
-  ├── reference_docs/
-  ├── codeSamples/
-  ├── Pre-Built-Templates/
-  └── ConfigPresets/
-```
+skill-name/
+├── reference_docs/
+├── codeSamples/
+├── Pre-Built-Templates/
+└── ConfigPresets/
+
+````
 
 ---
 
@@ -409,24 +428,24 @@ function validateSkillStructure(skillPath: string): ValidationResult {
     errors
   };
 }
-```
+````
 
 ### SKILL.md Frontmatter Validation
 
 ```typescript
 interface SkillFrontmatter {
-  name: string;              // Required: Skill name
-  description: string;       // Required: Brief description
-  category?: string;         // Optional: Category classification
-  tags?: string[];          // Optional: Tags for organization
-  author?: string;          // Optional: Author name
-  version?: string;         // Optional: Version string
-  dependencies?: string[];  // Optional: Skill dependencies
-  [key: string]: any;       // Allow additional fields
+  name: string; // Required: Skill name
+  description: string; // Required: Brief description
+  category?: string; // Optional: Category classification
+  tags?: string[]; // Optional: Tags for organization
+  author?: string; // Optional: Author name
+  version?: string; // Optional: Version string
+  dependencies?: string[]; // Optional: Skill dependencies
+  [key: string]: any; // Allow additional fields
 }
 
 function validateSkillFrontmatter(
-  frontmatter: Record<string, any>
+  frontmatter: Record<string, any>,
 ): ValidationResult {
   const errors: ValidationError[] = [];
 
@@ -435,7 +454,7 @@ function validateSkillFrontmatter(
     errors.push({
       code: "MISSING_REQUIRED_FIELD",
       message: `'name' is required and must be a string`,
-      severity: "error"
+      severity: "error",
     });
   }
 
@@ -443,7 +462,7 @@ function validateSkillFrontmatter(
     errors.push({
       code: "MISSING_REQUIRED_FIELD",
       message: `'description' is required and must be a string`,
-      severity: "error"
+      severity: "error",
     });
   }
 
@@ -452,7 +471,7 @@ function validateSkillFrontmatter(
     errors.push({
       code: "INVALID_FIELD_TYPE",
       message: `'tags' must be an array of strings`,
-      severity: "error"
+      severity: "error",
     });
   }
 
@@ -460,7 +479,7 @@ function validateSkillFrontmatter(
     errors.push({
       code: "INVALID_FIELD_TYPE",
       message: `'dependencies' must be an array of strings`,
-      severity: "error"
+      severity: "error",
     });
   }
 
@@ -468,13 +487,13 @@ function validateSkillFrontmatter(
     errors.push({
       code: "INVALID_FIELD_TYPE",
       message: `'version' must be a string (semantic version recommended)`,
-      severity: "warning"
+      severity: "warning",
     });
   }
 
   return {
-    valid: errors.filter(e => e.severity === "error").length === 0,
-    errors
+    valid: errors.filter((e) => e.severity === "error").length === 0,
+    errors,
   };
 }
 ```
@@ -493,12 +512,14 @@ When user creates a new skill via PromptStash:
    - Check name doesn't already exist
 
 2. **Create directory structure**
+
    ```
    .claude/skills/skill-name/
    └── SKILL.md
    ```
 
 3. **Populate SKILL.md with template**
+
    ```markdown
    ---
    name: "Skill Name"
@@ -553,15 +574,15 @@ When deploying skills to project:
 
 ## Comparison: Skills vs Agents vs Commands
 
-| Aspect | Agents | Commands | Skills |
-|--------|--------|----------|--------|
-| **File Type** | `.md` file | `.md` file | Directory |
-| **Location** | `.claude/agents/` | `.claude/commands/` | `.claude/skills/` |
-| **File Name** | `AGENT_NAME.md` | `COMMAND_NAME.md` | `skill-name/SKILL.md` |
-| **Naming Style** | Various | Various | kebab-case required |
-| **Structure** | Single file | Single file | Directory + subdirectories |
-| **Additional Files** | Not supported | Not supported | Optional reference files |
-| **File Count** | 1 per agent | 1 per command | 1+ per skill |
+| Aspect               | Agents            | Commands            | Skills                     |
+| -------------------- | ----------------- | ------------------- | -------------------------- |
+| **File Type**        | `.md` file        | `.md` file          | Directory                  |
+| **Location**         | `.claude/agents/` | `.claude/commands/` | `.claude/skills/`          |
+| **File Name**        | `AGENT_NAME.md`   | `COMMAND_NAME.md`   | `skill-name/SKILL.md`      |
+| **Naming Style**     | Various           | Various             | kebab-case required        |
+| **Structure**        | Single file       | Single file         | Directory + subdirectories |
+| **Additional Files** | Not supported     | Not supported       | Optional reference files   |
+| **File Count**       | 1 per agent       | 1 per command       | 1+ per skill               |
 
 ---
 
@@ -570,6 +591,7 @@ When deploying skills to project:
 ### Mistake 1: Creating Skill as Single File
 
 **❌ Wrong:**
+
 ```
 .claude/
 └── skills/
@@ -577,6 +599,7 @@ When deploying skills to project:
 ```
 
 **✅ Correct:**
+
 ```
 .claude/
 └── skills/
@@ -587,6 +610,7 @@ When deploying skills to project:
 ### Mistake 2: Wrong File Naming
 
 **❌ Wrong:**
+
 ```
 .claude/
 └── skills/
@@ -595,6 +619,7 @@ When deploying skills to project:
 ```
 
 **✅ Correct:**
+
 ```
 .claude/
 └── skills/
@@ -605,6 +630,7 @@ When deploying skills to project:
 ### Mistake 3: Putting Markdown Files at Root
 
 **❌ Wrong:**
+
 ```
 .claude/
 └── skills/
@@ -616,6 +642,7 @@ When deploying skills to project:
 ```
 
 **✅ Correct:**
+
 ```
 .claude/
 └── skills/
@@ -630,6 +657,7 @@ When deploying skills to project:
 ### Mistake 4: PascalCase Directory Names
 
 **❌ Wrong:**
+
 ```
 .claude/
 └── skills/
@@ -639,6 +667,7 @@ When deploying skills to project:
 ```
 
 **✅ Correct:**
+
 ```
 .claude/
 └── skills/
@@ -650,6 +679,7 @@ When deploying skills to project:
 ### Mistake 5: Directory Name Doesn't Match Skill Name
 
 **❌ Wrong:**
+
 ```
 .claude/
 └── skills/
@@ -660,6 +690,7 @@ When deploying skills to project:
 ```
 
 **✅ Correct:**
+
 ```
 .claude/
 └── skills/
@@ -678,6 +709,7 @@ If you have skills in the wrong format, here's how to migrate:
 ### From Flat File to Subdirectory
 
 **Before:**
+
 ```
 .claude/
 └── skills/
@@ -685,11 +717,13 @@ If you have skills in the wrong format, here's how to migrate:
 ```
 
 **Steps:**
+
 1. Create directory: `mkdir .claude/skills/my-skill/`
 2. Move file: `mv .claude/skills/my-skill.md .claude/skills/my-skill/SKILL.md`
 3. Update content if referencing parent directory
 
 **After:**
+
 ```
 .claude/
 └── skills/
@@ -700,6 +734,7 @@ If you have skills in the wrong format, here's how to migrate:
 ### From Wrong File Name to SKILL.md
 
 **Before:**
+
 ```
 .claude/
 └── skills/
@@ -708,9 +743,11 @@ If you have skills in the wrong format, here's how to migrate:
 ```
 
 **Steps:**
+
 1. Rename file: `mv .claude/skills/my-skill/skill.md .claude/skills/my-skill/SKILL.md`
 
 **After:**
+
 ```
 .claude/
 └── skills/
@@ -721,6 +758,7 @@ If you have skills in the wrong format, here's how to migrate:
 ### From Multiple Markdown Files to Organized Structure
 
 **Before:**
+
 ```
 .claude/
 └── skills/
@@ -733,10 +771,12 @@ If you have skills in the wrong format, here's how to migrate:
 ```
 
 **Steps:**
+
 1. Create docs directory: `mkdir .claude/skills/my-skill/docs/`
 2. Move files: `mv .claude/skills/my-skill/{examples,advanced,faq,troubleshooting}.md .claude/skills/my-skill/docs/`
 
 **After:**
+
 ```
 .claude/
 └── skills/

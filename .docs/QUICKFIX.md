@@ -6,6 +6,7 @@
 ## Problem
 
 Zod version mismatch between package.json and catalog:
+
 - apps/web had `zod: ^4.1.12`
 - Catalog has `zod: ^3.25.76`
 
@@ -41,7 +42,7 @@ pnpm dev
 ## Services
 
 - Web: http://localhost:3100
-- API: http://localhost:3300  
+- API: http://localhost:3300
 - Prisma Studio: http://localhost:3400
 - Email: http://localhost:3200
 

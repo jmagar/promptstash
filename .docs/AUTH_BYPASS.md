@@ -5,18 +5,21 @@
 ## Quick Toggle
 
 ### Disable Authentication (Current Setting)
+
 ```bash
 # In apps/web/.env.local
 NEXT_PUBLIC_DISABLE_AUTH=true
 ```
 
 When enabled, all protected routes will use a mock user:
+
 - **ID:** `dev-user-123`
 - **Name:** Dev User
 - **Email:** dev@promptstash.local
 - **Email Verified:** Yes
 
 ### Re-enable Authentication
+
 ```bash
 # In apps/web/.env.local
 NEXT_PUBLIC_DISABLE_AUTH=false
@@ -30,17 +33,17 @@ The bypass is implemented in `apps/web/hooks/use-auth-user.ts`:
 ```typescript
 export function useRequiredAuthUser() {
   // AUTH BYPASS for development - remove in production!
-  if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
+  if (process.env.NEXT_PUBLIC_DISABLE_AUTH === "true") {
     const mockUser = {
-      id: 'dev-user-123',
-      name: 'Dev User',
-      email: 'dev@promptstash.local',
+      id: "dev-user-123",
+      name: "Dev User",
+      email: "dev@promptstash.local",
       emailVerified: true,
       image: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    
+
     return {
       user: mockUser,
       isLoading: false,
@@ -48,7 +51,7 @@ export function useRequiredAuthUser() {
       refetch: async () => ({ data: null }),
     };
   }
-  
+
   // ... normal auth flow continues
 }
 ```
@@ -56,6 +59,7 @@ export function useRequiredAuthUser() {
 ## When to Use
 
 ### ✅ Use Auth Bypass When:
+
 - Developing UI/UX without needing real auth
 - Testing protected routes quickly
 - Working on features that don't involve user-specific data
@@ -63,6 +67,7 @@ export function useRequiredAuthUser() {
 - Demonstrating features without sign-in
 
 ### ❌ Don't Use Auth Bypass When:
+
 - Testing actual authentication flows (sign-up, sign-in, password reset)
 - Testing user-specific permissions
 - Working on multi-user features
@@ -74,6 +79,7 @@ export function useRequiredAuthUser() {
 When auth is bypassed, these routes become accessible without sign-in:
 
 ### Protected Routes
+
 - `/dashboard` - User dashboard
 - `/profile` - User profile page
 - `/stash` - PromptStash file manager
@@ -81,6 +87,7 @@ When auth is bypassed, these routes become accessible without sign-in:
 - `/settings/security` - Security settings (2FA, password)
 
 ### Still Public Routes
+
 - `/` - Landing page
 - `/sign-in` - Sign in page (still accessible, but not required)
 - `/sign-up` - Sign up page (still accessible, but not required)
@@ -112,12 +119,14 @@ If you need to bypass API auth too (e.g., for testing):
 When you're ready to test real authentication:
 
 1. **Disable the bypass:**
+
    ```bash
    # apps/web/.env.local
    NEXT_PUBLIC_DISABLE_AUTH=false
    ```
 
 2. **Restart the dev server:**
+
    ```bash
    pkill -f "next dev"
    pnpm --filter web dev
@@ -168,11 +177,11 @@ For production, you may want to remove the bypass code completely:
 // In apps/web/hooks/use-auth-user.ts
 export function useRequiredAuthUser() {
   // Delete the entire if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') block
-  
+
   const { user, isLoading, isAuthenticated, error, refetch } = useAuthUser({
     redirectOnUnauthenticated: true,
   });
-  
+
   // ... rest of the function
 }
 ```
@@ -186,12 +195,14 @@ export function useRequiredAuthUser() {
 **Solutions:**
 
 1. **Restart the dev server:**
+
    ```bash
    pkill -f "next dev"
    pnpm --filter web dev
    ```
 
 2. **Verify environment variable:**
+
    ```bash
    grep NEXT_PUBLIC_DISABLE_AUTH apps/web/.env.local
    # Should show: NEXT_PUBLIC_DISABLE_AUTH=true
@@ -217,16 +228,19 @@ export function useRequiredAuthUser() {
 **Solutions:**
 
 **Option 1: Create a real user and sign in**
+
 - Most realistic approach
 - Tests full auth flow
 - Best for integration testing
 
 **Option 2: Mock API responses (for pure UI dev)**
+
 - Use MSW (Mock Service Worker)
 - Or create mock API client
 - Good for isolated frontend development
 
 **Option 3: Temporarily disable API auth (dangerous!)**
+
 - Only for local development
 - Never commit to git
 - Re-enable before testing or deploying
@@ -239,15 +253,15 @@ export function useRequiredAuthUser() {
 
 ```typescript
 const mockUser: AuthUser = {
-  id: 'dev-user-123',
-  name: 'Dev User',
-  email: 'dev@promptstash.local',
+  id: "dev-user-123",
+  name: "Dev User",
+  email: "dev@promptstash.local",
   emailVerified: true,
   image: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   // Add any additional properties your app needs
-  role: 'admin',  // example
+  role: "admin", // example
   preferences: {}, // example
 };
 ```
@@ -268,13 +282,13 @@ For more sophisticated control, consider using a feature flag system:
 ```typescript
 // config/features.ts
 export const features = {
-  authBypass: process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true',
-  debugMode: process.env.NEXT_PUBLIC_DEBUG === 'true',
+  authBypass: process.env.NEXT_PUBLIC_DISABLE_AUTH === "true",
+  debugMode: process.env.NEXT_PUBLIC_DEBUG === "true",
   // ... other flags
 };
 
 // In your hook
-import { features } from '@/config/features';
+import { features } from "@/config/features";
 
 if (features.authBypass) {
   // ... bypass logic
@@ -283,10 +297,10 @@ if (features.authBypass) {
 
 ## Summary
 
-| Setting | Routes Accessible | API Auth | Use Case |
-|---------|-------------------|----------|----------|
-| `NEXT_PUBLIC_DISABLE_AUTH=true` | All | ❌ Still enforced | UI development |
-| `NEXT_PUBLIC_DISABLE_AUTH=false` | Public only | ✅ Enforced | Normal development |
-| Production | Public only | ✅ Enforced | Live app |
+| Setting                          | Routes Accessible | API Auth          | Use Case           |
+| -------------------------------- | ----------------- | ----------------- | ------------------ |
+| `NEXT_PUBLIC_DISABLE_AUTH=true`  | All               | ❌ Still enforced | UI development     |
+| `NEXT_PUBLIC_DISABLE_AUTH=false` | Public only       | ✅ Enforced       | Normal development |
+| Production                       | Public only       | ✅ Enforced       | Live app           |
 
 **Current Status:** ✅ Auth bypass **ENABLED** (`NEXT_PUBLIC_DISABLE_AUTH=true`)

@@ -1,10 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useCreateFolder } from '@/hooks/use-promptstash';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { toast } from 'sonner';
+import { Button } from '@workspace/ui/components/button';
 import {
   Dialog,
   DialogContent,
@@ -24,11 +22,13 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
-import { Textarea } from '@workspace/ui/components/textarea';
-import { Button } from '@workspace/ui/components/button';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { useCreateFolder } from '@/hooks/use-promptstash';
+import { Textarea } from '@workspace/ui/components/textarea';
 import { FolderPlus } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Folder name is required').max(255),
@@ -43,11 +43,7 @@ interface NewFolderModalProps {
   onSuccess?: () => void;
 }
 
-export function NewFolderModal({
-  stashId,
-  parentFolderId,
-  onSuccess,
-}: NewFolderModalProps) {
+export function NewFolderModal({ stashId, parentFolderId, onSuccess }: NewFolderModalProps) {
   const [open, setOpen] = useState(false);
   const createFolder = useCreateFolder();
 
@@ -90,9 +86,7 @@ export function NewFolderModal({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>
-          <DialogDescription>
-            Add a new folder to organize your files.
-          </DialogDescription>
+          <DialogDescription>Add a new folder to organize your files.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -105,9 +99,7 @@ export function NewFolderModal({
                   <FormControl>
                     <Input placeholder="my-folder" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Use lowercase and hyphens for folder names.
-                  </FormDescription>
+                  <FormDescription>Use lowercase and hyphens for folder names.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

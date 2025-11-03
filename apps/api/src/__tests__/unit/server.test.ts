@@ -28,6 +28,19 @@ jest.mock('@workspace/rate-limit', () => ({
 
 // Mock the auth middleware
 jest.mock('../../middleware/auth', () => ({
+  getSession: jest.fn((req: Request, res: Response, next: NextFunction) => {
+    // Mock authenticated user for testing
+    Object.assign(req, {
+      user: {
+        id: 'test-user-123',
+        email: 'test@example.com',
+      },
+      session: {
+        id: 'session-123',
+      },
+    });
+    next();
+  }),
   requireAuth: jest.fn((req: Request, res: Response, next: NextFunction) => {
     // Mock authenticated user for testing
     Object.assign(req, {

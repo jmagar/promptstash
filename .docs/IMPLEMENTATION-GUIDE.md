@@ -66,22 +66,22 @@ Consider how to store skill metadata:
 // Pseudo-code for database schema
 interface Skill {
   id: string;
-  name: string;                    // From frontmatter
-  description: string;             // From frontmatter
-  slug: string;                    // kebab-case directory name
-  category?: string;              // Optional
-  tags: string[];                 // Optional
-  author?: string;                // Optional
-  version?: string;               // Optional
-  dependencies: string[];         // Optional: other skill slugs
+  name: string; // From frontmatter
+  description: string; // From frontmatter
+  slug: string; // kebab-case directory name
+  category?: string; // Optional
+  tags: string[]; // Optional
+  author?: string; // Optional
+  version?: string; // Optional
+  dependencies: string[]; // Optional: other skill slugs
 
   // File system paths
-  rootPath: string;               // .claude/skills/skill-slug/
-  skillMdPath: string;            // Full path to SKILL.md
+  rootPath: string; // .claude/skills/skill-slug/
+  skillMdPath: string; // Full path to SKILL.md
 
   // Content
   frontmatter: Record<string, any>;
-  content: string;               // Markdown content of SKILL.md
+  content: string; // Markdown content of SKILL.md
 
   // Metadata
   createdAt: Date;
@@ -91,12 +91,12 @@ interface Skill {
   validationErrors: ValidationError[];
 
   // Organization
-  scope: "user" | "project" | "plugin";  // Where skill is stored
-  referenceFiles: ReferenceFile[];       // Optional docs, examples, etc.
+  scope: "user" | "project" | "plugin"; // Where skill is stored
+  referenceFiles: ReferenceFile[]; // Optional docs, examples, etc.
 }
 
 interface ReferenceFile {
-  path: string;                  // Relative to skill root
+  path: string; // Relative to skill root
   name: string;
   type: "doc" | "example" | "template" | "sample" | "config";
   description?: string;
@@ -121,7 +121,7 @@ function detectFileType(path: string, stats: FileStats): FileType {
     // Check if it has SKILL.md
     const skillMdPath = join(path, "SKILL.md");
     if (existsSync(skillMdPath)) {
-      return "skill";  // It's a skill directory
+      return "skill"; // It's a skill directory
     }
     // Otherwise, not a valid Claude Code file
     throw new Error("Directory must contain SKILL.md to be a skill");
@@ -173,7 +173,7 @@ function validateSkillStructure(skillPath: string): {
       code: "NOT_DIRECTORY",
       message: "Skill must be a directory",
       severity: "error",
-      suggestion: "Create a directory structure"
+      suggestion: "Create a directory structure",
     });
     return { valid: false, errors };
   }
@@ -185,7 +185,7 @@ function validateSkillStructure(skillPath: string): {
       code: "INVALID_DIR_NAME",
       message: `Directory name must be kebab-case, got: ${dirName}`,
       severity: "error",
-      suggestion: `Rename directory to: ${toKebabCase(dirName)}`
+      suggestion: `Rename directory to: ${toKebabCase(dirName)}`,
     });
   }
 
@@ -196,40 +196,40 @@ function validateSkillStructure(skillPath: string): {
       code: "MISSING_SKILL_MD",
       message: "Missing SKILL.md file",
       severity: "error",
-      suggestion: "Create SKILL.md file in skill directory"
+      suggestion: "Create SKILL.md file in skill directory",
     });
     return { valid: false, errors };
   }
 
   // Rule 4: Cannot have other SKILL.* files
-  const skillFiles = listFiles(skillPath)
-    .filter(f => f.startsWith("SKILL."));
+  const skillFiles = listFiles(skillPath).filter((f) => f.startsWith("SKILL."));
 
   if (skillFiles.length > 1) {
     errors.push({
       code: "MULTIPLE_SKILL_DEFINITIONS",
       message: `Found ${skillFiles.length} SKILL files, need exactly 1`,
       severity: "error",
-      suggestion: `Remove: ${skillFiles.filter(f => f !== "SKILL.md").join(", ")}`
+      suggestion: `Remove: ${skillFiles.filter((f) => f !== "SKILL.md").join(", ")}`,
     });
   }
 
   // Rule 5: No loose .md files at root (except SKILL.md)
-  const rootMarkdownFiles = listFiles(skillPath)
-    .filter(f => f.endsWith(".md") && f !== "SKILL.md");
+  const rootMarkdownFiles = listFiles(skillPath).filter(
+    (f) => f.endsWith(".md") && f !== "SKILL.md",
+  );
 
   if (rootMarkdownFiles.length > 0) {
     errors.push({
       code: "LOOSE_MARKDOWN_FILES",
       message: `Found ${rootMarkdownFiles.length} markdown files at root`,
       severity: "warning",
-      suggestion: `Move to subdirectories: docs/, examples/, etc.`
+      suggestion: `Move to subdirectories: docs/, examples/, etc.`,
     });
   }
 
   return {
-    valid: errors.some(e => e.severity === "error").length === 0,
-    errors
+    valid: errors.some((e) => e.severity === "error").length === 0,
+    errors,
   };
 }
 
@@ -263,9 +263,10 @@ interface FrontmatterSchema {
   dependencies?: { type: "string[]" };
 }
 
-function validateFrontmatter(
-  frontmatter: Record<string, any>
-): { valid: boolean; errors: ValidationError[] } {
+function validateFrontmatter(frontmatter: Record<string, any>): {
+  valid: boolean;
+  errors: ValidationError[];
+} {
   const errors: ValidationError[] = [];
 
   // Required: name
@@ -273,13 +274,13 @@ function validateFrontmatter(
     errors.push({
       code: "MISSING_NAME",
       message: "'name' is required and must be a string",
-      severity: "error"
+      severity: "error",
     });
   } else if (frontmatter.name.length < 2 || frontmatter.name.length > 200) {
     errors.push({
       code: "INVALID_NAME_LENGTH",
       message: "'name' must be 2-200 characters",
-      severity: "error"
+      severity: "error",
     });
   }
 
@@ -288,7 +289,7 @@ function validateFrontmatter(
     errors.push({
       code: "MISSING_DESCRIPTION",
       message: "'description' is required and must be a string",
-      severity: "error"
+      severity: "error",
     });
   } else if (
     frontmatter.description.length < 10 ||
@@ -297,7 +298,7 @@ function validateFrontmatter(
     errors.push({
       code: "INVALID_DESCRIPTION_LENGTH",
       message: "'description' must be 10-500 characters",
-      severity: "error"
+      severity: "error",
     });
   }
 
@@ -307,13 +308,13 @@ function validateFrontmatter(
       errors.push({
         code: "INVALID_TAGS_TYPE",
         message: "'tags' must be an array of strings",
-        severity: "error"
+        severity: "error",
       });
     } else if (frontmatter.tags.length > 20) {
       errors.push({
         code: "TOO_MANY_TAGS",
         message: "Maximum 20 tags allowed",
-        severity: "warning"
+        severity: "warning",
       });
     }
   }
@@ -321,11 +322,14 @@ function validateFrontmatter(
   // Optional: version validation
   if (frontmatter.version !== undefined) {
     const semverPattern = /^\d+\.\d+\.\d+$/;
-    if (typeof frontmatter.version !== "string" || !semverPattern.test(frontmatter.version)) {
+    if (
+      typeof frontmatter.version !== "string" ||
+      !semverPattern.test(frontmatter.version)
+    ) {
       errors.push({
         code: "INVALID_VERSION_FORMAT",
         message: "Version should follow semantic versioning (X.Y.Z)",
-        severity: "warning"
+        severity: "warning",
       });
     }
   }
@@ -336,14 +340,14 @@ function validateFrontmatter(
       errors.push({
         code: "INVALID_DEPENDENCIES_TYPE",
         message: "'dependencies' must be an array of skill names",
-        severity: "error"
+        severity: "error",
       });
     }
   }
 
   return {
-    valid: errors.filter(e => e.severity === "error").length === 0,
-    errors
+    valid: errors.filter((e) => e.severity === "error").length === 0,
+    errors,
   };
 }
 ```
@@ -352,7 +356,7 @@ function validateFrontmatter(
 
 Validate markdown content.
 
-```typescript
+````typescript
 function validateContent(content: string): {
   valid: boolean;
   errors: ValidationError[];
@@ -365,7 +369,7 @@ function validateContent(content: string): {
     errors.push({
       code: "EMPTY_CONTENT",
       message: "File has no content",
-      severity: "error"
+      severity: "error",
     });
     return { valid: false, errors };
   }
@@ -375,7 +379,7 @@ function validateContent(content: string): {
     errors.push({
       code: "CONTENT_TOO_SHORT",
       message: "Content is too short (minimum 50 characters)",
-      severity: "warning"
+      severity: "warning",
     });
   }
 
@@ -384,7 +388,7 @@ function validateContent(content: string): {
     errors.push({
       code: "SCRIPT_TAG_FOUND",
       message: "Script tags are not allowed",
-      severity: "error"
+      severity: "error",
     });
   }
 
@@ -393,30 +397,30 @@ function validateContent(content: string): {
     errors.push({
       code: "NO_HEADINGS",
       message: "Should contain at least one markdown heading",
-      severity: "warning"
+      severity: "warning",
     });
   }
 
   // Rule 5: Validate code blocks have language
   const codeBlockPattern = /```(\w*)\n/g;
   const matches = content.match(codeBlockPattern) || [];
-  const emptyLang = matches.filter(m => m === "```\n");
+  const emptyLang = matches.filter((m) => m === "```\n");
 
   if (emptyLang.length > 0) {
     errors.push({
       code: "CODE_BLOCK_NO_LANGUAGE",
       message: `${emptyLang.length} code block(s) missing language specification`,
       severity: "warning",
-      suggestion: "Add language to code blocks: ```javascript"
+      suggestion: "Add language to code blocks: ```javascript",
     });
   }
 
   return {
-    valid: errors.filter(e => e.severity === "error").length === 0,
-    errors
+    valid: errors.filter((e) => e.severity === "error").length === 0,
+    errors,
   };
 }
-```
+````
 
 ### 5. Skill Creation Workflow
 
@@ -424,8 +428,8 @@ Handle skill creation with proper structure generation.
 
 ```typescript
 interface CreateSkillRequest {
-  name: string;              // User-provided name
-  description: string;       // User-provided description
+  name: string; // User-provided name
+  description: string; // User-provided description
   category?: string;
   tags?: string[];
   scope: "user" | "project" | "plugin";
@@ -458,7 +462,7 @@ async function createSkill(request: CreateSkillRequest): Promise<Skill> {
     name: request.name,
     description: request.description,
     ...(request.category && { category: request.category }),
-    ...(request.tags && { tags: request.tags })
+    ...(request.tags && { tags: request.tags }),
   };
 
   const skillMdContent = generateSkillTemplate(frontmatter);
@@ -471,7 +475,7 @@ async function createSkill(request: CreateSkillRequest): Promise<Skill> {
     // Rollback on validation failure
     fs.rmSync(skillPath, { recursive: true });
     throw new Error(
-      `Created skill failed validation: ${structureValidation.errors[0].message}`
+      `Created skill failed validation: ${structureValidation.errors[0].message}`,
     );
   }
 
@@ -483,7 +487,7 @@ function generateSkillTemplate(frontmatter: Record<string, any>): string {
   const yaml = Object.entries(frontmatter)
     .map(([key, value]) => {
       if (Array.isArray(value)) {
-        return `${key}:\n${value.map(v => `  - "${v}"`).join("\n")}`;
+        return `${key}:\n${value.map((v) => `  - "${v}"`).join("\n")}`;
       }
       return `${key}: "${value}"`;
     })
@@ -530,7 +534,7 @@ interface UploadResult {
 
 async function uploadSkill(
   uploadedPath: string,
-  destinationScope: "user" | "project" | "plugin"
+  destinationScope: "user" | "project" | "plugin",
 ): Promise<UploadResult> {
   const errors: ValidationError[] = [];
   const warnings: ValidationError[] = [];
@@ -542,8 +546,12 @@ async function uploadSkill(
   if (stats.isDirectory()) {
     // Uploaded a directory - validate as skill
     const structValidation = validateSkillStructure(uploadedPath);
-    errors.push(...structValidation.errors.filter(e => e.severity === "error"));
-    warnings.push(...structValidation.errors.filter(e => e.severity === "warning"));
+    errors.push(
+      ...structValidation.errors.filter((e) => e.severity === "error"),
+    );
+    warnings.push(
+      ...structValidation.errors.filter((e) => e.severity === "warning"),
+    );
 
     if (errors.length > 0) {
       return { success: false, errors, warnings };
@@ -559,7 +567,7 @@ async function uploadSkill(
         errors.push({
           code: "CANCELED",
           message: "Upload canceled",
-          severity: "error"
+          severity: "error",
         });
         return { success: false, errors, warnings };
       }
@@ -572,7 +580,7 @@ async function uploadSkill(
       errors.push({
         code: "INVALID_UPLOAD",
         message: "Uploaded .md file must be named SKILL.md",
-        severity: "error"
+        severity: "error",
       });
       return { success: false, errors, warnings };
     }
@@ -580,14 +588,14 @@ async function uploadSkill(
     errors.push({
       code: "INVALID_FILE_TYPE",
       message: "Must upload skill directory or SKILL.md file",
-      severity: "error"
+      severity: "error",
     });
     return { success: false, errors, warnings };
   }
 
   // Step 2: Validate complete skill
   const contentValidation = validateContent(
-    fs.readFileSync(join(skillDirPath, "SKILL.md"), "utf-8")
+    fs.readFileSync(join(skillDirPath, "SKILL.md"), "utf-8"),
   );
   warnings.push(...contentValidation.errors);
 
@@ -598,7 +606,7 @@ async function uploadSkill(
       errors.push({
         code: "SKILL_EXISTS",
         message: `Skill '${basename(skillDirPath)}' already exists`,
-        severity: "error"
+        severity: "error",
       });
       return { success: false, errors, warnings };
     }
@@ -610,7 +618,7 @@ async function uploadSkill(
     success: true,
     skillPath: finalPath,
     errors,
-    warnings
+    warnings,
   };
 }
 ```
@@ -854,14 +862,14 @@ describe("validateFrontmatter", () => {
   it("should pass valid frontmatter", () => {
     const result = validateFrontmatter({
       name: "My Skill",
-      description: "A useful skill for doing things"
+      description: "A useful skill for doing things",
     });
     expect(result.valid).toBe(true);
   });
 
   it("should fail if name is missing", () => {
     const result = validateFrontmatter({
-      description: "A useful skill"
+      description: "A useful skill",
     });
     expect(result.valid).toBe(false);
   });
@@ -869,7 +877,7 @@ describe("validateFrontmatter", () => {
   it("should reject name that's too short", () => {
     const result = validateFrontmatter({
       name: "A",
-      description: "Valid description"
+      description: "Valid description",
     });
     expect(result.valid).toBe(false);
   });
@@ -885,7 +893,7 @@ describe("Skill Workflow", () => {
     const skill = await createSkill({
       name: "Test Skill",
       description: "A test skill",
-      scope: "user"
+      scope: "user",
     });
 
     expect(skill).toBeDefined();
@@ -928,7 +936,7 @@ async function deploySkill(skill: Skill): Promise<DeploymentPackage> {
   const package = {
     name: skill.slug,
     version: skill.version || "1.0.0",
-    files: []
+    files: [],
   };
 
   // Step 3: Include all files
@@ -936,7 +944,7 @@ async function deploySkill(skill: Skill): Promise<DeploymentPackage> {
   for (const file of files) {
     package.files.push({
       path: relative(skill.rootPath, file),
-      content: readFileSync(file, "utf-8")
+      content: readFileSync(file, "utf-8"),
     });
   }
 

@@ -21,9 +21,11 @@
 ### Conflicts Resolved (5 files)
 
 #### 1. `apps/api/src/routes/file.routes.ts` ✅
+
 **Strategy**: Combined both sets of changes
 
 **What Was Merged**:
+
 - ✅ Authorization checks with `requireAuth` middleware
 - ✅ Ownership verification via stash (`userId` checks, 403 responses)
 - ✅ Helper functions (`generateFilePath`, `mapToPrismaFileType`)
@@ -35,14 +37,17 @@
 - ✅ Used real `userId` instead of "user" placeholder in `createdBy`
 
 **Key Resolutions**:
+
 - Combined `select` and `include` properly in existingFile query
 - Merged validation logic with authorization checks
 - Kept transaction pattern from main with userId from our branch
 
 #### 2. `apps/api/src/routes/folder.routes.ts` ✅
+
 **Strategy**: Combined auth checks with enhanced selects
 
 **What Was Merged**:
+
 - ✅ Authorization checks with ownership verification
 - ✅ Enhanced children select with specific fields
 - ✅ Enhanced tag selects with id, name, color
@@ -51,9 +56,11 @@
 - ✅ All CRUD operations protected with 403 responses
 
 #### 3. `apps/api/src/routes/stash.routes.ts` ✅
+
 **Strategy**: Combined auth with pagination
 
 **What Was Merged**:
+
 - ✅ Authorization checks replacing "user-id-placeholder"
 - ✅ Real userId from authentication
 - ✅ Auto-create default stash logic preserved
@@ -63,12 +70,15 @@
 - ✅ All routes protected with ownership checks
 
 **Key Addition**:
+
 - Added `import { prisma, type Prisma } from "@workspace/db"` for pagination types
 
 #### 4. `apps/web/app/(default)/stash/page.tsx` ✅
+
 **Strategy**: Kept main's version entirely
 
 **Reason**: Main branch had significant new features:
+
 - New modal components (NewFileModal, NewFolderModal)
 - File editor integration (FileEditor component)
 - Enhanced state management (editorFileId, editorOpen)
@@ -78,15 +88,18 @@
 Our branch only had documentation changes that were already in main.
 
 #### 5. `apps/web/lib/api-client.ts` ✅
+
 **Strategy**: Combined both improvements
 
 **What Was Merged**:
+
 - ✅ Better type safety: `params as Record<string, string>` (from main)
 - ✅ Credentials included in requests: `credentials: 'include'` (from our branch)
 
 ### Verification Results
 
 ✅ **TypeScript Compilation**: PASSED
+
 ```bash
 cd apps/api && pnpm check-types
 # Exit code: 0
@@ -99,6 +112,7 @@ cd apps/api && pnpm check-types
 ### Features Combined Successfully
 
 #### Security Features (Our Branch)
+
 - ✅ `requireAuth` middleware on all routes
 - ✅ `AuthenticatedRequest` type for type safety
 - ✅ Ownership verification via stash relationship
@@ -106,6 +120,7 @@ cd apps/api && pnpm check-types
 - ✅ Real userId from auth context (no placeholders)
 
 #### Performance & Quality Features (Main Branch)
+
 - ✅ Helper functions for path generation and type mapping
 - ✅ Auto-path generation based on fileType
 - ✅ Transaction-based updates for data consistency
@@ -118,6 +133,7 @@ cd apps/api && pnpm check-types
 ### Branch Status
 
 **Current Commits**:
+
 ```
 2e683f8 - fix(api): use filename from path for agent validation
 d521c39 - Merge branch 'main' into docs/promptstash-rebrand-and-cleanup
@@ -131,6 +147,7 @@ ffb9bbb - fix(api): add authorization checks and fix TypeScript errors
 ### Next Steps
 
 #### Option 1: Create PR to Main ✅ **RECOMMENDED**
+
 ```bash
 # Create PR via GitHub CLI
 gh pr create \
@@ -144,7 +161,7 @@ gh pr create \
 - Ownership verification via stash relationship
 - 403 Forbidden responses for unauthorized access
 
-## TypeScript Fixes  
+## TypeScript Fixes
 - Fixed req.user possibly null/undefined errors
 - Created AuthenticatedRequest type
 - All routes properly typed
@@ -166,6 +183,7 @@ All conflicts resolved. TypeScript compilation passes. Authorization and perform
 ```
 
 #### Option 2: Direct Merge to Main
+
 ```bash
 git checkout main
 git merge docs/promptstash-rebrand-and-cleanup --no-ff
@@ -210,12 +228,14 @@ git push origin main
 ### Backup
 
 Backup branch created before merge:
+
 ```bash
 git branch | grep backup
 # backup/pre-merge-20251103-XXXXXX
 ```
 
 Can restore if needed:
+
 ```bash
 git reset --hard backup/pre-merge-20251103-XXXXXX
 ```

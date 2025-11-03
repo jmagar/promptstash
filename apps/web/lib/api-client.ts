@@ -1,6 +1,6 @@
 /**
  * API Client for PromptStash Backend
- * 
+ *
  * Provides typed functions for interacting with the Express API
  */
 
@@ -101,12 +101,15 @@ export const apiClient = {
   },
 
   // Files
-  async getFiles(stashId: string, params?: {
-    search?: string;
-    fileType?: string;
-    tags?: string;
-    folderId?: string;
-  }): Promise<File[]> {
+  async getFiles(
+    stashId: string,
+    params?: {
+      search?: string;
+      fileType?: string;
+      tags?: string;
+      folderId?: string;
+    },
+  ): Promise<File[]> {
     const searchParams = new URLSearchParams(params as Record<string, string>);
     const res = await fetch(`${API_BASE_URL}/stashes/${stashId}/files?${searchParams}`, {
       credentials: 'include',
@@ -147,11 +150,14 @@ export const apiClient = {
     return res.json();
   },
 
-  async updateFile(id: string, data: {
-    name?: string;
-    content?: string;
-    tags?: string[];
-  }): Promise<File> {
+  async updateFile(
+    id: string,
+    data: {
+      name?: string;
+      content?: string;
+      tags?: string[];
+    },
+  ): Promise<File> {
     const res = await fetch(`${API_BASE_URL}/files/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -215,10 +221,13 @@ export const apiClient = {
     return res.json();
   },
 
-  async updateFolder(id: string, data: {
-    name?: string;
-    path?: string;
-  }): Promise<Folder> {
+  async updateFolder(
+    id: string,
+    data: {
+      name?: string;
+      path?: string;
+    },
+  ): Promise<Folder> {
     const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

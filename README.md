@@ -28,6 +28,7 @@ pnpm dev
 ## ✨ Features (50% Complete - MVP Working!)
 
 ✅ **Working Now:**
+
 - Create, view, edit, and save files through UI
 - Automatic versioning on every save
 - File type validation (Agent, Skill, MCP, Hooks)
@@ -36,6 +37,7 @@ pnpm dev
 - Modal-based workflows
 
 🔜 **Coming Soon:**
+
 - Syntax-highlighted editor (Monaco/CodeMirror)
 - Folder navigation
 - Search (Cmd+K)

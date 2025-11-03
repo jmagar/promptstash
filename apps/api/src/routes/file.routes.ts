@@ -1,12 +1,8 @@
-import { Router, Request, Response } from "express";
-import { prisma, type Prisma } from "@workspace/db";
-import {
-  validateAgentFile,
-  validateSkillFile,
-  validateMCPFile,
-} from "@workspace/utils";
-import { requireAuth } from "../middleware/auth";
-import type { AuthenticatedRequest } from "../types/express";
+import { prisma, type Prisma } from '@workspace/db';
+import { validateAgentFile, validateMCPFile, validateSkillFile } from '@workspace/utils';
+import { Request, Response, Router } from 'express';
+import { requireAuth } from '../middleware/auth';
+import type { AuthenticatedRequest } from '../types/express';
 
 // Validation result type
 interface ValidationResult {
@@ -24,7 +20,7 @@ router.use(requireAuth);
  * GET /api/files/:id
  * Get a specific file by ID
  */
-router.get("/:id", async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as AuthenticatedRequest).user.id;
@@ -45,18 +41,18 @@ router.get("/:id", async (req: Request, res: Response) => {
     });
 
     if (!file) {
-      return res.status(404).json({ error: "File not found" });
+      return res.status(404).json({ error: 'File not found' });
     }
 
     // Verify ownership via stash
     if (file.stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     res.json(file);
   } catch (error) {
-    console.error("Error fetching file:", error);
-    res.status(500).json({ error: "Failed to fetch file" });
+    console.error('Error fetching file:', error);
+    res.status(500).json({ error: 'Failed to fetch file' });
   }
 });
 
@@ -116,7 +112,7 @@ function mapToPrismaFileType(fileType: string): 'MARKDOWN' | 'JSON' | 'JSONL' | 
  * POST /api/files
  * Create a new file
  */
-router.post("/", async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const { name, content, fileType, stashId, folderId, tags } = req.body;
     let { path } = req.body;
@@ -126,8 +122,8 @@ router.post("/", async (req: Request, res: Response) => {
     if (!user || !user.id) {
       console.error('User authentication failed:', { user, hasSession: !!req.session });
       return res.status(401).json({
-        error: "Authentication failed",
-        message: "User ID not found in session",
+        error: 'Authentication failed',
+        message: 'User ID not found in session',
       });
     }
     const userId = user.id;
@@ -135,7 +131,7 @@ router.post("/", async (req: Request, res: Response) => {
     // Validate required fields
     if (!name || !content || !fileType || !stashId) {
       return res.status(400).json({
-        error: "Missing required fields: name, content, fileType, stashId",
+        error: 'Missing required fields: name, content, fileType, stashId',
       });
     }
 
@@ -154,11 +150,11 @@ router.post("/", async (req: Request, res: Response) => {
     });
 
     if (!stash) {
-      return res.status(404).json({ error: "Stash not found" });
+      return res.status(404).json({ error: 'Stash not found' });
     }
 
     if (stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     // If folderId is provided, verify the folder belongs to the same stash
@@ -169,30 +165,30 @@ router.post("/", async (req: Request, res: Response) => {
       });
 
       if (!folder) {
-        return res.status(404).json({ error: "Folder not found" });
+        return res.status(404).json({ error: 'Folder not found' });
       }
 
       if (folder.stashId !== stashId) {
-        return res.status(400).json({ error: "Folder must belong to the same stash" });
+        return res.status(400).json({ error: 'Folder must belong to the same stash' });
       }
     }
 
     // Validate file content based on type
     let validation: ValidationResult = { valid: true, errors: [], warnings: [] };
 
-    if (fileType === "AGENT") {
+    if (fileType === 'AGENT') {
       // Extract filename from generated path (e.g., ".claude/agents/test-agent.md" -> "test-agent.md")
       const filename = path.split('/').pop() || name;
       validation = validateAgentFile(content, filename);
-    } else if (fileType === "SKILL") {
+    } else if (fileType === 'SKILL') {
       validation = validateSkillFile(content, path);
-    } else if (fileType === "MCP") {
+    } else if (fileType === 'MCP') {
       validation = validateMCPFile(content);
     }
 
     if (!validation.valid) {
       return res.status(400).json({
-        error: "Validation failed",
+        error: 'Validation failed',
         errors: validation.errors,
         warnings: validation.warnings,
       });
@@ -209,9 +205,11 @@ router.post("/", async (req: Request, res: Response) => {
         folderId: folderId || null,
         tags: tags
           ? {
-              create: tags.filter((tagId: unknown): tagId is string => typeof tagId === "string").map((tagId: string) => ({
-                tagId,
-              })),
+              create: tags
+                .filter((tagId: unknown): tagId is string => typeof tagId === 'string')
+                .map((tagId: string) => ({
+                  tagId,
+                })),
             }
           : undefined,
       },
@@ -241,14 +239,14 @@ router.post("/", async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error("Error creating file:", error);
-    console.error("Error details:", {
+    console.error('Error creating file:', error);
+    console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
       requestBody: req.body,
     });
     res.status(500).json({
-      error: "Failed to create file",
+      error: 'Failed to create file',
       details: error instanceof Error ? error.message : 'Unknown error',
     });
   }
@@ -258,7 +256,7 @@ router.post("/", async (req: Request, res: Response) => {
  * PUT /api/files/:id
  * Update an existing file
  */
-router.put("/:id", async (req: Request, res: Response) => {
+router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, content, tags } = req.body;
@@ -266,7 +264,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 
     // Validate id parameter
     if (!id) {
-      return res.status(400).json({ error: "File ID is required" });
+      return res.status(400).json({ error: 'File ID is required' });
     }
 
     // Get existing file with stash for ownership verification
@@ -282,7 +280,7 @@ router.put("/:id", async (req: Request, res: Response) => {
           select: { userId: true },
         },
         versions: {
-          orderBy: { version: "desc" },
+          orderBy: { version: 'desc' },
           take: 1,
           select: {
             version: true,
@@ -292,29 +290,29 @@ router.put("/:id", async (req: Request, res: Response) => {
     });
 
     if (!existingFile) {
-      return res.status(404).json({ error: "File not found" });
+      return res.status(404).json({ error: 'File not found' });
     }
 
     // Verify ownership via stash
     if (existingFile.stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     // Validate content if provided
     if (content) {
       let validation: ValidationResult = { valid: true, errors: [], warnings: [] };
 
-      if (existingFile.fileType === "MARKDOWN" && existingFile.path.includes("/agents/")) {
+      if (existingFile.fileType === 'MARKDOWN' && existingFile.path.includes('/agents/')) {
         validation = validateAgentFile(content, name || existingFile.name);
-      } else if (existingFile.fileType === "MARKDOWN" && existingFile.path.includes("/skills/")) {
+      } else if (existingFile.fileType === 'MARKDOWN' && existingFile.path.includes('/skills/')) {
         validation = validateSkillFile(content, existingFile.path);
-      } else if (existingFile.fileType === "JSON" && existingFile.name === ".mcp.json") {
+      } else if (existingFile.fileType === 'JSON' && existingFile.name === '.mcp.json') {
         validation = validateMCPFile(content);
       }
 
       if (!validation.valid) {
         return res.status(400).json({
-          error: "Validation failed",
+          error: 'Validation failed',
           errors: validation.errors,
           warnings: validation.warnings,
         });
@@ -334,9 +332,11 @@ router.put("/:id", async (req: Request, res: Response) => {
           ...(tags && {
             tags: {
               deleteMany: {},
-              create: tags.filter((tagId: unknown): tagId is string => typeof tagId === "string").map((tagId: string) => ({
-                tagId,
-              })),
+              create: tags
+                .filter((tagId: unknown): tagId is string => typeof tagId === 'string')
+                .map((tagId: string) => ({
+                  tagId,
+                })),
             },
           }),
         },
@@ -367,8 +367,8 @@ router.put("/:id", async (req: Request, res: Response) => {
 
     res.json(result);
   } catch (error) {
-    console.error("Error updating file:", error);
-    res.status(500).json({ error: "Failed to update file" });
+    console.error('Error updating file:', error);
+    res.status(500).json({ error: 'Failed to update file' });
   }
 });
 
@@ -376,7 +376,7 @@ router.put("/:id", async (req: Request, res: Response) => {
  * DELETE /api/files/:id
  * Delete a file
  */
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as AuthenticatedRequest).user.id;
@@ -392,11 +392,11 @@ router.delete("/:id", async (req: Request, res: Response) => {
     });
 
     if (!file) {
-      return res.status(404).json({ error: "File not found" });
+      return res.status(404).json({ error: 'File not found' });
     }
 
     if (file.stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     await prisma.file.delete({
@@ -405,8 +405,8 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting file:", error);
-    res.status(500).json({ error: "Failed to delete file" });
+    console.error('Error deleting file:', error);
+    res.status(500).json({ error: 'Failed to delete file' });
   }
 });
 
@@ -414,7 +414,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
  * GET /api/files/:id/versions
  * Get all versions of a file
  */
-router.get("/:id/versions", async (req: Request, res: Response) => {
+router.get('/:id/versions', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as AuthenticatedRequest).user.id;
@@ -430,22 +430,22 @@ router.get("/:id/versions", async (req: Request, res: Response) => {
     });
 
     if (!file) {
-      return res.status(404).json({ error: "File not found" });
+      return res.status(404).json({ error: 'File not found' });
     }
 
     if (file.stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     const versions = await prisma.fileVersion.findMany({
       where: { fileId: id },
-      orderBy: { version: "desc" },
+      orderBy: { version: 'desc' },
     });
 
     res.json(versions);
   } catch (error) {
-    console.error("Error fetching versions:", error);
-    res.status(500).json({ error: "Failed to fetch versions" });
+    console.error('Error fetching versions:', error);
+    res.status(500).json({ error: 'Failed to fetch versions' });
   }
 });
 
@@ -453,14 +453,14 @@ router.get("/:id/versions", async (req: Request, res: Response) => {
  * POST /api/files/:id/revert
  * Revert file to a specific version
  */
-router.post("/:id/revert", async (req: Request, res: Response) => {
+router.post('/:id/revert', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { versionId } = req.body;
     const userId = (req as AuthenticatedRequest).user.id;
 
     if (!versionId) {
-      return res.status(400).json({ error: "Version ID is required" });
+      return res.status(400).json({ error: 'Version ID is required' });
     }
 
     // Verify file ownership before reverting
@@ -474,11 +474,11 @@ router.post("/:id/revert", async (req: Request, res: Response) => {
     });
 
     if (!file) {
-      return res.status(404).json({ error: "File not found" });
+      return res.status(404).json({ error: 'File not found' });
     }
 
     if (file.stash.userId !== userId) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     // Get the version
@@ -487,13 +487,13 @@ router.post("/:id/revert", async (req: Request, res: Response) => {
     });
 
     if (!version || version.fileId !== id) {
-      return res.status(404).json({ error: "Version not found" });
+      return res.status(404).json({ error: 'Version not found' });
     }
 
     // Get current latest version
     const latestVersion = await prisma.fileVersion.findFirst({
       where: { fileId: id },
-      orderBy: { version: "desc" },
+      orderBy: { version: 'desc' },
     });
 
     // Update file with version content
@@ -516,8 +516,8 @@ router.post("/:id/revert", async (req: Request, res: Response) => {
 
     res.json(updatedFile);
   } catch (error) {
-    console.error("Error reverting file:", error);
-    res.status(500).json({ error: "Failed to revert file" });
+    console.error('Error reverting file:', error);
+    res.status(500).json({ error: 'Failed to revert file' });
   }
 });
 

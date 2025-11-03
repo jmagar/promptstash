@@ -25,12 +25,14 @@
 ## Directory Structure
 
 ### Minimal Skill
+
 ```
 my-skill/
 └── SKILL.md
 ```
 
 ### Organized Skill
+
 ```
 my-skill/
 ├── SKILL.md
@@ -48,6 +50,7 @@ my-skill/
 ## SKILL.md File Requirements
 
 ### Required Frontmatter
+
 ```yaml
 ---
 name: "Skill Name"
@@ -56,6 +59,7 @@ description: "Brief description"
 ```
 
 ### Optional Frontmatter
+
 ```yaml
 category: "category"
 tags: ["tag1", "tag2"]
@@ -65,6 +69,7 @@ dependencies: []
 ```
 
 ### Content
+
 - At least 50 characters of meaningful content
 - At least one markdown heading
 - Code blocks must specify language (e.g., ```javascript)
@@ -74,10 +79,10 @@ dependencies: []
 
 ## Naming Conventions
 
-| Item | Format | Example |
-|------|--------|---------|
-| Directory | kebab-case | `my-skill`, `data-processor` |
-| File | SKILL.md | SKILL.md (exactly) |
+| Item       | Format     | Example                      |
+| ---------- | ---------- | ---------------------------- |
+| Directory  | kebab-case | `my-skill`, `data-processor` |
+| File       | SKILL.md   | SKILL.md (exactly)           |
 | Skill name | PascalCase | "My Skill", "Data Processor" |
 
 ---
@@ -85,24 +90,28 @@ dependencies: []
 ## What PromptStash Must Validate
 
 ### Structure Checks
+
 - [ ] Is it a directory (not a file)?
 - [ ] Directory name is kebab-case?
 - [ ] Contains exactly one SKILL.md?
 - [ ] SKILL.md filename is exact (not skill.md, index.md)?
 
 ### Frontmatter Checks
+
 - [ ] Has valid YAML frontmatter?
 - [ ] Has `name` field (2-200 characters)?
 - [ ] Has `description` field (10-500 characters)?
 - [ ] All optional fields have correct types?
 
 ### Content Checks
+
 - [ ] Has meaningful markdown content (50+ chars)?
 - [ ] Has at least one heading?
 - [ ] No script tags or raw HTML?
 - [ ] Code blocks specify language?
 
 ### Organization Checks
+
 - [ ] No loose .md files at root (except SKILL.md)?
 - [ ] Reference files in subdirectories (docs/, examples/)?
 - [ ] Nested directories properly organized?
@@ -112,12 +121,14 @@ dependencies: []
 ## Common Mistakes
 
 ### Mistake 1: File Instead of Directory
+
 ```
 ❌ .claude/skills/my-skill.md
 ✓ .claude/skills/my-skill/SKILL.md
 ```
 
 ### Mistake 2: Wrong Filename
+
 ```
 ❌ .claude/skills/my-skill/skill.md
 ❌ .claude/skills/my-skill/index.md
@@ -125,6 +136,7 @@ dependencies: []
 ```
 
 ### Mistake 3: Wrong Directory Name
+
 ```
 ❌ .claude/skills/MySkill/
 ❌ .claude/skills/my_skill/
@@ -132,6 +144,7 @@ dependencies: []
 ```
 
 ### Mistake 4: Files at Root
+
 ```
 ❌ .claude/skills/my-skill/
    ├── SKILL.md
@@ -149,40 +162,42 @@ dependencies: []
 
 ## Validation Error Codes
 
-| Code | Meaning | Fix |
-|------|---------|-----|
-| NOT_DIRECTORY | Skill is a file, not directory | Create directory structure |
-| INVALID_DIR_NAME | Directory name not kebab-case | Rename to kebab-case |
-| MISSING_SKILL_MD | SKILL.md not found | Create SKILL.md file |
-| WRONG_FILENAME | File named incorrectly | Rename to SKILL.md (uppercase) |
-| MISSING_NAME | 'name' field missing | Add name to frontmatter |
-| MISSING_DESCRIPTION | 'description' missing | Add description to frontmatter |
-| INVALID_YAML | Frontmatter syntax error | Fix YAML syntax |
-| EMPTY_CONTENT | No markdown content | Add content after frontmatter |
+| Code                | Meaning                        | Fix                            |
+| ------------------- | ------------------------------ | ------------------------------ |
+| NOT_DIRECTORY       | Skill is a file, not directory | Create directory structure     |
+| INVALID_DIR_NAME    | Directory name not kebab-case  | Rename to kebab-case           |
+| MISSING_SKILL_MD    | SKILL.md not found             | Create SKILL.md file           |
+| WRONG_FILENAME      | File named incorrectly         | Rename to SKILL.md (uppercase) |
+| MISSING_NAME        | 'name' field missing           | Add name to frontmatter        |
+| MISSING_DESCRIPTION | 'description' missing          | Add description to frontmatter |
+| INVALID_YAML        | Frontmatter syntax error       | Fix YAML syntax                |
+| EMPTY_CONTENT       | No markdown content            | Add content after frontmatter  |
 
 ---
 
 ## File Comparison
 
-| Aspect | Agents | Commands | Skills |
-|--------|--------|----------|--------|
-| **Type** | File | File | Directory |
-| **Path** | `.claude/agents/` | `.claude/commands/` | `.claude/skills/` |
-| **Filename** | `ANY_NAME.md` | `ANY_NAME.md` | `SKILL.md` |
-| **Location** | Root of agents dir | Root of commands dir | Subdirectory (kebab-case) |
-| **Can have subdirs** | No | No | Yes |
-| **Naming** | Any | Any | kebab-case required |
+| Aspect               | Agents             | Commands             | Skills                    |
+| -------------------- | ------------------ | -------------------- | ------------------------- |
+| **Type**             | File               | File                 | Directory                 |
+| **Path**             | `.claude/agents/`  | `.claude/commands/`  | `.claude/skills/`         |
+| **Filename**         | `ANY_NAME.md`      | `ANY_NAME.md`        | `SKILL.md`                |
+| **Location**         | Root of agents dir | Root of commands dir | Subdirectory (kebab-case) |
+| **Can have subdirs** | No                 | No                   | Yes                       |
+| **Naming**           | Any                | Any                  | kebab-case required       |
 
 ---
 
 ## Creating a Skill (3 Steps)
 
 ### Step 1: Create Directory
+
 ```bash
 mkdir .claude/skills/my-skill
 ```
 
 ### Step 2: Create SKILL.md
+
 ```markdown
 ---
 name: "My Skill"
@@ -195,6 +210,7 @@ Content here...
 ```
 
 ### Step 3: Add Content
+
 - Add overview section
 - List capabilities
 - Provide examples
@@ -205,6 +221,7 @@ Content here...
 ## Reference Files Organization
 
 ### Recommended Subdirectories
+
 ```
 my-skill/
 ├── docs/           # Documentation files
@@ -215,6 +232,7 @@ my-skill/
 ```
 
 ### What Goes Where
+
 - **docs/**: Additional documentation (guides, troubleshooting)
 - **examples/**: Usage examples and demonstrations
 - **templates/**: Reusable templates users can copy
@@ -225,15 +243,15 @@ my-skill/
 
 ## Frontmatter Field Limits
 
-| Field | Min | Max | Type | Required |
-|-------|-----|-----|------|----------|
-| name | 2 | 200 | string | Yes |
-| description | 10 | 500 | string | Yes |
-| category | - | 50 | string | No |
-| tags | - | 20 | array | No |
-| author | - | 100 | string | No |
-| version | - | 20 | string | No |
-| dependencies | - | - | array | No |
+| Field        | Min | Max | Type   | Required |
+| ------------ | --- | --- | ------ | -------- |
+| name         | 2   | 200 | string | Yes      |
+| description  | 10  | 500 | string | Yes      |
+| category     | -   | 50  | string | No       |
+| tags         | -   | 20  | array  | No       |
+| author       | -   | 100 | string | No       |
+| version      | -   | 20  | string | No       |
+| dependencies | -   | -   | array  | No       |
 
 ---
 
@@ -283,14 +301,14 @@ Before publishing a skill:
 
 ## Key Resource Files
 
-| File | Purpose | Best For |
-|------|---------|----------|
-| SKILLS-README.md | Master index | Quick orientation |
-| skills-subdirectory-structure.md | Architecture detail | Understanding design |
-| validation-rules-reference.md | Technical specs | Building validation |
-| skill-template-guidelines.md | Writing guides | Creating skills |
-| IMPLEMENTATION-GUIDE.md | Code examples | Building PromptStash |
-| DOCUMENTATION-SUMMARY.md | Package overview | Package understanding |
+| File                             | Purpose             | Best For              |
+| -------------------------------- | ------------------- | --------------------- |
+| SKILLS-README.md                 | Master index        | Quick orientation     |
+| skills-subdirectory-structure.md | Architecture detail | Understanding design  |
+| validation-rules-reference.md    | Technical specs     | Building validation   |
+| skill-template-guidelines.md     | Writing guides      | Creating skills       |
+| IMPLEMENTATION-GUIDE.md          | Code examples       | Building PromptStash  |
+| DOCUMENTATION-SUMMARY.md         | Package overview    | Package understanding |
 
 ---
 

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { useFile, useUpdateFile } from '@/hooks/use-promptstash';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
 import {
   Sheet,
   SheetContent,
@@ -23,8 +24,9 @@ import { Button } from '@workspace/ui/components/button';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { Badge } from '@workspace/ui/components/badge';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { useFile, useUpdateFile } from '@/hooks/use-promptstash';
-import { Save, X, Clock, AlertCircle } from 'lucide-react';
+import { AlertCircle, Clock, Save, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface FileEditorProps {
   fileId: string | null;
@@ -116,11 +118,11 @@ export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
                 )}
               </SheetTitle>
               {file && (
-                <SheetDescription className="flex items-center gap-4 mt-1">
+                <SheetDescription className="mt-1 flex items-center gap-4">
                   <span className="flex items-center gap-1">
                     <Badge variant="secondary">{file.fileType}</Badge>
                   </span>
-                  <span className="text-xs flex items-center gap-1">
+                  <span className="flex items-center gap-1 text-xs">
                     <Clock className="h-3 w-3" />
                     Updated {new Date(file.updatedAt).toLocaleDateString()}
                   </span>
@@ -133,22 +135,22 @@ export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
           </div>
         </SheetHeader>
 
-        <div className="mt-6 flex flex-col gap-4 h-[calc(100vh-12rem)]">
+        <div className="mt-6 flex h-[calc(100vh-12rem)] flex-col gap-4">
           {/* File Description */}
           {file?.description && (
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground">{file.description}</p>
+            <div className="bg-muted/50 rounded-lg p-4">
+              <p className="text-muted-foreground text-sm">{file.description}</p>
             </div>
           )}
 
           {/* Editor */}
-          <div className="flex-1 flex flex-col gap-2">
+          <div className="flex flex-1 flex-col gap-2">
             <label className="text-sm font-medium">Content</label>
             <Textarea
               value={content}
               onChange={(e) => handleContentChange(e.target.value)}
               placeholder="Start typing..."
-              className="flex-1 font-mono text-sm resize-none"
+              className="flex-1 resize-none font-mono text-sm"
               disabled={isLoading}
             />
           </div>
@@ -179,11 +181,9 @@ export function FileEditor({ fileId, open, onOpenChange }: FileEditorProps) {
 
           {/* Version Info */}
           {file && (
-            <div className="text-xs text-muted-foreground border-t pt-2">
+            <div className="text-muted-foreground border-t pt-2 text-xs">
               <p>Version: {file.version || 1}</p>
-              <p className="mt-1">
-                Created: {new Date(file.createdAt).toLocaleString()}
-              </p>
+              <p className="mt-1">Created: {new Date(file.createdAt).toLocaleString()}</p>
             </div>
           )}
         </div>

@@ -9,34 +9,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Technology Stack
 
 ### Core Frameworks
+
 - **Next.js 16.0.0** with App Router and Turbopack (port 3000)
 - **React 19.2.0** with modern hooks and Server Components
 - **Express 5.1.0** API server (port 4000)
 - **TypeScript 5.9.2** with strict type checking throughout
 
 ### Build System
+
 - **Turborepo 2.5.5**: Monorepo orchestration with intelligent caching
 - **pnpm 10.4.1**: Package manager with workspace support and catalog feature
 - **Node.js ≥20**: Required minimum version
 
 ### Database & ORM
+
 - **PostgreSQL**: Primary database (port 5432)
 - **Prisma 6.16.1**: ORM with migrations and client generation
   - Binary targets include: `native`, `linux-musl`, `linux-musl-openssl-3.0.x` for Docker support
 
 ### Authentication
+
 - **Better Auth 1.3.27**: Modern authentication framework
 - OAuth providers: Google Sign-In
 - Two-factor authentication (2FA) with QR codes and backup codes
 - Email verification and password reset flows
 
 ### UI & Styling
+
 - **Tailwind CSS 4.1.11**: Utility-first styling
 - **shadcn/ui**: Component library built on Radix UI primitives
 - **next-themes 0.4.6**: Dark mode support
 - **Lucide React 0.475.0**: Icon library
 
 ### Additional Services
+
 - **TanStack Query 5.87.4**: Server state management
 - **React Hook Form 7.62.0** + **Zod 3.25.76**: Form handling and validation
 - **React Email 4.3.0** + **Resend 4.5.1**: Email templates and delivery
@@ -70,6 +76,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Workspace Dependencies
 
 Internal packages use the `workspace:*` protocol. Packages are referenced as:
+
 ```typescript
 import { Button } from "@workspace/ui/components/button";
 import { db } from "@workspace/db";
@@ -79,6 +86,7 @@ import { auth } from "@workspace/auth";
 ### pnpm Catalog Pattern
 
 This monorepo uses pnpm's catalog feature for centralized dependency management across workspaces:
+
 - `catalog:web`: Frontend-specific dependencies
 - `catalog:server`: Backend-specific dependencies
 - `catalog:core`: Shared dependencies
@@ -116,6 +124,7 @@ app/
 ### 2. Provider Pattern
 
 All React context providers are composed in `apps/web/app/providers.tsx`:
+
 - `ThemeProvider`: Dark mode support
 - `QueryClientProvider`: TanStack Query for server state
 - `SidebarProvider`: Sidebar state management
@@ -152,6 +161,7 @@ import { authMiddleware } from "@workspace/auth/node-handlers";
 ### 5. Factory Pattern for Server Creation
 
 The Express server uses a factory function (`createServer()`) in `apps/api/src/server.ts` that:
+
 - Enables easy testing with multiple server instances
 - Separates server creation from server startup
 - Allows dependency injection for middleware
@@ -159,6 +169,7 @@ The Express server uses a factory function (`createServer()`) in `apps/api/src/s
 ### 6. Database Access Layer
 
 Prisma client is centralized in `@workspace/db`:
+
 - Schema: `packages/db/prisma/schema.prisma`
 - Generated client: `packages/db/generated/`
 - Single source of truth for all database operations
@@ -202,6 +213,7 @@ pnpm --filter @workspace/db db:reset
 ```
 
 **Important**: The `DATABASE_URL` environment variable must be set in both:
+
 1. `apps/web/.env.local` (for Next.js)
 2. `packages/db/.env` (for Prisma CLI)
 
@@ -237,6 +249,7 @@ pnpm --filter @workspace/api test    # Run Jest tests with coverage
 ### Required Environment Variables
 
 **Web App** (`apps/web/.env.local`):
+
 ```env
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/mydb
@@ -261,6 +274,7 @@ NODE_ENV=development
 ```
 
 **API Server** (`apps/api/.env`):
+
 ```env
 NODE_ENV=development
 PORT=4000
@@ -274,6 +288,7 @@ GOOGLE_CLIENT_SECRET=<same-as-web-app>
 ```
 
 **Database Package** (`packages/db/.env`):
+
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/mydb
 ```
@@ -329,6 +344,7 @@ db:generate → ^build → build/lint/check-types
 ```
 
 **Key behaviors**:
+
 - `build` depends on `db:generate` and all upstream package builds (`^build`)
 - `dev` depends on `^db:generate` and runs persistently
 - Outputs are cached: `.next/**`, `dist/**`, `generated/**/*`
@@ -346,6 +362,7 @@ Both `apps/web/Dockerfile.prod` and `apps/api/Dockerfile.prod` use multi-stage b
 4. **runner**: Production image with non-root user
 
 **Security features**:
+
 - Non-root users (`nextjs:1001`, `expressjs:1001`)
 - Alpine Linux base for minimal attack surface
 - Only production dependencies in final image
@@ -371,6 +388,7 @@ pnpm docker:prod
 ### Production Environment Files
 
 Ensure these exist before running `pnpm docker:prod`:
+
 - `apps/web/.env.production`
 - `apps/api/.env.production`
 - `packages/db/.env`
@@ -378,26 +396,31 @@ Ensure these exist before running `pnpm docker:prod`:
 ## Prisma Schema Key Models
 
 ### User Model
+
 - Email/password authentication with hashing
 - Email verification status
 - Image URL for profile picture
 - Created/updated timestamps
 
 ### Session Model
+
 - User relationship (one-to-many)
 - Token and expiration
 - IP address and user agent tracking
 
 ### Account Model
+
 - OAuth provider integration
 - Links social accounts to users
 
 ### Verification Model
+
 - Email verification codes
 - Password reset tokens
 - Expiration handling
 
 ### TwoFactor Model
+
 - TOTP secrets
 - Backup codes (hashed)
 - User relationship
@@ -407,11 +430,13 @@ Ensure these exist before running `pnpm docker:prod`:
 ### ESLint (v9 with Flat Config)
 
 Base configuration in `packages/eslint-config/base.js`:
+
 - TypeScript ESLint parser and recommended rules
 - `only-warn` plugin converts all errors to warnings
 - Separate configs for React and Next.js apps
 
 **Running lint**:
+
 ```bash
 pnpm lint              # Lint entire monorepo
 pnpm lint --fix        # Auto-fix issues
@@ -420,17 +445,20 @@ pnpm lint --fix        # Auto-fix issues
 ### Prettier
 
 Configuration in `packages/prettier-config/index.js`:
+
 - Single quotes
 - 100 character line width
 - Trailing commas (ES5)
 - Tab width: 2 spaces
 
 **Plugins**:
+
 - `prettier-plugin-organize-imports`: Auto-sort imports
 - `prettier-plugin-tailwindcss`: Sort Tailwind classes
 - `prettier-plugin-packagejson`: Format package.json
 
 **Running format**:
+
 ```bash
 pnpm format            # Format entire monorepo
 ```
@@ -438,12 +466,14 @@ pnpm format            # Format entire monorepo
 ### TypeScript Configuration
 
 Base config in `packages/typescript-config/base.json`:
+
 - Strict mode enabled
 - Modern module resolution (`NodeNext`)
 - `esModuleInterop` and `skipLibCheck` enabled
 - Target: `ES2022`
 
 Apps and packages extend the base config:
+
 ```json
 {
   "extends": "@workspace/typescript-config/base.json"
@@ -455,6 +485,7 @@ Apps and packages extend the base config:
 GitHub Actions workflow (`.github/workflows/ci.yml`) runs on push and PR:
 
 **Jobs** (run in parallel):
+
 1. **lint**: ESLint check across monorepo
 2. **type-check**: TypeScript type validation
 3. **test**: Jest tests with coverage
@@ -462,6 +493,7 @@ GitHub Actions workflow (`.github/workflows/ci.yml`) runs on push and PR:
 5. **format-check**: Prettier formatting validation
 
 **Optimizations**:
+
 - pnpm cache using GitHub Actions cache
 - Node 20 with pnpm 10.4.1
 - Timeouts: 5-15 minutes per job
@@ -473,17 +505,20 @@ GitHub Actions workflow (`.github/workflows/ci.yml`) runs on push and PR:
 Rate limiting uses Upstash Redis with the `@upstash/ratelimit` package:
 
 **Global API rate limit** (`apps/api/src/middleware/rate-limit.ts`):
+
 - Applied to all `/api/*` routes
 - Uses IP address as identifier
 - Configured in middleware chain before routes
 
 **Auth-specific limits** (`packages/rate-limit/src/auth.ts`):
+
 - Separate rate limiters for sensitive authentication endpoints
 - Used in Better Auth configuration
 
 ### Upstash Redis
 
 Requires environment variables:
+
 ```env
 UPSTASH_REDIS_REST_URL=https://your-redis.upstash.io
 UPSTASH_REDIS_REST_TOKEN=your-token
@@ -496,16 +531,19 @@ UPSTASH_REDIS_REST_TOKEN=your-token
 Configuration is in `packages/auth/src/server.ts`:
 
 **Plugins enabled**:
+
 - Generic OAuth (Google)
 - Two-factor authentication
 - Organization/multi-tenancy (prepared)
 
 **Session management**:
+
 - Cookie-based sessions
 - Expires: 7 days
 - Update age: 1 day
 
 **Email integration**:
+
 - Uses `@workspace/email` for sending verification and password reset emails
 - Resend as email delivery service
 
@@ -541,6 +579,7 @@ In `apps/web/app/(default)/`, routes are protected by Better Auth middleware. Un
 ### React Email Templates
 
 Templates in `packages/email/src/templates/`:
+
 - Built with React components
 - Preview server at `apps/email/` for development
 - Compiled to HTML for delivery
@@ -556,13 +595,14 @@ await sendEmail({
   to: "user@example.com",
   subject: "Welcome!",
   templateId: "welcome",
-  templateData: { name: "John" }
+  templateData: { name: "John" },
 });
 ```
 
 ### Email Service
 
 **Resend** is used for email delivery:
+
 - Requires `RESEND_API_KEY` in environment
 - From address: `RESEND_FROM_EMAIL`
 
@@ -602,11 +642,13 @@ await sendEmail({
 ### Next.js Turbopack
 
 The web app uses Turbopack in development:
+
 ```json
 "dev": "next dev --turbopack"
 ```
 
 This provides faster HMR and build times. If you encounter issues, fallback to webpack:
+
 ```bash
 pnpm --filter @workspace/web dev -- --no-turbopack
 ```
@@ -614,8 +656,9 @@ pnpm --filter @workspace/web dev -- --no-turbopack
 ### Standalone Output Mode
 
 Next.js is configured for standalone output in `next.config.mjs`:
+
 ```javascript
-output: 'standalone'
+output: "standalone";
 ```
 
 This creates a minimal production build for Docker deployment with all dependencies bundled.
@@ -623,8 +666,9 @@ This creates a minimal production build for Docker deployment with all dependenc
 ### Package Transpilation
 
 The web app transpiles workspace packages in `next.config.mjs`:
+
 ```javascript
-transpilePackages: ['@workspace/ui', '@workspace/auth', '@workspace/email']
+transpilePackages: ["@workspace/ui", "@workspace/auth", "@workspace/email"];
 ```
 
 This ensures shared packages work correctly in the Next.js build.
@@ -632,6 +676,7 @@ This ensures shared packages work correctly in the Next.js build.
 ### Better Auth Client/Server Split
 
 Never use server-side auth functions in client components:
+
 ```typescript
 // ❌ Don't do this in a Client Component
 import { auth } from "@workspace/auth/server";
@@ -650,11 +695,9 @@ import { useSession } from "@workspace/auth/client";
 ### CORS Configuration
 
 The API server allows requests from origins specified in `apps/api/src/config/allowedOrigins.ts`:
+
 ```typescript
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://yourdomain.com'
-];
+const allowedOrigins = ["http://localhost:3000", "https://yourdomain.com"];
 ```
 
 Update this list when deploying to production or adding new frontends.

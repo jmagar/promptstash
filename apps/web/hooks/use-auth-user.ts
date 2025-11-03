@@ -49,23 +49,31 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
 
   // AUTH BYPASS for development - remove in production!
   const isBypassEnabled = process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true';
-  
+
   // Prevent auth bypass in production environments
   if (process.env.NODE_ENV === 'production' && isBypassEnabled) {
     throw new Error('Auth bypass cannot be enabled in production');
   }
-  
+
   // Only redirect if explicitly enabled and not on auth pages (skip if bypass is enabled)
   useEffect(() => {
     if (isBypassEnabled) return;
-    
+
     if (shouldRedirect && !session.isPending && !session.data?.user) {
       // Don't redirect if already on auth pages
       if (!pathname.startsWith('/sign-in') && !pathname.startsWith('/sign-up')) {
         router.push(redirectTo);
       }
     }
-  }, [isBypassEnabled, shouldRedirect, session.isPending, session.data?.user, router, pathname, redirectTo]);
+  }, [
+    isBypassEnabled,
+    shouldRedirect,
+    session.isPending,
+    session.data?.user,
+    router,
+    pathname,
+    redirectTo,
+  ]);
 
   // Return mock user if bypass is enabled
   if (isBypassEnabled) {
@@ -79,7 +87,7 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
       updatedAt: new Date(),
       twoFactorEnabled: false,
     };
-    
+
     return {
       user: mockUser,
       isLoading: false,
@@ -108,14 +116,13 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
 export function useRequiredAuthUser():
   | UseRequiredAuthUserReturn
   | UseRequiredAuthUserLoadingReturn {
-  
   const { user, isLoading, isAuthenticated, error, refetch } = useAuthUser({
     redirectOnUnauthenticated: true,
   });
 
   // AUTH BYPASS for development - remove in production!
   const isBypassEnabled = process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true';
-  
+
   if (isBypassEnabled) {
     const mockUser: AuthUser = {
       id: 'dev-user-123',
@@ -127,7 +134,7 @@ export function useRequiredAuthUser():
       updatedAt: new Date(),
       twoFactorEnabled: false,
     };
-    
+
     return {
       user: mockUser,
       isLoading: false,

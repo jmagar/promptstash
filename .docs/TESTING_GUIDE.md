@@ -5,6 +5,7 @@
 ## Quick Start
 
 ### 1. Stop All Running Services
+
 ```bash
 # Kill Next.js dev server
 pkill -f "next dev"
@@ -23,12 +24,14 @@ pkill -f "email dev"
 ```
 
 ### 2. Clean Build Artifacts
+
 ```bash
 cd /home/jmagar/code/promptstash
 pnpm clean
 ```
 
 ### 3. Verify Environment Files
+
 ```bash
 # Check web app .env.local
 cat apps/web/.env.local | grep -E "(PORT|URL|BETTER_AUTH)"
@@ -49,6 +52,7 @@ cat apps/api/.env | grep -E "(PORT|ALLOWED_ORIGINS|UPSTASH)"
 ```
 
 ### 4. Start All Services
+
 ```bash
 pnpm dev
 ```
@@ -57,23 +61,25 @@ pnpm dev
 
 Open these URLs in your browser:
 
-| Service | URL | Expected Result |
-|---------|-----|-----------------|
-| Web App | http://localhost:3100 | PromptStash landing page or sign-in |
-| API Health | http://localhost:3300 | JSON response or 404 (expected) |
-| Prisma Studio | http://localhost:3400 | Database admin interface |
-| Email Preview | http://localhost:3200 | Email templates list |
+| Service       | URL                   | Expected Result                     |
+| ------------- | --------------------- | ----------------------------------- |
+| Web App       | http://localhost:3100 | PromptStash landing page or sign-in |
+| API Health    | http://localhost:3300 | JSON response or 404 (expected)     |
+| Prisma Studio | http://localhost:3400 | Database admin interface            |
+| Email Preview | http://localhost:3200 | Email templates list                |
 
 ## Detailed Testing
 
 ### Test 1: Check Logs for Warnings
 
 **What to Check:**
+
 - ✅ NO prettier version mismatch warnings
-- ✅ NO Upstash Redis missing URL/token warnings  
+- ✅ NO Upstash Redis missing URL/token warnings
 - ✅ NO Better Auth Google provider warnings
 
 **How to Check:**
+
 ```bash
 # Watch the terminal output when running pnpm dev
 # Look for these specific error patterns (should NOT appear):
@@ -83,6 +89,7 @@ Open these URLs in your browser:
 ```
 
 **Expected Output:**
+
 ```
 ┌─ web#dev
    ▲ Next.js 16.0.0 (Turbopack)
@@ -105,11 +112,13 @@ Running preview at: http://localhost:3200
 ### Test 2: Port Configuration
 
 **Command:**
+
 ```bash
 lsof -i :3100 -i :3300 -i :5100 -i :3200
 ```
 
 **Expected Output:**
+
 ```
 COMMAND   PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
 node    xxxxx jmagar   XX  IPv4 xxxxxx      0t0  TCP *:3100 (LISTEN)
@@ -121,6 +130,7 @@ node    xxxxx jmagar   XX  IPv4 xxxxxx      0t0  TCP *:3200 (LISTEN)
 ### Test 3: API Connectivity
 
 **Test CORS:**
+
 ```bash
 curl -H "Origin: http://localhost:3100" \
      -H "Access-Control-Request-Method: GET" \
@@ -132,6 +142,7 @@ curl -H "Origin: http://localhost:3100" \
 
 **Expected:**
 Should include CORS headers like:
+
 ```
 < Access-Control-Allow-Origin: http://localhost:3100
 < Access-Control-Allow-Credentials: true
@@ -140,6 +151,7 @@ Should include CORS headers like:
 ### Test 4: Database Connection
 
 **Via Prisma Studio:**
+
 1. Open http://localhost:5100
 2. You should see the database schema tables:
    - User
@@ -154,6 +166,7 @@ Should include CORS headers like:
    - etc.
 
 **Via API:**
+
 ```bash
 # This should work if database is connected
 curl http://localhost:3300/api/stashes
@@ -165,11 +178,13 @@ curl http://localhost:3300/api/stashes
 Navigate to: http://localhost:3100/sign-up
 
 Fill in:
+
 - Name: Test User
 - Email: test@example.com
 - Password: TestPassword123!
 
-**Expected:** 
+**Expected:**
+
 - Should create user
 - May show email verification page (if email service configured)
 - Or redirect to dashboard
@@ -180,23 +195,27 @@ Navigate to: http://localhost:3100/sign-in
 Use credentials from sign-up.
 
 **Expected:**
+
 - Should authenticate successfully
 - Redirect to dashboard or home page
 - Session cookie should be set
 
 **3. Protected Routes:**
 Try accessing:
+
 - http://localhost:3100/dashboard
 - http://localhost:3100/stash
 - http://localhost:3100/profile
 
 **Expected:**
+
 - If not signed in: Redirect to /sign-in
 - If signed in: Show the respective page
 
 ### Test 6: Email Templates
 
 **View Templates:**
+
 1. Open http://localhost:3200
 2. Should see list of templates:
    - verify-email
@@ -205,6 +224,7 @@ Try accessing:
    - welcome (if exists)
 
 **Test Rendering:**
+
 - Click on any template
 - Should render preview with sample data
 - No console errors
@@ -212,16 +232,19 @@ Try accessing:
 ### Test 7: Prisma Client Generation
 
 **Rebuild Prisma Client:**
+
 ```bash
 pnpm --filter @workspace/db db:generate
 ```
 
 **Expected:**
+
 ```
 ✔ Generated Prisma Client to ./generated in XXXms
 ```
 
 **Check Generated Files:**
+
 ```bash
 ls -la packages/db/generated/
 ```
@@ -235,6 +258,7 @@ Should show Prisma client files.
 **Error:** `Port 3100 is already in use`
 
 **Solution:**
+
 ```bash
 # Find process using the port
 lsof -i :3100
@@ -251,6 +275,7 @@ pkill -f node
 **Error:** `Can't reach database server at localhost:3500`
 
 **Solution:**
+
 ```bash
 # Check if PostgreSQL container is running
 docker ps | grep postgres
@@ -267,6 +292,7 @@ psql postgresql://promptstash:promptstash_dev_password@localhost:3500/promptstas
 **Error:** `Access to fetch at 'http://localhost:3300/api/...' from origin 'http://localhost:3100' has been blocked by CORS`
 
 **Check:**
+
 ```bash
 # Verify ALLOWED_ORIGINS in API .env
 cat apps/api/.env | grep ALLOWED_ORIGINS
@@ -275,6 +301,7 @@ cat apps/api/.env | grep ALLOWED_ORIGINS
 **Should include:** `http://localhost:3100`
 
 **Fix if needed:**
+
 ```bash
 # Edit apps/api/.env and add:
 ALLOWED_ORIGINS=http://localhost:3100,https://your-production-domain.com
@@ -283,21 +310,27 @@ ALLOWED_ORIGINS=http://localhost:3100,https://your-production-domain.com
 ### Issue: Better Auth Session Not Working
 
 **Symptoms:**
+
 - Can't sign in
 - Redirects to sign-in repeatedly
 - Session not persisting
 
 **Check:**
+
 1. Verify `BETTER_AUTH_URL` matches in both .env files:
+
    ```bash
    grep BETTER_AUTH_URL apps/web/.env.local apps/api/.env
    ```
+
    Both should be: `http://localhost:3100`
 
 2. Verify `BETTER_AUTH_SECRET` matches:
+
    ```bash
    grep BETTER_AUTH_SECRET apps/web/.env.local apps/api/.env
    ```
+
    Should be the same 32-byte hex string
 
 3. Clear browser cookies and try again
@@ -307,6 +340,7 @@ ALLOWED_ORIGINS=http://localhost:3100,https://your-production-domain.com
 **Error:** `Module not found: Can't resolve '@workspace/...'`
 
 **Solution:**
+
 ```bash
 # Reinstall dependencies
 pnpm install

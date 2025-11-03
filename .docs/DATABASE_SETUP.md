@@ -20,6 +20,7 @@ docker compose -f docker-compose.dev.yml up -d
 ```
 
 This will:
+
 - Create a PostgreSQL 16 container named `promptstash-postgres-dev`
 - Expose the database on `localhost:3500`
 - Create a database named `promptstash`
@@ -59,6 +60,7 @@ pnpm db:seed
 ```
 
 The seed script creates:
+
 - Demo user: `demo@promptstash.dev`
 - Sample stash: "My PromptStash"
 - Root folder structure
@@ -71,6 +73,7 @@ The seed script creates:
 The PromptStash database includes the following main models:
 
 ### Authentication Models
+
 - **User**: User accounts with email verification
 - **Session**: Active user sessions with tokens
 - **Account**: OAuth provider integration
@@ -78,6 +81,7 @@ The PromptStash database includes the following main models:
 - **Verification**: Email verification codes
 
 ### PromptStash Models
+
 - **Stash**: Top-level container for organizing Claude Code files
   - Scopes: USER, PROJECT, PLUGIN, MARKETPLACE
 - **Folder**: Hierarchical folder structure within stashes
@@ -152,7 +156,7 @@ If port 5434 is already in use, you can modify the port in `docker-compose.dev.y
 
 ```yaml
 ports:
-  - '5435:5432'  # Change host port to 5435
+  - "5435:5432" # Change host port to 5435
 ```
 
 Don't forget to update the `DATABASE_URL` in `packages/db/.env` accordingly.
@@ -181,11 +185,13 @@ pnpm db:seed
 ## Production Setup
 
 For production deployment, use the main `docker-compose.prod.yml` file which includes:
+
 - Web application
 - API server
 - PostgreSQL database
 
 Make sure to:
+
 1. Set strong passwords in production `.env` files
 2. Use proper SSL/TLS certificates
 3. Configure backup strategies

@@ -2,8 +2,8 @@
  * React Query Hooks for PromptStash API
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Types for query parameters
 export interface FileQueryParams {
@@ -52,7 +52,7 @@ export function useStash(id: string) {
 
 export function useCreateStash() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: apiClient.createStash,
     onSuccess: () => {
@@ -80,12 +80,12 @@ export function useFile(id: string) {
 
 export function useCreateFile() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: apiClient.createFile,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.files(variables.stashId)
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.files(variables.stashId),
       });
     },
   });
@@ -93,9 +93,9 @@ export function useCreateFile() {
 
 export function useUpdateFile() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FileUpdateData }) => 
+    mutationFn: ({ id, data }: { id: string; data: FileUpdateData }) =>
       apiClient.updateFile(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.file(data.id) });
@@ -106,7 +106,7 @@ export function useUpdateFile() {
 
 export function useDeleteFile() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: apiClient.deleteFile,
     onSuccess: (_, deletedFileId) => {
@@ -128,7 +128,7 @@ export function useFileVersions(id: string) {
 
 export function useRevertFile() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ id, versionId }: { id: string; versionId: string }) =>
       apiClient.revertFile(id, versionId),
@@ -150,12 +150,12 @@ export function useFolder(id: string) {
 
 export function useCreateFolder() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: apiClient.createFolder,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.files(variables.stashId)
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.files(variables.stashId),
       });
     },
   });
@@ -163,7 +163,7 @@ export function useCreateFolder() {
 
 export function useUpdateFolder() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: FolderUpdateData }) =>
       apiClient.updateFolder(id, data),
@@ -175,7 +175,7 @@ export function useUpdateFolder() {
 
 export function useDeleteFolder() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: apiClient.deleteFolder,
     onSuccess: (_, deletedFolderId) => {

@@ -20,6 +20,7 @@ Complete documentation reference for understanding and working with Claude Code 
 ## Quick Reference
 
 ### Correct Skill Structure
+
 ```
 .claude/skills/
 └── my-skill/
@@ -29,6 +30,7 @@ Complete documentation reference for understanding and working with Claude Code 
 ```
 
 ### Wrong Skill Structure
+
 ```
 .claude/skills/
 └── my-skill.md                    ❌ WRONG - Should be directory
@@ -39,11 +41,13 @@ Complete documentation reference for understanding and working with Claude Code 
 ## Documentation Files
 
 ### 1. Skills Subdirectory Structure Guide
+
 **File**: `/home/jmagar/code/promptstash/.docs/skills-subdirectory-structure.md`
 
 **Purpose**: Comprehensive guide explaining why skills require subdirectory structure and how to organize them correctly.
 
 **Contents**:
+
 - Correct vs. incorrect structures (with visual examples)
 - Directory naming conventions
 - SKILL.md file requirements
@@ -57,11 +61,13 @@ Complete documentation reference for understanding and working with Claude Code 
 ---
 
 ### 2. Validation Rules Reference
+
 **File**: `/home/jmagar/code/promptstash/.docs/validation-rules-reference.md`
 
 **Purpose**: Technical reference for all validation rules PromptStash should enforce.
 
 **Contents**:
+
 - File type definitions (Agents, Commands, Skills)
 - YAML frontmatter validation rules
 - Content validation requirements
@@ -74,11 +80,13 @@ Complete documentation reference for understanding and working with Claude Code 
 ---
 
 ### 3. Skill Template Guidelines
+
 **File**: `/home/jmagar/code/promptstash/.docs/skill-template-guidelines.md`
 
 **Purpose**: Practical templates and examples for creating well-structured skill files.
 
 **Contents**:
+
 - Quick start template
 - Minimal template for simple skills
 - Full-featured template for complex skills
@@ -97,14 +105,14 @@ Complete documentation reference for understanding and working with Claude Code 
 
 ### What Makes Skills Different
 
-| Aspect | Agents | Commands | Skills |
-|--------|--------|----------|--------|
-| **File Structure** | Single .md file | Single .md file | Directory tree |
-| **Location** | `.claude/agents/` | `.claude/commands/` | `.claude/skills/` |
-| **Entry Point** | Filename | Filename | `SKILL.md` in subdirectory |
-| **Naming Convention** | Any format | Any format | kebab-case for directory |
-| **Reference Files** | Not supported | Not supported | Supported in subdirectories |
-| **Complexity** | Simpler | Simpler | More structured |
+| Aspect                | Agents            | Commands            | Skills                      |
+| --------------------- | ----------------- | ------------------- | --------------------------- |
+| **File Structure**    | Single .md file   | Single .md file     | Directory tree              |
+| **Location**          | `.claude/agents/` | `.claude/commands/` | `.claude/skills/`           |
+| **Entry Point**       | Filename          | Filename            | `SKILL.md` in subdirectory  |
+| **Naming Convention** | Any format        | Any format          | kebab-case for directory    |
+| **Reference Files**   | Not supported     | Not supported       | Supported in subdirectories |
+| **Complexity**        | Simpler           | Simpler             | More structured             |
 
 ### Why Subdirectories?
 
@@ -160,24 +168,28 @@ PromptStash must enforce these core rules:
 ### UI/UX Considerations
 
 **File Creation**:
+
 - Prompt user for skill name
 - Auto-convert to kebab-case directory name
 - Create directory structure automatically
 - Pre-fill SKILL.md with template
 
 **File Upload**:
+
 - Detect if upload is skill (has SKILL.md)
 - Validate complete structure before import
 - Suggest fixes for common issues
 - Preserve directory organization
 
 **File Editor**:
+
 - Highlight SKILL.md as primary file
 - Show optional reference files in secondary styling
 - Recommend organizing multiple files in subdirectories
 - Display validation status in real-time
 
 **Deployment**:
+
 - Validate structure before export
 - Preserve complete directory tree
 - Generate deployment packages with correct structure
@@ -190,11 +202,13 @@ PromptStash must enforce these core rules:
 ### Manual Creation
 
 1. Create directory with kebab-case name
+
    ```bash
    mkdir .claude/skills/my-skill
    ```
 
 2. Create SKILL.md (uppercase) with frontmatter
+
    ```markdown
    ---
    name: "My Skill"
@@ -207,6 +221,7 @@ PromptStash must enforce these core rules:
    ```
 
 3. Add optional reference files in subdirectories
+
    ```bash
    mkdir .claude/skills/my-skill/docs
    mkdir .claude/skills/my-skill/examples
@@ -271,6 +286,7 @@ PromptStash must enforce these core rules:
 **Likely Cause**: Structure is incorrect
 
 **Check**:
+
 1. Is it a directory or file? (Should be directory)
 2. Is SKILL.md named correctly? (Must be uppercase)
 3. Is SKILL.md at root of skill directory? (Not in subdirectory)
@@ -286,12 +302,12 @@ PromptStash must enforce these core rules:
 
 **Common Errors**:
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| "Skill must be directory" | File instead of directory | Create directory structure |
-| "Missing SKILL.md" | Wrong filename | Rename to `SKILL.md` (uppercase) |
-| "Directory name not kebab-case" | Wrong naming format | Rename to kebab-case |
-| "Missing 'description' field" | Incomplete frontmatter | Add description to YAML |
+| Error                           | Cause                     | Fix                              |
+| ------------------------------- | ------------------------- | -------------------------------- |
+| "Skill must be directory"       | File instead of directory | Create directory structure       |
+| "Missing SKILL.md"              | Wrong filename            | Rename to `SKILL.md` (uppercase) |
+| "Directory name not kebab-case" | Wrong naming format       | Rename to kebab-case             |
+| "Missing 'description' field"   | Incomplete frontmatter    | Add description to YAML          |
 
 ---
 
@@ -300,6 +316,7 @@ PromptStash must enforce these core rules:
 **Symptom**: Optional files aren't visible or organized
 
 **Solution**:
+
 1. Ensure reference files are in subdirectories (not at root)
 2. Use standard subdirectory names: `docs/`, `examples/`, `templates/`
 3. Verify file names are descriptive
@@ -310,24 +327,28 @@ PromptStash must enforce these core rules:
 ## Integration Points for PromptStash
 
 ### File Management
+
 - New skill creation wizard
 - Skill import/upload handler
 - Skill rename/move operations
 - Skill deletion with directory cleanup
 
 ### Validation
+
 - Real-time frontmatter validation
 - Structure validation on save
 - Content quality suggestions
 - Pre-deployment validation
 
 ### UI Components
+
 - Skill explorer (showing directory tree)
 - SKILL.md editor with template
 - Reference file organizer
 - Validation status indicator
 
 ### Deployment
+
 - Package skill with complete directory structure
 - Validate before export
 - Generate deployment reports
@@ -338,15 +359,18 @@ PromptStash must enforce these core rules:
 ## References & Resources
 
 ### External Documentation
+
 - [Claude Code Skills Documentation](https://docs.claude.com/en/docs/claude-code/skills.md)
 - [Claude Code Overview](https://docs.claude.com/en/docs/claude-code/)
 
 ### Related PromptStash Documentation
+
 - [Project Overview](../promptstash.md)
 - [Project Architecture](../promptstash2.md)
 - [Project CLAUDE.md](../CLAUDE.md)
 
 ### Internal Documentation
+
 - [Skills Subdirectory Structure Guide](./skills-subdirectory-structure.md) - Detailed architecture explanation
 - [Validation Rules Reference](./validation-rules-reference.md) - Technical validation requirements
 - [Skill Template Guidelines](./skill-template-guidelines.md) - Practical templates and examples
@@ -355,24 +379,24 @@ PromptStash must enforce these core rules:
 
 ## Glossary
 
-| Term | Definition |
-|------|-----------|
-| **Skill** | Reusable capability in Claude Code, organized as directory with SKILL.md |
-| **SKILL.md** | Entry point file for skill, contains frontmatter and documentation |
-| **Subdirectory** | Directory inside skill directory for organizing reference files |
-| **Frontmatter** | YAML metadata at top of markdown file between `---` delimiters |
-| **kebab-case** | Naming format using hyphens (my-skill, data-processor) |
-| **PascalCase** | Naming format using capitals (MySkill, DataProcessor) |
-| **Reference Files** | Optional documentation files alongside SKILL.md (examples, guides) |
-| **Validation** | Process of checking skill structure and content meet requirements |
+| Term                | Definition                                                               |
+| ------------------- | ------------------------------------------------------------------------ |
+| **Skill**           | Reusable capability in Claude Code, organized as directory with SKILL.md |
+| **SKILL.md**        | Entry point file for skill, contains frontmatter and documentation       |
+| **Subdirectory**    | Directory inside skill directory for organizing reference files          |
+| **Frontmatter**     | YAML metadata at top of markdown file between `---` delimiters           |
+| **kebab-case**      | Naming format using hyphens (my-skill, data-processor)                   |
+| **PascalCase**      | Naming format using capitals (MySkill, DataProcessor)                    |
+| **Reference Files** | Optional documentation files alongside SKILL.md (examples, guides)       |
+| **Validation**      | Process of checking skill structure and content meet requirements        |
 
 ---
 
 ## Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2025-11-02 | Initial release with comprehensive skill documentation |
+| Version | Date       | Changes                                                |
+| ------- | ---------- | ------------------------------------------------------ |
+| 1.0.0   | 2025-11-02 | Initial release with comprehensive skill documentation |
 
 ---
 
@@ -387,11 +411,13 @@ PromptStash must enforce these core rules:
 ## Questions & Support
 
 For questions about:
+
 - **Skill structure**: See [Skills Subdirectory Structure Guide](./skills-subdirectory-structure.md)
 - **Creating skills**: See [Skill Template Guidelines](./skill-template-guidelines.md)
 - **Validation logic**: See [Validation Rules Reference](./validation-rules-reference.md)
 
 For Claude Code questions:
+
 - [Claude Code Documentation](https://docs.claude.com/en/docs/claude-code/)
 
 ---

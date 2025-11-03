@@ -4,9 +4,9 @@ import express, { type Express, json, urlencoded } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import corsOptions from './config/corsOptions';
+import { getSession } from './middleware/auth';
 import credentials from './middleware/credentials';
 import { errorHandler } from './middleware/error';
-import { getSession } from './middleware/auth';
 import routes from './routes';
 
 const isProd = process.env.NODE_ENV === 'production';

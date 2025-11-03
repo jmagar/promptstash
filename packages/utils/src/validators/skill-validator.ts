@@ -1,22 +1,22 @@
-import { z } from "zod";
-import { parseSimpleYaml } from "./yaml-parser";
+import { z } from 'zod';
+import { parseSimpleYaml } from './yaml-parser';
 
 /**
  * Skill YAML Frontmatter Schema
- * 
+ *
  * Validates YAML frontmatter for Claude Code skill files (.claude/skills/SKILL_NAME/SKILL.md)
- * 
+ *
  * Skills require a subdirectory structure with SKILL.md file inside
  * Optional: reference.md and scripts/ subdirectory
- * 
+ *
  * @see https://docs.claude.com/en/docs/claude-code/skills.md
  */
 
 export const skillFrontmatterSchema = z.object({
   description: z
     .string()
-    .min(1, "Description is required")
-    .max(500, "Description must be 500 characters or less"),
+    .min(1, 'Description is required')
+    .max(500, 'Description must be 500 characters or less'),
 });
 
 export type SkillFrontmatter = z.infer<typeof skillFrontmatterSchema>;
@@ -34,7 +34,7 @@ export function validateSkillDirectoryName(dirName: string): {
   const kebabCaseRegex = /^[a-z0-9]+(-[a-z0-9]+)*$/;
   if (!kebabCaseRegex.test(dirName)) {
     errors.push(
-      "Skill directory name must be kebab-case (lowercase with hyphens, e.g., code-review)"
+      'Skill directory name must be kebab-case (lowercase with hyphens, e.g., code-review)',
     );
   }
 
@@ -57,19 +57,17 @@ export function validateSkillPath(path: string): {
   const warnings: string[] = [];
 
   // Check if path ends with SKILL.md
-  if (!path.endsWith("SKILL.md")) {
-    errors.push("Skill file must be named SKILL.md (uppercase)");
+  if (!path.endsWith('SKILL.md')) {
+    errors.push('Skill file must be named SKILL.md (uppercase)');
   }
 
   // Check if in a subdirectory
-  const pathParts = path.split("/");
+  const pathParts = path.split('/');
   if (pathParts.length < 2) {
-    errors.push(
-      "Skill file must be in a subdirectory (e.g., .claude/skills/code-review/SKILL.md)"
-    );
+    errors.push('Skill file must be in a subdirectory (e.g., .claude/skills/code-review/SKILL.md)');
   } else {
     // Validate directory name
-    const dirName = pathParts[pathParts.length - 2] || "";
+    const dirName = pathParts[pathParts.length - 2] || '';
     const dirValidation = validateSkillDirectoryName(dirName);
     if (!dirValidation.valid) {
       errors.push(...dirValidation.errors);
@@ -86,7 +84,10 @@ export function validateSkillPath(path: string): {
 /**
  * Validates full skill file (frontmatter + content)
  */
-export function validateSkillFile(content: string, path: string): {
+export function validateSkillFile(
+  content: string,
+  path: string,
+): {
   valid: boolean;
   errors: string[];
   warnings: string[];
@@ -107,20 +108,20 @@ export function validateSkillFile(content: string, path: string): {
   const match = content.match(frontmatterRegex);
 
   if (!match) {
-    errors.push("Skill file must start with YAML frontmatter (--- ... ---)");
+    errors.push('Skill file must start with YAML frontmatter (--- ... ---)');
     return { valid: false, errors, warnings };
   }
 
   try {
     // Parse YAML (simple implementation)
-    const yamlContent = match[1] || "";
+    const yamlContent = match[1] || '';
     const frontmatter = parseSimpleYaml(yamlContent);
 
     // Validate against schema
     const result = skillFrontmatterSchema.safeParse(frontmatter);
 
     if (!result.success) {
-      errors.push(...result.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`));
+      errors.push(...result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`));
     }
 
     return {
@@ -130,7 +131,9 @@ export function validateSkillFile(content: string, path: string): {
       frontmatter: result.success ? result.data : undefined,
     };
   } catch (error) {
-    errors.push(`Failed to parse YAML: ${error instanceof Error ? error.message : "Unknown error"}`);
+    errors.push(
+      `Failed to parse YAML: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
     return { valid: false, errors, warnings };
   }
 }
@@ -150,16 +153,16 @@ export function validateSkillStructure(files: string[]): {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  const hasSkillMd = files.some((f) => f.endsWith("SKILL.md"));
-  const hasReference = files.some((f) => f.endsWith("reference.md"));
-  const hasScripts = files.some((f) => f.includes("/scripts/"));
+  const hasSkillMd = files.some((f) => f.endsWith('SKILL.md'));
+  const hasReference = files.some((f) => f.endsWith('reference.md'));
+  const hasScripts = files.some((f) => f.includes('/scripts/'));
 
   if (!hasSkillMd) {
-    errors.push("Skill directory must contain SKILL.md file");
+    errors.push('Skill directory must contain SKILL.md file');
   }
 
   if (!hasReference) {
-    warnings.push("Consider adding reference.md for additional documentation");
+    warnings.push('Consider adding reference.md for additional documentation');
   }
 
   return {
@@ -170,5 +173,3 @@ export function validateSkillStructure(files: string[]): {
     hasScripts,
   };
 }
-
-

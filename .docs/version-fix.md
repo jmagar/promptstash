@@ -5,6 +5,7 @@
 ## Issue
 
 The web app had a zod version mismatch:
+
 - **apps/web/package.json:** `zod: ^4.1.12` (manually added)
 - **pnpm-workspace.yaml catalog:** `zod: ^3.25.76`
 
@@ -46,8 +47,8 @@ Always use catalog references when adding dependencies:
 ```json
 {
   "dependencies": {
-    "zod": "catalog:core",  // ✅ Good - uses catalog
-    "zod": "^4.1.12"        // ❌ Bad - hardcoded version
+    "zod": "catalog:core", // ✅ Good - uses catalog
+    "zod": "^4.1.12" // ❌ Bad - hardcoded version
   }
 }
 ```

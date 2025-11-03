@@ -14,12 +14,14 @@ This document provides a comprehensive reference for validation rules that Promp
 **Definition**: Reusable AI prompt frameworks with specific capabilities and behavior patterns.
 
 **Structure**:
+
 ```
 .claude/agents/
 └── AGENT_NAME.md
 ```
 
 **File Requirements**:
+
 - Single `.md` file per agent
 - File name: `AGENT_NAME.md` (any case)
 - YAML frontmatter required
@@ -27,27 +29,29 @@ This document provides a comprehensive reference for validation rules that Promp
 
 **Validation Rules**:
 
-| Rule | Severity | Check |
-|------|----------|-------|
-| Must be `.md` file | Error | `file.endsWith(".md")` |
-| Must be in agents directory | Error | `path.includes(".claude/agents")` |
-| Cannot be in subdirectory | Error | `dirname(agentFile) === ".claude/agents"` |
-| Must have YAML frontmatter | Error | `frontmatterExists && isValidYAML` |
-| Must have `name` in frontmatter | Error | `frontmatter.name !== undefined` |
-| Must have `description` in frontmatter | Error | `frontmatter.description !== undefined` |
-| File name cannot start with dot | Error | `!basename.startsWith(".")` |
+| Rule                                   | Severity | Check                                     |
+| -------------------------------------- | -------- | ----------------------------------------- |
+| Must be `.md` file                     | Error    | `file.endsWith(".md")`                    |
+| Must be in agents directory            | Error    | `path.includes(".claude/agents")`         |
+| Cannot be in subdirectory              | Error    | `dirname(agentFile) === ".claude/agents"` |
+| Must have YAML frontmatter             | Error    | `frontmatterExists && isValidYAML`        |
+| Must have `name` in frontmatter        | Error    | `frontmatter.name !== undefined`          |
+| Must have `description` in frontmatter | Error    | `frontmatter.description !== undefined`   |
+| File name cannot start with dot        | Error    | `!basename.startsWith(".")`               |
 
 ### Commands
 
 **Definition**: Custom slash commands for Claude Code that extend available functionality.
 
 **Structure**:
+
 ```
 .claude/commands/
 └── COMMAND_NAME.md
 ```
 
 **File Requirements**:
+
 - Single `.md` file per command
 - File name: `COMMAND_NAME.md` (any case)
 - YAML frontmatter required
@@ -55,20 +59,21 @@ This document provides a comprehensive reference for validation rules that Promp
 
 **Validation Rules**:
 
-| Rule | Severity | Check |
-|------|----------|-------|
-| Must be `.md` file | Error | `file.endsWith(".md")` |
-| Must be in commands directory | Error | `path.includes(".claude/commands")` |
-| Cannot be in subdirectory | Error | `dirname(commandFile) === ".claude/commands"` |
-| Must have YAML frontmatter | Error | `frontmatterExists && isValidYAML` |
-| Must have `name` in frontmatter | Error | `frontmatter.name !== undefined` |
-| File name cannot start with dot | Error | `!basename.startsWith(".")` |
+| Rule                            | Severity | Check                                         |
+| ------------------------------- | -------- | --------------------------------------------- |
+| Must be `.md` file              | Error    | `file.endsWith(".md")`                        |
+| Must be in commands directory   | Error    | `path.includes(".claude/commands")`           |
+| Cannot be in subdirectory       | Error    | `dirname(commandFile) === ".claude/commands"` |
+| Must have YAML frontmatter      | Error    | `frontmatterExists && isValidYAML`            |
+| Must have `name` in frontmatter | Error    | `frontmatter.name !== undefined`              |
+| File name cannot start with dot | Error    | `!basename.startsWith(".")`                   |
 
 ### Skills
 
 **Definition**: Reusable capabilities that can be invoked during Claude Code sessions, organized with optional reference files.
 
 **Structure**:
+
 ```
 .claude/skills/
 └── skill-name/
@@ -81,6 +86,7 @@ This document provides a comprehensive reference for validation rules that Promp
 ```
 
 **File Requirements**:
+
 - Directory per skill (NOT a file)
 - Directory name: `kebab-case`
 - Mandatory: `SKILL.md` in root of skill directory
@@ -89,18 +95,18 @@ This document provides a comprehensive reference for validation rules that Promp
 
 **Validation Rules**:
 
-| Rule | Severity | Check |
-|------|----------|-------|
-| Must be directory, not file | Error | `isDirectory(skillPath)` |
-| Directory must be in skills folder | Error | `path.includes(".claude/skills")` |
-| Directory name must be kebab-case | Error | `isKebabCase(dirname)` |
-| Must contain SKILL.md | Error | `exists(join(skillPath, "SKILL.md"))` |
-| File must be named exactly SKILL.md | Error | `basename === "SKILL.md"` |
-| Cannot have multiple SKILL.* files | Error | `count(skillFiles matching SKILL.*) === 1` |
-| Must have YAML frontmatter in SKILL.md | Error | `frontmatterExists && isValidYAML` |
-| Must have `name` in frontmatter | Error | `frontmatter.name !== undefined` |
-| Must have `description` in frontmatter | Error | `frontmatter.description !== undefined` |
-| Cannot have .md files at root (except SKILL.md) | Warning | `!rootFiles.filter(f => f.endsWith(".md") && f !== "SKILL.md").length > 0` |
+| Rule                                            | Severity | Check                                                                      |
+| ----------------------------------------------- | -------- | -------------------------------------------------------------------------- |
+| Must be directory, not file                     | Error    | `isDirectory(skillPath)`                                                   |
+| Directory must be in skills folder              | Error    | `path.includes(".claude/skills")`                                          |
+| Directory name must be kebab-case               | Error    | `isKebabCase(dirname)`                                                     |
+| Must contain SKILL.md                           | Error    | `exists(join(skillPath, "SKILL.md"))`                                      |
+| File must be named exactly SKILL.md             | Error    | `basename === "SKILL.md"`                                                  |
+| Cannot have multiple SKILL.\* files             | Error    | `count(skillFiles matching SKILL.*) === 1`                                 |
+| Must have YAML frontmatter in SKILL.md          | Error    | `frontmatterExists && isValidYAML`                                         |
+| Must have `name` in frontmatter                 | Error    | `frontmatter.name !== undefined`                                           |
+| Must have `description` in frontmatter          | Error    | `frontmatter.description !== undefined`                                    |
+| Cannot have .md files at root (except SKILL.md) | Warning  | `!rootFiles.filter(f => f.endsWith(".md") && f !== "SKILL.md").length > 0` |
 
 ---
 
@@ -109,80 +115,85 @@ This document provides a comprehensive reference for validation rules that Promp
 ### Agents & Commands
 
 **Required Fields**:
+
 ```yaml
 ---
-name: string              # (Required) Display name of the agent/command
-description: string       # (Required) Brief description
+name: string # (Required) Display name of the agent/command
+description: string # (Required) Brief description
 ---
 ```
 
 **Optional Fields**:
+
 ```yaml
 ---
 name: string
 description: string
-tags: string[]           # Array of tags for organization
-author: string           # Author name
-version: string          # Version (semantic versioning recommended)
-category: string         # Category classification
+tags: string[] # Array of tags for organization
+author: string # Author name
+version: string # Version (semantic versioning recommended)
+category: string # Category classification
 ---
 ```
 
 **Validation Rules**:
 
-| Field | Type | Required | Validation |
-|-------|------|----------|-----------|
-| `name` | string | Yes | Must not be empty; max 200 chars |
-| `description` | string | Yes | Must not be empty; max 500 chars |
-| `tags` | string[] | No | Array of strings; max 20 tags; max 50 chars per tag |
-| `author` | string | No | Max 100 chars |
-| `version` | string | No | Should follow semantic versioning (X.Y.Z) |
-| `category` | string | No | Max 50 chars |
+| Field         | Type     | Required | Validation                                          |
+| ------------- | -------- | -------- | --------------------------------------------------- |
+| `name`        | string   | Yes      | Must not be empty; max 200 chars                    |
+| `description` | string   | Yes      | Must not be empty; max 500 chars                    |
+| `tags`        | string[] | No       | Array of strings; max 20 tags; max 50 chars per tag |
+| `author`      | string   | No       | Max 100 chars                                       |
+| `version`     | string   | No       | Should follow semantic versioning (X.Y.Z)           |
+| `category`    | string   | No       | Max 50 chars                                        |
 
 ### Skills
 
 **Required Fields**:
+
 ```yaml
 ---
-name: string              # (Required) Display name of the skill
-description: string       # (Required) Brief description
+name: string # (Required) Display name of the skill
+description: string # (Required) Brief description
 ---
 ```
 
 **Recommended Fields**:
+
 ```yaml
 ---
 name: string
 description: string
-category: string         # Recommended: Category classification
-tags: string[]           # Recommended: Tags for organization
+category: string # Recommended: Category classification
+tags: string[] # Recommended: Tags for organization
 ---
 ```
 
 **Optional Fields**:
+
 ```yaml
 ---
 name: string
 description: string
 category: string
 tags: string[]
-author: string           # Author name
-version: string          # Version (semantic versioning recommended)
-dependencies: string[]   # Other skills this skill depends on
+author: string # Author name
+version: string # Version (semantic versioning recommended)
+dependencies: string[] # Other skills this skill depends on
 ---
 ```
 
 **Validation Rules**:
 
-| Field | Type | Required | Validation |
-|-------|------|----------|-----------|
-| `name` | string | Yes | Must not be empty; max 200 chars; should match directory name |
-| `description` | string | Yes | Must not be empty; max 500 chars |
-| `category` | string | No | Max 50 chars |
-| `tags` | string[] | No | Array of strings; max 20 tags; max 50 chars per tag |
-| `author` | string | No | Max 100 chars |
-| `version` | string | No | Should follow semantic versioning (X.Y.Z) |
-| `dependencies` | string[] | No | Array of skill names that are required |
+| Field          | Type     | Required | Validation                                                    |
+| -------------- | -------- | -------- | ------------------------------------------------------------- |
+| `name`         | string   | Yes      | Must not be empty; max 200 chars; should match directory name |
+| `description`  | string   | Yes      | Must not be empty; max 500 chars                              |
+| `category`     | string   | No       | Max 50 chars                                                  |
+| `tags`         | string[] | No       | Array of strings; max 20 tags; max 50 chars per tag           |
+| `author`       | string   | No       | Max 100 chars                                                 |
+| `version`      | string   | No       | Should follow semantic versioning (X.Y.Z)                     |
+| `dependencies` | string[] | No       | Array of skill names that are required                        |
 
 ---
 
@@ -191,44 +202,47 @@ dependencies: string[]   # Other skills this skill depends on
 ### Markdown Content
 
 **Requirements**:
+
 - Valid markdown syntax
 - At least one heading (## or lower)
 - Meaningful content (not just YAML frontmatter)
 
 **Validation Rules**:
 
-| Rule | Severity | Check |
-|------|----------|-------|
-| Must have markdown content | Error | `contentAfterFrontmatter.length > 0` |
-| Must have at least one heading | Warning | `content.includes(/^#{1,6}\s/m)` |
-| Markdown must be valid | Warning | `parseMarkdown(content).isValid` |
-| No script tags allowed | Error | `!content.includes("<script")` |
-| No raw HTML tags | Warning | `!content.match(/<(?!br|p|a|b|i|em|strong|code)/)` |
+| Rule                           | Severity | Check                                |
+| ------------------------------ | -------- | ------------------------------------ | --- | --- | --- | --- | --- | ------ | -------- |
+| Must have markdown content     | Error    | `contentAfterFrontmatter.length > 0` |
+| Must have at least one heading | Warning  | `content.includes(/^#{1,6}\s/m)`     |
+| Markdown must be valid         | Warning  | `parseMarkdown(content).isValid`     |
+| No script tags allowed         | Error    | `!content.includes("<script")`       |
+| No raw HTML tags               | Warning  | `!content.match(/<(?!br              | p   | a   | b   | i   | em  | strong | code)/)` |
 
 ### Code Blocks
 
 **Requirements**:
+
 - Language specified when including code examples
 - Valid syntax highlighting language specified
 
 **Examples**:
+
 ```markdown
 ✅ CORRECT:
 \`\`\`javascript
 function example() {
-  return true;
+return true;
 }
 \`\`\`
 
 \`\`\`python
 def example():
-    return True
+return True
 \`\`\`
 
 ❌ INCORRECT:
 \`\`\`
 function example() {
-  return true;
+return true;
 }
 \`\`\`
 ```
@@ -253,11 +267,11 @@ const agentRules = {
 
   // Content
   hasMarkdownContent: true,
-  minContentLength: 50,  // At least 50 chars of meaningful content
+  minContentLength: 50, // At least 50 chars of meaningful content
 
   // Security
   noScriptTags: true,
-  noExternalScripts: true
+  noExternalScripts: true,
 };
 ```
 
@@ -281,7 +295,7 @@ const commandRules = {
 
   // Content
   hasMarkdownContent: true,
-  minContentLength: 50
+  minContentLength: 50,
 };
 ```
 
@@ -309,16 +323,11 @@ const skillRules = {
 
   // Reference files
   canHaveSubdirectories: true,
-  recommendedSubdirectories: [
-    "docs/",
-    "templates/",
-    "examples/",
-    "samples/"
-  ],
+  recommendedSubdirectories: ["docs/", "templates/", "examples/", "samples/"],
   noMarkdownInRootExceptSKILLmd: true,
 
   // Security
-  noScriptTags: true
+  noScriptTags: true,
 };
 ```
 
@@ -328,68 +337,68 @@ const skillRules = {
 
 ### Error Levels
 
-| Level | Meaning | Action |
-|-------|---------|--------|
-| **Error** | Critical validation failure | Block save/upload until fixed |
-| **Warning** | Non-critical issue | Allow save but display warning |
-| **Info** | Suggestion for improvement | Display tip/hint |
+| Level       | Meaning                     | Action                         |
+| ----------- | --------------------------- | ------------------------------ |
+| **Error**   | Critical validation failure | Block save/upload until fixed  |
+| **Warning** | Non-critical issue          | Allow save but display warning |
+| **Info**    | Suggestion for improvement  | Display tip/hint               |
 
 ### Error Codes
 
 #### Structure Errors
 
-| Code | Message | Severity | Fix |
-|------|---------|----------|-----|
-| `INVALID_FILE_TYPE` | File must be .md | Error | Rename file to .md |
-| `INVALID_LOCATION` | File not in correct directory | Error | Move to correct location |
-| `NOT_A_DIRECTORY` | Skill must be a directory | Error | Create directory and move SKILL.md inside |
-| `MISSING_SKILL_MD` | Skill missing SKILL.md | Error | Create SKILL.md in skill directory |
-| `WRONG_FILENAME` | File must be named SKILL.md | Error | Rename to SKILL.md (uppercase) |
-| `MULTIPLE_SKILL_DEFINITIONS` | Multiple SKILL.* files found | Error | Keep only one SKILL.md |
-| `FILE_IN_SUBDIRECTORY` | Agent/command cannot be in subdirectory | Error | Move file to parent directory |
+| Code                         | Message                                 | Severity | Fix                                       |
+| ---------------------------- | --------------------------------------- | -------- | ----------------------------------------- |
+| `INVALID_FILE_TYPE`          | File must be .md                        | Error    | Rename file to .md                        |
+| `INVALID_LOCATION`           | File not in correct directory           | Error    | Move to correct location                  |
+| `NOT_A_DIRECTORY`            | Skill must be a directory               | Error    | Create directory and move SKILL.md inside |
+| `MISSING_SKILL_MD`           | Skill missing SKILL.md                  | Error    | Create SKILL.md in skill directory        |
+| `WRONG_FILENAME`             | File must be named SKILL.md             | Error    | Rename to SKILL.md (uppercase)            |
+| `MULTIPLE_SKILL_DEFINITIONS` | Multiple SKILL.\* files found           | Error    | Keep only one SKILL.md                    |
+| `FILE_IN_SUBDIRECTORY`       | Agent/command cannot be in subdirectory | Error    | Move file to parent directory             |
 
 #### Naming Errors
 
-| Code | Message | Severity | Fix |
-|------|---------|----------|-----|
-| `INVALID_NAMING_FORMAT` | Skill directory name must be kebab-case | Error | Rename directory to kebab-case |
-| `INVALID_NAME_CHARS` | Name contains invalid characters | Error | Use only alphanumeric, hyphens, underscores |
-| `EMPTY_NAME` | File/directory name cannot be empty | Error | Provide a name |
-| `RESERVED_NAME` | Name is reserved or conflicts | Error | Choose different name |
-| `NAMECASE_MISMATCH` | Directory name doesn't match skill name | Warning | Update directory or skill name to match |
+| Code                    | Message                                 | Severity | Fix                                         |
+| ----------------------- | --------------------------------------- | -------- | ------------------------------------------- |
+| `INVALID_NAMING_FORMAT` | Skill directory name must be kebab-case | Error    | Rename directory to kebab-case              |
+| `INVALID_NAME_CHARS`    | Name contains invalid characters        | Error    | Use only alphanumeric, hyphens, underscores |
+| `EMPTY_NAME`            | File/directory name cannot be empty     | Error    | Provide a name                              |
+| `RESERVED_NAME`         | Name is reserved or conflicts           | Error    | Choose different name                       |
+| `NAMECASE_MISMATCH`     | Directory name doesn't match skill name | Warning  | Update directory or skill name to match     |
 
 #### Frontmatter Errors
 
-| Code | Message | Severity | Fix |
-|------|---------|----------|-----|
-| `NO_FRONTMATTER` | Missing YAML frontmatter | Error | Add frontmatter with --- delimiters |
-| `INVALID_YAML` | YAML frontmatter is invalid | Error | Fix YAML syntax |
-| `MISSING_NAME` | Required field 'name' not found | Error | Add 'name' field to frontmatter |
-| `MISSING_DESCRIPTION` | Required field 'description' not found | Error | Add 'description' field |
-| `INVALID_FIELD_TYPE` | Field has wrong type | Error | Fix field type to match schema |
-| `NAME_TOO_LONG` | Name exceeds max length (200 chars) | Warning | Shorten name |
-| `DESCRIPTION_TOO_LONG` | Description exceeds max length (500 chars) | Warning | Shorten description |
-| `INVALID_TAGS` | Tags must be array of strings | Error | Format tags as array: ["tag1", "tag2"] |
-| `TOO_MANY_TAGS` | Exceeds max tag limit (20) | Warning | Remove some tags |
+| Code                   | Message                                    | Severity | Fix                                    |
+| ---------------------- | ------------------------------------------ | -------- | -------------------------------------- |
+| `NO_FRONTMATTER`       | Missing YAML frontmatter                   | Error    | Add frontmatter with --- delimiters    |
+| `INVALID_YAML`         | YAML frontmatter is invalid                | Error    | Fix YAML syntax                        |
+| `MISSING_NAME`         | Required field 'name' not found            | Error    | Add 'name' field to frontmatter        |
+| `MISSING_DESCRIPTION`  | Required field 'description' not found     | Error    | Add 'description' field                |
+| `INVALID_FIELD_TYPE`   | Field has wrong type                       | Error    | Fix field type to match schema         |
+| `NAME_TOO_LONG`        | Name exceeds max length (200 chars)        | Warning  | Shorten name                           |
+| `DESCRIPTION_TOO_LONG` | Description exceeds max length (500 chars) | Warning  | Shorten description                    |
+| `INVALID_TAGS`         | Tags must be array of strings              | Error    | Format tags as array: ["tag1", "tag2"] |
+| `TOO_MANY_TAGS`        | Exceeds max tag limit (20)                 | Warning  | Remove some tags                       |
 
 #### Content Errors
 
-| Code | Message | Severity | Fix |
-|------|---------|----------|-----|
-| `NO_CONTENT` | File has no markdown content | Error | Add content after frontmatter |
-| `EMPTY_CONTENT` | Content is too short | Warning | Add more meaningful content |
-| `INVALID_MARKDOWN` | Markdown syntax is invalid | Warning | Fix markdown syntax |
-| `NO_HEADINGS` | File should have at least one heading | Warning | Add markdown heading (## Title) |
-| `SCRIPT_TAG_FOUND` | Script tags not allowed | Error | Remove script tags |
-| `HTML_NOT_ALLOWED` | Raw HTML not recommended | Warning | Use markdown formatting instead |
+| Code               | Message                               | Severity | Fix                             |
+| ------------------ | ------------------------------------- | -------- | ------------------------------- |
+| `NO_CONTENT`       | File has no markdown content          | Error    | Add content after frontmatter   |
+| `EMPTY_CONTENT`    | Content is too short                  | Warning  | Add more meaningful content     |
+| `INVALID_MARKDOWN` | Markdown syntax is invalid            | Warning  | Fix markdown syntax             |
+| `NO_HEADINGS`      | File should have at least one heading | Warning  | Add markdown heading (## Title) |
+| `SCRIPT_TAG_FOUND` | Script tags not allowed               | Error    | Remove script tags              |
+| `HTML_NOT_ALLOWED` | Raw HTML not recommended              | Warning  | Use markdown formatting instead |
 
 #### Organization Errors
 
-| Code | Message | Severity | Fix |
-|------|---------|----------|-----|
-| `MARKDOWN_IN_ROOT` | Only SKILL.md should be at root | Warning | Move markdown files to subdirectory (docs/, examples/) |
-| `UNORGANIZED_FILES` | Consider organizing reference files in subdirectories | Info | Create docs/ or templates/ subdirectory |
-| `NESTED_SKILL_DIRECTORY` | Skill directory found inside another skill | Error | Move skill to correct location |
+| Code                     | Message                                               | Severity | Fix                                                    |
+| ------------------------ | ----------------------------------------------------- | -------- | ------------------------------------------------------ |
+| `MARKDOWN_IN_ROOT`       | Only SKILL.md should be at root                       | Warning  | Move markdown files to subdirectory (docs/, examples/) |
+| `UNORGANIZED_FILES`      | Consider organizing reference files in subdirectories | Info     | Create docs/ or templates/ subdirectory                |
+| `NESTED_SKILL_DIRECTORY` | Skill directory found inside another skill            | Error    | Move skill to correct location                         |
 
 ---
 

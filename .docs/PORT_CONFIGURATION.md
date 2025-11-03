@@ -8,19 +8,20 @@ All services now run on sequential ports in the 3xxx range (3100, 3200, 3300, 34
 
 ## Port Assignments
 
-| Service | Port | URL | Description |
-|---------|------|-----|-------------|
-| **Web App** | 3100 | http://localhost:3100 | Next.js frontend application |
-| **API Server** | 3300 | http://localhost:3300 | Express backend API |
-| **Prisma Studio** | 3400 | http://localhost:3400 | Database admin interface |
-| **Email Preview** | 3200 | http://localhost:3200 | React Email preview server |
-| **PostgreSQL** | 3500 | postgresql://localhost:3500 | Database server |
+| Service           | Port | URL                         | Description                  |
+| ----------------- | ---- | --------------------------- | ---------------------------- |
+| **Web App**       | 3100 | http://localhost:3100       | Next.js frontend application |
+| **API Server**    | 3300 | http://localhost:3300       | Express backend API          |
+| **Prisma Studio** | 3400 | http://localhost:3400       | Database admin interface     |
+| **Email Preview** | 3200 | http://localhost:3200       | React Email preview server   |
+| **PostgreSQL**    | 3500 | postgresql://localhost:3500 | Database server              |
 
 ## Configuration Files
 
 ### Web App (`apps/web`)
 
 **package.json:**
+
 ```json
 {
   "scripts": {
@@ -31,6 +32,7 @@ All services now run on sequential ports in the 3xxx range (3100, 3200, 3300, 34
 ```
 
 **.env.local:**
+
 ```env
 NEXT_PUBLIC_BASE_URL=http://localhost:3100
 NEXT_PUBLIC_API_URL=http://localhost:3300/api
@@ -40,6 +42,7 @@ BETTER_AUTH_URL=http://localhost:3100
 ### API Server (`apps/api`)
 
 **package.json:**
+
 ```json
 {
   "scripts": {
@@ -49,6 +52,7 @@ BETTER_AUTH_URL=http://localhost:3100
 ```
 
 **.env:**
+
 ```env
 PORT=3300
 ALLOWED_ORIGINS=http://localhost:3100,https://your-production-domain.com
@@ -58,6 +62,7 @@ BETTER_AUTH_URL=http://localhost:3100
 ### Prisma Studio (`apps/studio`)
 
 **package.json:**
+
 ```json
 {
   "scripts": {
@@ -69,6 +74,7 @@ BETTER_AUTH_URL=http://localhost:3100
 ### Email Preview (`apps/email`)
 
 **package.json:**
+
 ```json
 {
   "scripts": {
@@ -80,11 +86,13 @@ BETTER_AUTH_URL=http://localhost:3100
 ## Starting Services
 
 ### Development (All Services)
+
 ```bash
 pnpm dev
 ```
 
 This starts:
+
 - ✅ Web App on port 3100
 - ✅ API Server on port 3300
 - ✅ Prisma Studio on port 3400
@@ -109,16 +117,17 @@ pnpm --filter email dev
 
 ## Accessing Services
 
-| Service | Access URL | Notes |
-|---------|-----------|-------|
-| Web Application | http://localhost:3100 | Main user interface |
-| API Documentation | http://localhost:3300/api | REST API endpoints |
-| Database Admin | http://localhost:3400 | Prisma Studio UI |
-| Email Templates | http://localhost:3200 | Email preview |
+| Service           | Access URL                | Notes               |
+| ----------------- | ------------------------- | ------------------- |
+| Web Application   | http://localhost:3100     | Main user interface |
+| API Documentation | http://localhost:3300/api | REST API endpoints  |
+| Database Admin    | http://localhost:3400     | Prisma Studio UI    |
+| Email Templates   | http://localhost:3200     | Email preview       |
 
 ## Docker Configuration
 
 ### Development
+
 Database runs on host port **3500** to maintain sequential port scheme:
 
 ```yaml
@@ -129,6 +138,7 @@ services:
 ```
 
 ### Production
+
 Production Docker containers use internal ports and expose through reverse proxy or load balancer.
 
 ## Troubleshooting
@@ -138,6 +148,7 @@ Production Docker containers use internal ports and expose through reverse proxy
 If you see "Port XXXX is already in use":
 
 1. **Check what's using the port:**
+
    ```bash
    lsof -i :3100  # For web app
    lsof -i :3300  # For API
@@ -145,6 +156,7 @@ If you see "Port XXXX is already in use":
    ```
 
 2. **Kill the process:**
+
    ```bash
    kill -9 <PID>
    ```
@@ -164,6 +176,7 @@ If you see CORS errors:
 If Prisma can't connect:
 
 1. Verify PostgreSQL is running:
+
    ```bash
    docker compose -f docker-compose.dev.yml ps
    ```
@@ -181,7 +194,6 @@ If Prisma can't connect:
   - 3000: Standard Next.js/React dev server
   - 4000: Standard Express/API server
   - 5432: Standard PostgreSQL port
-  
 - **Production:** In production, services typically run on standard ports (80/443) behind a reverse proxy (Nginx, Caddy, etc.)
 
 - **Consistency:** Always keep `BETTER_AUTH_URL` and `NEXT_PUBLIC_BASE_URL` in sync across all environment files.
