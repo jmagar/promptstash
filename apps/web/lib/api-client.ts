@@ -1,10 +1,27 @@
 /**
  * API Client for PromptStash Backend
- * 
+ *
  * Provides typed functions for interacting with the Express API
  */
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+
+// Helper function for better error handling
+async function handleResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: response.statusText }));
+    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+// Helper function for void responses (delete operations)
+async function handleVoidResponse(response: Response): Promise<void> {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: response.statusText }));
+    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+  }
+}
 
 // Types
 export interface Stash {
@@ -72,14 +89,12 @@ export const apiClient = {
   // Stashes
   async getStashes(): Promise<Stash[]> {
     const res = await fetch(`${API_BASE_URL}/stashes`);
-    if (!res.ok) throw new Error('Failed to fetch stashes');
-    return res.json();
+    return handleResponse<Stash[]>(res);
   },
 
   async getStash(id: string): Promise<Stash> {
     const res = await fetch(`${API_BASE_URL}/stashes/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch stash');
-    return res.json();
+    return handleResponse<Stash>(res);
   },
 
   async createStash(data: { name: string; scope: string; description?: string }): Promise<Stash> {
@@ -88,27 +103,27 @@ export const apiClient = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error('Failed to create stash');
-    return res.json();
+    return handleResponse<Stash>(res);
   },
 
   // Files
-  async getFiles(stashId: string, params?: {
-    search?: string;
-    fileType?: string;
-    tags?: string;
-    folderId?: string;
-  }): Promise<File[]> {
+  async getFiles(
+    stashId: string,
+    params?: {
+      search?: string;
+      fileType?: string;
+      tags?: string;
+      folderId?: string;
+    },
+  ): Promise<File[]> {
     const searchParams = new URLSearchParams(params as Record<string, string>);
     const res = await fetch(`${API_BASE_URL}/stashes/${stashId}/files?${searchParams}`);
-    if (!res.ok) throw new Error('Failed to fetch files');
-    return res.json();
+    return handleResponse<File[]>(res);
   },
 
   async getFile(id: string): Promise<File> {
     const res = await fetch(`${API_BASE_URL}/files/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch file');
-    return res.json();
+    return handleResponse<File>(res);
   },
 
   async createFile(data: {
@@ -125,38 +140,35 @@ export const apiClient = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.error || 'Failed to create file');
-    }
-    return res.json();
+    return handleResponse<File>(res);
   },
 
-  async updateFile(id: string, data: {
-    name?: string;
-    content?: string;
-    tags?: string[];
-  }): Promise<File> {
+  async updateFile(
+    id: string,
+    data: {
+      name?: string;
+      content?: string;
+      tags?: string[];
+    },
+  ): Promise<File> {
     const res = await fetch(`${API_BASE_URL}/files/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error('Failed to update file');
-    return res.json();
+    return handleResponse<File>(res);
   },
 
   async deleteFile(id: string): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/files/${id}`, {
       method: 'DELETE',
     });
-    if (!res.ok) throw new Error('Failed to delete file');
+    return handleVoidResponse(res);
   },
 
   async getFileVersions(id: string): Promise<FileVersion[]> {
     const res = await fetch(`${API_BASE_URL}/files/${id}/versions`);
-    if (!res.ok) throw new Error('Failed to fetch versions');
-    return res.json();
+    return handleResponse<FileVersion[]>(res);
   },
 
   async revertFile(id: string, versionId: string): Promise<File> {
@@ -165,15 +177,13 @@ export const apiClient = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ versionId }),
     });
-    if (!res.ok) throw new Error('Failed to revert file');
-    return res.json();
+    return handleResponse<File>(res);
   },
 
   // Folders
   async getFolder(id: string): Promise<Folder> {
     const res = await fetch(`${API_BASE_URL}/folders/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch folder');
-    return res.json();
+    return handleResponse<Folder>(res);
   },
 
   async createFolder(data: {
@@ -187,28 +197,29 @@ export const apiClient = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error('Failed to create folder');
-    return res.json();
+    return handleResponse<Folder>(res);
   },
 
-  async updateFolder(id: string, data: {
-    name?: string;
-    path?: string;
-  }): Promise<Folder> {
+  async updateFolder(
+    id: string,
+    data: {
+      name?: string;
+      path?: string;
+    },
+  ): Promise<Folder> {
     const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error('Failed to update folder');
-    return res.json();
+    return handleResponse<Folder>(res);
   },
 
   async deleteFolder(id: string): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
       method: 'DELETE',
     });
-    if (!res.ok) throw new Error('Failed to delete folder');
+    return handleVoidResponse(res);
   },
 
   // Validation
@@ -218,8 +229,7 @@ export const apiClient = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content, filename }),
     });
-    if (!res.ok) throw new Error('Failed to validate agent');
-    return res.json();
+    return handleResponse(res);
   },
 
   async validateSkill(content: string, path: string) {
@@ -228,8 +238,7 @@ export const apiClient = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content, path }),
     });
-    if (!res.ok) throw new Error('Failed to validate skill');
-    return res.json();
+    return handleResponse(res);
   },
 
   async validateMCP(content: string) {
@@ -238,8 +247,7 @@ export const apiClient = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content }),
     });
-    if (!res.ok) throw new Error('Failed to validate MCP');
-    return res.json();
+    return handleResponse(res);
   },
 
   async validateHooks(config: unknown, language?: 'typescript' | 'python') {
@@ -248,7 +256,6 @@ export const apiClient = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ config, language }),
     });
-    if (!res.ok) throw new Error('Failed to validate hooks');
-    return res.json();
+    return handleResponse(res);
   },
 };

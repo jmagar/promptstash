@@ -45,7 +45,7 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
   const pathname = usePathname();
 
   const shouldRedirect = options?.redirectOnUnauthenticated ?? false;
-  const redirectTo = options?.redirectTo ?? '/';
+  const redirectTo = options?.redirectTo ?? '/sign-in';
 
   // Only redirect if explicitly enabled and not on auth pages
   useEffect(() => {

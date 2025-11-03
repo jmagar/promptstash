@@ -10,6 +10,7 @@
 ### Phase 1-2: Backend Foundation & Database Schema (COMPLETED)
 
 **Database Models (Prisma):**
+
 - ✅ User, Session, Account (Authentication from template)
 - ✅ Stash (USER/PROJECT/PLUGIN/MARKETPLACE scopes)
 - ✅ File (with content, type, metadata)
@@ -19,6 +20,7 @@
 - ✅ FileShare (permissions: VIEW/EDIT/COMMENT)
 
 **Validation Utilities (`packages/utils/src/validators/`):**
+
 - ✅ Agent Validator - `.claude/agents/*.md` files
   - YAML frontmatter validation
   - Kebab-case filename checking
@@ -43,19 +45,17 @@
   - Hook output schema validation
 
 **API Routes (`apps/api/src/routes/`):**
+
 - ✅ File Routes - `/api/files`
   - GET, POST, PUT, DELETE
   - Version history
   - Revert to previous version
-  
 - ✅ Stash Routes - `/api/stashes`
   - CRUD operations
   - File listing with filters
-  
 - ✅ Folder Routes - `/api/folders`
   - Hierarchical management
   - Cascade delete
-  
 - ✅ Validation Routes - `/api/validate`
   - Real-time validation endpoints
   - Agent, Skill, MCP, Hooks validation
@@ -63,6 +63,7 @@
 ### Phase 3: Database Setup (COMPLETED)
 
 **Infrastructure:**
+
 - ✅ PostgreSQL 16 container via Docker Compose
 - ✅ Port 5434 (avoiding conflicts with existing DBs)
 - ✅ Persistent volume: `promptstash_postgres_dev_data`
@@ -70,17 +71,20 @@
 - ✅ Credentials configured in all env files
 
 **Migration:**
+
 - ✅ Initial migration: `20251102074234_init_promptstash_schema`
 - ✅ 13 tables created successfully
 - ✅ All foreign keys and indexes in place
 
 **Seeding:**
+
 - ✅ TypeScript seed script at `packages/db/prisma/seed.ts`
 - ✅ Demo user: demo@promptstash.dev
 - ✅ Sample stash with folders and files
 - ✅ Tags: "react" and "ui"
 
 **Documentation:**
+
 - ✅ `DATABASE_SETUP.md` - Complete setup guide
 - ✅ `.docs/database-setup-summary.md` - Detailed summary
 
@@ -138,6 +142,7 @@
    - Utility exports
 
 **Additional Components Installed:**
+
 - ✅ Badge component (for tags)
 - ✅ Avatar component (for user profile)
 - ✅ Tooltip component (for button hints)
@@ -228,6 +233,7 @@
 ## 📋 Next Steps (Remaining Phases)
 
 ### Phase 5: Main Page Integration & Data Fetching
+
 - [ ] Update `apps/web/app/(default)/page.tsx`
 - [ ] Integrate Header, Toolbar, Breadcrumb, FileGrid
 - [ ] Set up TanStack Query for API calls
@@ -236,6 +242,7 @@
 - [ ] Add New File and New Folder modals
 
 ### Phase 6: File Editors
+
 - [ ] Markdown Editor with YAML frontmatter
 - [ ] JSON Editor with syntax highlighting
 - [ ] Session Viewer for .jsonl files
@@ -243,6 +250,7 @@
 - [ ] Save/discard functionality
 
 ### Phase 7: Hooks Builder UI
+
 - [ ] Hook event type selector
 - [ ] Matcher pattern configuration
 - [ ] Command vs Prompt editor
@@ -250,30 +258,35 @@
 - [ ] Hook templates library
 
 ### Phase 8: Advanced Features
+
 - [ ] GitHub Actions workflow generator
 - [ ] Statusline script builder
 - [ ] Plugin/Marketplace manifest creators
 - [ ] Deployment ZIP generation
 
 ### Phase 9: Search & Tags
+
 - [ ] Cmd+K command palette
 - [ ] Full-text search
 - [ ] Tag management interface
 - [ ] Filter by tags/type/date
 
 ### Phase 10: Collaboration
+
 - [ ] File sharing with permissions
 - [ ] Share link generation
 - [ ] Version comparison UI
 - [ ] Revert to previous version UI
 
 ### Phase 11: Testing
+
 - [ ] API route tests
 - [ ] Component tests
 - [ ] E2E tests with Playwright
 - [ ] Validation utility tests
 
 ### Phase 12: Deployment
+
 - [ ] Production Docker setup
 - [ ] Environment variable documentation
 - [ ] CI/CD pipeline
@@ -331,6 +344,7 @@ pnpm test
 ## 🔑 Key Achievements
 
 ✨ **Solid Foundation:**
+
 - Complete database schema with versioning
 - Comprehensive validation system
 - RESTful API with TypeScript
@@ -338,6 +352,7 @@ pnpm test
 - Docker-based development environment
 
 ✨ **Production-Ready Features:**
+
 - Automatic file versioning on every save
 - Real-time validation for all file types
 - Type-safe API and frontend
@@ -345,6 +360,7 @@ pnpm test
 - Dark mode support
 
 ✨ **Developer Experience:**
+
 - pnpm monorepo with Turborepo
 - Hot reload for API and web
 - TypeScript strict mode throughout
