@@ -45,7 +45,7 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
   const pathname = usePathname();
 
   const shouldRedirect = options?.redirectOnUnauthenticated ?? false;
-  const redirectTo = options?.redirectTo ?? '/';
+  const redirectTo = options?.redirectTo ?? '/sign-in';
 
   // AUTH BYPASS for development - remove in production!
   const isBypassEnabled = process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true';

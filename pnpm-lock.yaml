@@ -99,6 +99,9 @@ catalogs:
       specifier: ^8.39.0
       version: 8.39.0
   prettier:
+    prettier:
+      specifier: ^3.6.2
+      version: 3.6.2
     prettier-plugin-organize-imports:
       specifier: ^4.1.0
       version: 4.2.0
@@ -228,9 +231,6 @@ catalogs:
       specifier: ^1.3.6
       version: 1.4.0
 
-overrides:
-  prettier: 3.6.2
-
 importers:
 
   .:
@@ -242,7 +242,7 @@ importers:
         specifier: catalog:eslint
         version: 9.32.0(jiti@2.6.1)
       prettier:
-        specifier: 3.6.2
+        specifier: catalog:prettier
         version: 3.6.2
       prettier-plugin-organize-imports:
         specifier: catalog:prettier
@@ -584,7 +584,7 @@ importers:
   packages/prettier-config:
     dependencies:
       prettier:
-        specifier: 3.6.2
+        specifier: catalog:prettier
         version: 3.6.2
     devDependencies:
       prettier-plugin-organize-imports:
@@ -5082,7 +5082,7 @@ packages:
   prettier-plugin-organize-imports@4.2.0:
     resolution: {integrity: sha512-Zdy27UhlmyvATZi67BTnLcKTo8fm6Oik59Sz6H64PgZJVs6NJpPD1mT240mmJn62c98/QaL+r3kx9Q3gRpDajg==}
     peerDependencies:
-      prettier: 3.6.2
+      prettier: '>=2.0'
       typescript: '>=2.9'
       vue-tsc: ^2.1.0 || 3
     peerDependenciesMeta:
@@ -5092,7 +5092,7 @@ packages:
   prettier-plugin-packagejson@2.5.19:
     resolution: {integrity: sha512-Qsqp4+jsZbKMpEGZB1UP1pxeAT8sCzne2IwnKkr+QhUe665EXUo3BAvTf1kAPCqyMv9kg3ZmO0+7eOni/C6Uag==}
     peerDependencies:
-      prettier: 3.6.2
+      prettier: '>= 1.16.0'
     peerDependenciesMeta:
       prettier:
         optional: true
@@ -5108,7 +5108,7 @@ packages:
       '@shopify/prettier-plugin-liquid': '*'
       '@trivago/prettier-plugin-sort-imports': '*'
       '@zackad/prettier-plugin-twig': '*'
-      prettier: 3.6.2
+      prettier: ^3.0
       prettier-plugin-astro: '*'
       prettier-plugin-css-order: '*'
       prettier-plugin-import-sort: '*'
@@ -5157,6 +5157,11 @@ packages:
         optional: true
       prettier-plugin-svelte:
         optional: true
+
+  prettier@3.5.3:
+    resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   prettier@3.6.2:
     resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
@@ -8118,7 +8123,7 @@ snapshots:
       json5: 2.2.3
       log-symbols: 4.1.0
       module-punycode: punycode@2.3.1
-      next: 15.5.2(@babel/core@7.26.10)(react-dom@19.0.0(react@19.2.0))(react@19.0.0)
+      next: 15.5.2(@babel/core@7.26.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       node-html-parser: 7.0.1
       ora: 5.4.1
       pretty-bytes: 6.1.1
@@ -8158,7 +8163,7 @@ snapshots:
   '@react-email/render@1.0.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       html-to-text: 9.0.5
-      prettier: 3.6.2
+      prettier: 3.5.3
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
       react-promise-suspense: 0.3.4
@@ -11026,7 +11031,7 @@ snapshots:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
-  next@15.5.2(@babel/core@7.26.10)(react-dom@19.0.0(react@19.2.0))(react@19.0.0):
+  next@15.5.2(@babel/core@7.26.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       '@next/env': 15.5.2
       '@swc/helpers': 0.5.15
@@ -11376,6 +11381,8 @@ snapshots:
       prettier: 3.6.2
     optionalDependencies:
       prettier-plugin-organize-imports: 4.2.0(prettier@3.6.2)(typescript@5.9.2)
+
+  prettier@3.5.3: {}
 
   prettier@3.6.2: {}
 

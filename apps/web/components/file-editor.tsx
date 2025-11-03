@@ -1,15 +1,6 @@
 'use client';
 
 import { useFile, useUpdateFile } from '@/hooks/use-promptstash';
-import { Badge } from '@workspace/ui/components/badge';
-import { Button } from '@workspace/ui/components/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@workspace/ui/components/sheet';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,10 +11,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
-import { Button } from '@workspace/ui/components/button';
-import { Textarea } from '@workspace/ui/components/textarea';
 import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@workspace/ui/components/sheet';
 import { Spinner } from '@workspace/ui/components/spinner';
+import { Textarea } from '@workspace/ui/components/textarea';
 import { AlertCircle, Clock, Save, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';

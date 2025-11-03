@@ -13,7 +13,6 @@ import { useState } from 'react';
 
 export default function StashPage() {
   const [selectedStashId] = useState<string | null>(null);
-  const [, setCurrentPath] = useState<string>('/');
 
   // Fetch stashes
   const { data: stashes, isLoading: stashesLoading } = useStashes();
@@ -49,7 +48,9 @@ export default function StashPage() {
   const breadcrumbItems = [
     {
       label: stashes?.find((s) => s.id === activeStashId)?.name || 'User',
-      onClick: () => setCurrentPath('/'),
+      onClick: () => {
+        // TODO: Navigate to root
+      },
     },
     {
       label: '.claude',

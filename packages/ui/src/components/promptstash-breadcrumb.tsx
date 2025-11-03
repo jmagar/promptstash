@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { ChevronRight, Home } from 'lucide-react';
-import * as React from 'react';
+import * as React from "react";
+import { Home, ChevronRight } from "lucide-react";
 
 export interface BreadcrumbItem {
   label: string;
@@ -14,19 +14,22 @@ export interface PromptStashBreadcrumbProps {
   className?: string;
 }
 
-export function PromptStashBreadcrumb({ items, className }: PromptStashBreadcrumbProps) {
+export function PromptStashBreadcrumb({
+  items,
+  className,
+}: PromptStashBreadcrumbProps) {
   return (
-    <div className={`bg-background flex h-10 items-center gap-2 border-b px-5 ${className || ''}`}>
+    <div className={`flex h-10 items-center gap-2 border-b bg-background px-5 ${className || ""}`}>
       {items.map((item, index) => (
         <React.Fragment key={index}>
-          {index > 0 && <ChevronRight className="text-muted-foreground h-4 w-4" />}
+          {index > 0 && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
           <button
             onClick={item.onClick}
             disabled={item.active}
             className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors ${
               item.active
-                ? 'text-foreground cursor-default font-semibold'
-                : 'text-muted-foreground hover:text-foreground cursor-pointer'
+                ? "text-foreground font-semibold cursor-default"
+                : "text-muted-foreground hover:text-foreground cursor-pointer"
             }`}
           >
             {index === 0 && <Home className="h-4 w-4" />}

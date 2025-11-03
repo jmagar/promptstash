@@ -1,19 +1,22 @@
-import { Home } from 'lucide-react';
+import { FolderKanban, Home, Settings, User } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const siteConfig: Metadata = {
-  title: 'build-elevate',
-  description: 'A starter template for building applications with Turborepo.',
+  title: 'PromptStash',
+  description:
+    'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
   icons: {
     icon: [{ url: '/favicon.ico' }],
     apple: '/apple-touch-icon.png',
     shortcut: '/favicon.ico',
   },
   keywords: [
+    'promptstash',
+    'claude code',
+    'prompts',
+    'agents',
+    'skills',
     'turborepo',
-    'starter',
-    'template',
-    'react',
     'typescript',
     'nextjs',
     'tailwindcss',
@@ -21,20 +24,19 @@ export const siteConfig: Metadata = {
     'postgresql',
     'shadcn/ui',
     'better-auth',
-    'resend',
-    'react-email',
   ],
   openGraph: {
-    title: 'build-elevate',
-    description: 'A starter template for building applications with Turborepo.',
-    url: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://turborepo.org',
-    siteName: 'build-elevate',
+    title: 'PromptStash',
+    description:
+      'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
+    url: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://promptstash.dev',
+    siteName: 'PromptStash',
     images: [
       {
-        url: 'https://turborepo.com/_next/image?url=%2Fimages%2Fdocs%2Fslow-tasks-dark.png&w=1920&q=75',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'build-elevate',
+        alt: 'PromptStash',
       },
     ],
     locale: 'en_US',
@@ -42,24 +44,38 @@ export const siteConfig: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'build-elevate',
-    description: 'A starter template for building applications with Turborepo.',
-    images: [
-      'https://turborepo.com/_next/image?url=%2Fimages%2Fdocs%2Fslow-tasks-dark.png&w=1920&q=75',
-    ],
+    title: 'PromptStash',
+    description:
+      'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
+    images: ['/og-image.png'],
   },
 };
 
 export const config = {
-  name: 'build-elevate',
+  name: 'PromptStash',
   description: siteConfig.description,
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://turborepo.org',
-  domain: process.env.NEXT_PUBLIC_DOMAIN ?? 'turborepo.org',
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://promptstash.dev',
+  domain: process.env.NEXT_PUBLIC_DOMAIN ?? 'promptstash.dev',
   nav: [
     {
       title: 'Dashboard',
       href: '/dashboard',
       icon: Home,
+    },
+    {
+      title: 'Stash',
+      href: '/stash',
+      icon: FolderKanban,
+    },
+    {
+      title: 'Profile',
+      href: '/profile',
+      icon: User,
+    },
+    {
+      title: 'Settings',
+      href: '/settings/general',
+      icon: Settings,
     },
   ],
 };

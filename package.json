@@ -29,8 +29,14 @@
     "node": ">=20"
   },
   "pnpm": {
-    "overrides": {
-      "prettier": "3.6.2"
-    }
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "@tailwindcss/oxide",
+      "esbuild",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }
