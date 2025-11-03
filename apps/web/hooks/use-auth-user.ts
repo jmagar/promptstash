@@ -50,6 +50,11 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
   // AUTH BYPASS for development - remove in production!
   const isBypassEnabled = process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true';
   
+  // Prevent auth bypass in production environments
+  if (process.env.NODE_ENV === 'production' && isBypassEnabled) {
+    throw new Error('Auth bypass cannot be enabled in production');
+  }
+  
   // Only redirect if explicitly enabled and not on auth pages (skip if bypass is enabled)
   useEffect(() => {
     if (isBypassEnabled) return;
