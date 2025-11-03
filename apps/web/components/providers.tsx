@@ -2,6 +2,7 @@
 
 import { AppSidebar } from '@/components/app-sidebar';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SidebarProvider } from '@workspace/ui/components/sidebar';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';
@@ -19,6 +20,11 @@ const queryClient = new QueryClient({
   },
 });
 
+function KeyboardShortcutsProvider({ children }: { children: React.ReactNode }) {
+  useKeyboardShortcuts();
+  return <>{children}</>;
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
@@ -32,9 +38,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <SidebarProvider>
             <TooltipProvider>
-              <AppSidebar />
-              <Toaster richColors />
-              {children}
+              <KeyboardShortcutsProvider>
+                <AppSidebar />
+                <Toaster richColors />
+                {children}
+              </KeyboardShortcutsProvider>
             </TooltipProvider>
           </SidebarProvider>
         </QueryClientProvider>
