@@ -41,11 +41,23 @@ interface NewFolderModalProps {
   stashId: string;
   parentFolderId?: string;
   onSuccess?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function NewFolderModal({ stashId, parentFolderId, onSuccess }: NewFolderModalProps) {
-  const [open, setOpen] = useState(false);
+export function NewFolderModal({
+  stashId,
+  parentFolderId,
+  onSuccess,
+  open: controlledOpen,
+  onOpenChange,
+}: NewFolderModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const createFolder = useCreateFolder();
+
+  // Use controlled or internal state
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -77,12 +89,14 @@ export function NewFolderModal({ stashId, parentFolderId, onSuccess }: NewFolder
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <FolderPlus className="h-4 w-4" />
-          New Folder
-        </Button>
-      </DialogTrigger>
+      {controlledOpen === undefined && (
+        <DialogTrigger asChild>
+          <Button variant="outline">
+            <FolderPlus className="h-4 w-4" />
+            New Folder
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>

@@ -22,17 +22,17 @@ import { prisma } from '../../db/src/client';
 function isValidGoogleOAuthConfig(): boolean {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  
+
   if (!clientId || !clientSecret) {
     return false;
   }
-  
+
   // Check if values are not placeholder strings
-  const isValidClientId = clientId.trim().length > 0 && 
-    clientId !== 'your-google-client-id.apps.googleusercontent.com';
-  const isValidSecret = clientSecret.trim().length > 0 && 
-    clientSecret !== 'your-google-client-secret';
-  
+  const isValidClientId =
+    clientId.trim().length > 0 && clientId !== 'your-google-client-id.apps.googleusercontent.com';
+  const isValidSecret =
+    clientSecret.trim().length > 0 && clientSecret !== 'your-google-client-secret';
+
   return isValidClientId && isValidSecret;
 }
 

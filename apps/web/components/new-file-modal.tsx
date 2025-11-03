@@ -51,7 +51,7 @@ const FILE_TYPES = [
 ] as const;
 
 // Type derived from the constant array
-type FileType = typeof FILE_TYPES[number];
+type FileType = (typeof FILE_TYPES)[number];
 
 // UI display options for file types
 const fileTypes: Array<{ value: FileType; label: string }> = [
@@ -78,11 +78,23 @@ interface NewFileModalProps {
   stashId: string;
   folderId?: string;
   onSuccess?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function NewFileModal({ stashId, folderId, onSuccess }: NewFileModalProps) {
-  const [open, setOpen] = useState(false);
+export function NewFileModal({
+  stashId,
+  folderId,
+  onSuccess,
+  open: controlledOpen,
+  onOpenChange,
+}: NewFileModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const createFile = useCreateFile();
+
+  // Use controlled or internal state
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -166,12 +178,14 @@ Describe what this skill does.
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-          <FilePlus className="h-4 w-4" />
-          New File
-        </Button>
-      </DialogTrigger>
+      {controlledOpen === undefined && (
+        <DialogTrigger asChild>
+          <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+            <FilePlus className="h-4 w-4" />
+            New File
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>Create New File</DialogTitle>

@@ -18,6 +18,24 @@ const userApiLimiter = createRateLimiter({
   limiter: slidingWindow(60, '1 m'),
 });
 
+// Strict rate limiter for authentication endpoints: 5 requests per 15 minutes
+const authStrictLimiter = createRateLimiter({
+  prefix: 'auth-strict',
+  limiter: slidingWindow(5, '15 m'),
+});
+
+// File upload rate limiter: 10 uploads per hour
+const fileUploadLimiter = createRateLimiter({
+  prefix: 'file-upload',
+  limiter: slidingWindow(10, '1 h'),
+});
+
+// File operation rate limiter: 30 operations per minute
+const fileOperationLimiter = createRateLimiter({
+  prefix: 'file-operation',
+  limiter: slidingWindow(30, '1 m'),
+});
+
 /**
  * Generic rate limit middleware factory
  * Creates a middleware that uses a specific rate limiter
@@ -69,5 +87,23 @@ export const globalRateLimit = createRateLimitMiddleware(
 // User-specific rate limiter (by user ID)
 export const userRateLimit = createRateLimitMiddleware(
   userApiLimiter,
+  (req) => req.user?.id || req.ip || 'anonymous',
+);
+
+// Strict auth rate limiter - for sensitive authentication operations
+export const authStrictRateLimit = createRateLimitMiddleware(
+  authStrictLimiter,
+  (req) => req.ip || 'anonymous',
+);
+
+// File upload rate limiter - for file uploads (by user ID or IP)
+export const fileUploadRateLimit = createRateLimitMiddleware(
+  fileUploadLimiter,
+  (req) => req.user?.id || req.ip || 'anonymous',
+);
+
+// File operation rate limiter - for file CRUD operations
+export const fileOperationRateLimit = createRateLimitMiddleware(
+  fileOperationLimiter,
   (req) => req.user?.id || req.ip || 'anonymous',
 );

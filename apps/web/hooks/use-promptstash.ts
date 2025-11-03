@@ -11,6 +11,8 @@ export interface FileQueryParams {
   fileType?: string;
   tags?: string;
   folderId?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface FileUpdateData {
@@ -32,6 +34,8 @@ export const queryKeys = {
   file: (id: string) => ['files', id] as const,
   fileVersions: (id: string) => ['files', id, 'versions'] as const,
   folder: (id: string) => ['folders', id] as const,
+  tags: ['tags'] as const,
+  tag: (id: string) => ['tags', id] as const,
 };
 
 // Stash Hooks
@@ -67,6 +71,8 @@ export function useFiles(stashId: string, params?: FileQueryParams) {
     queryKey: queryKeys.files(stashId, params),
     queryFn: () => apiClient.getFiles(stashId, params),
     enabled: !!stashId,
+    // Keep previous data while loading next page for smoother UX
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -182,6 +188,60 @@ export function useDeleteFolder() {
       // Invalidate specific folder query
       queryClient.invalidateQueries({ queryKey: queryKeys.folder(deletedFolderId) });
       // Invalidate all files queries (folder deletion affects file lists)
+      queryClient.invalidateQueries({ queryKey: ['files'] });
+    },
+  });
+}
+
+// Tag Hooks
+export function useTags() {
+  return useQuery({
+    queryKey: queryKeys.tags,
+    queryFn: () => apiClient.getTags(),
+  });
+}
+
+export function useTag(id: string) {
+  return useQuery({
+    queryKey: queryKeys.tag(id),
+    queryFn: () => apiClient.getTag(id),
+    enabled: !!id,
+  });
+}
+
+export function useCreateTag() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: apiClient.createTag,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tags });
+    },
+  });
+}
+
+export function useUpdateTag() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { name?: string; color?: string } }) =>
+      apiClient.updateTag(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tag(data.id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tags });
+    },
+  });
+}
+
+export function useDeleteTag() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: apiClient.deleteTag,
+    onSuccess: (_, deletedTagId) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tag(deletedTagId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tags });
+      // Invalidate files queries since tag deletion affects file tags
       queryClient.invalidateQueries({ queryKey: ['files'] });
     },
   });

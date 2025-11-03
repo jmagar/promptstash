@@ -22,9 +22,10 @@ The validation functions in `packages/utils/src/validators/agent-validator.ts` e
      - "Filename must be kebab-case"
 
 2. **Code was passing raw user input** ([`apps/api/src/routes/file.routes.ts:176-179`](apps/api/src/routes/file.routes.ts#L176-L179) - before fix):
+
    ```typescript
    if (fileType === "AGENT") {
-     validation = validateAgentFile(content, name);  // ❌ Passing "Test Agent"
+     validation = validateAgentFile(content, name); // ❌ Passing "Test Agent"
    }
    ```
 
@@ -39,12 +40,13 @@ Updated [`apps/api/src/routes/file.routes.ts:176-179`](apps/api/src/routes/file.
 ```typescript
 if (fileType === "AGENT") {
   // Extract filename from generated path (e.g., ".claude/agents/test-agent.md" -> "test-agent.md")
-  const filename = path.split('/').pop() || name;
+  const filename = path.split("/").pop() || name;
   validation = validateAgentFile(content, filename);
 }
 ```
 
 **Why this works:**
+
 - `path` is already generated in correct format (`.claude/agents/test-agent.md`)
 - `split('/').pop()` extracts just the filename (`test-agent.md`)
 - Validator receives properly formatted filename and passes validation

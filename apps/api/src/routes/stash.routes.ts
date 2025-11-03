@@ -9,8 +9,48 @@ const router: Router = Router();
 router.use(requireAuth);
 
 /**
- * GET /api/stashes
- * Get all stashes for the authenticated user
+ * @openapi
+ * /api/stashes:
+ *   get:
+ *     tags:
+ *       - Stashes
+ *     summary: Get all stashes for the authenticated user
+ *     description: |
+ *       Retrieves all stashes belonging to the authenticated user.
+ *       If the user has no stashes, a default stash is automatically created.
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved stashes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/Stash'
+ *                   - type: object
+ *                     properties:
+ *                       _count:
+ *                         type: object
+ *                         properties:
+ *                           files:
+ *                             type: integer
+ *                           folders:
+ *                             type: integer
+ *       401:
+ *         description: Unauthorized - User is not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.get('/', async (req: Request, res: Response) => {
   try {

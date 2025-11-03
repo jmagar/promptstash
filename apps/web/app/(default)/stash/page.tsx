@@ -1,5 +1,9 @@
 'use client';
 
+import { FileEditor } from '@/components/file-editor';
+import { NewFileModal } from '@/components/new-file-modal';
+import { NewFolderModal } from '@/components/new-folder-modal';
+import { SearchModal } from '@/components/search-modal';
 import { useFiles, useStashes } from '@/hooks/use-promptstash';
 import {
   PromptStashBreadcrumb,
@@ -9,24 +13,40 @@ import {
   Skeleton,
   type FileItem,
 } from '@workspace/ui';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function StashPage() {
+  const router = useRouter();
   const [selectedStashId] = useState<string | null>(null);
+  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+  const [fileEditorOpen, setFileEditorOpen] = useState(false);
+  const [newFileModalOpen, setNewFileModalOpen] = useState(false);
+  const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
 
   // Fetch stashes
-  const { data: stashes, isLoading: stashesLoading } = useStashes();
+  const { data: stashes, isLoading: stashesLoading, refetch: refetchStashes } = useStashes();
 
   // Select first stash by default
   const activeStashId = selectedStashId || stashes?.[0]?.id;
 
-  // Fetch files for active stash
-  const { data: files, isLoading: filesLoading } = useFiles(activeStashId || '', {
+  // Fetch files for active stash with pagination
+  const {
+    data: filesData,
+    isLoading: filesLoading,
+    refetch: refetchFiles,
+  } = useFiles(activeStashId || '', {
     folderId: 'root',
+    page: 1,
+    limit: 50,
   });
 
+  // Extract files from paginated response
+  const files = filesData?.files || [];
+
   // Convert API files to FileItem format
-  const fileItems: FileItem[] = (files || []).map((file) => {
+  const fileItems: FileItem[] = files.map((file) => {
     // Determine file type based on path and fileType
     let type: FileItem['type'] = 'markdown';
 
@@ -60,28 +80,45 @@ export default function StashPage() {
 
   // Handlers
   const handleFileClick = (file: FileItem) => {
-    console.log('File clicked:', file);
-    // TODO: Open file editor
+    setSelectedFileId(file.id);
+    setFileEditorOpen(true);
   };
 
   const handleNewFile = () => {
-    console.log('New file clicked');
-    // TODO: Open new file modal
+    setNewFileModalOpen(true);
   };
 
   const handleNewFolder = () => {
-    console.log('New folder clicked');
-    // TODO: Open new folder modal
+    setNewFolderModalOpen(true);
   };
 
   const handleSearch = () => {
-    console.log('Search clicked');
-    // TODO: Open search modal
+    setSearchModalOpen(true);
+  };
+
+  const handleSearchFileSelect = (fileId: string) => {
+    setSelectedFileId(fileId);
+    setFileEditorOpen(true);
+    setSearchModalOpen(false);
   };
 
   const handleSettings = () => {
-    console.log('Settings clicked');
-    // TODO: Navigate to settings
+    router.push('/settings/general');
+  };
+
+  const handleFileEditorClose = () => {
+    setFileEditorOpen(false);
+    setSelectedFileId(null);
+  };
+
+  const handleFileCreated = () => {
+    refetchFiles();
+    setNewFileModalOpen(false);
+  };
+
+  const handleFolderCreated = () => {
+    refetchFiles();
+    setNewFolderModalOpen(false);
   };
 
   if (stashesLoading) {
@@ -108,85 +145,121 @@ export default function StashPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col">
-      {/* Header */}
-      <PromptStashHeader
-        onSearchClick={handleSearch}
-        onSettingsClick={handleSettings}
-        userEmail="demo@promptstash.dev"
+    <>
+      <div className="flex h-screen flex-col">
+        {/* Header */}
+        <PromptStashHeader
+          onSearchClick={handleSearch}
+          onSettingsClick={handleSettings}
+          userEmail="demo@promptstash.dev"
+        />
+
+        {/* Main Container */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Sidebar */}
+          <aside className="bg-background flex w-60 flex-col overflow-hidden border-r">
+            <div className="border-b p-3">
+              <div className="bg-secondary hover:bg-accent hover:border-muted-foreground/20 flex h-9 cursor-pointer items-center justify-between rounded-md border px-3 text-[13px] font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all">
+                <span className="flex items-center gap-2">
+                  <span>👤</span>
+                  <span>User</span>
+                </span>
+                <span className="text-xs">▼</span>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-1.5">
+              <div className="space-y-0.5">
+                {[
+                  'agents',
+                  'commands',
+                  'docs',
+                  'hooks',
+                  'plugins',
+                  'prompts',
+                  'sessions',
+                  'skills',
+                ].map((folder) => (
+                  <div
+                    key={folder}
+                    className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all"
+                  >
+                    <span className="text-[#03A9F4]">📁</span>
+                    <span>{folder}</span>
+                  </div>
+                ))}
+                <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all">
+                  <span>📄</span>
+                  <span>CLAUDE.md</span>
+                </div>
+                <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all">
+                  <span>📄</span>
+                  <span>AGENTS.md</span>
+                </div>
+                <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all">
+                  <span>⚙️</span>
+                  <span>.mcp.json</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Content Area */}
+          <main className="flex flex-1 flex-col overflow-hidden">
+            {/* Toolbar */}
+            <PromptStashToolbar onNewFile={handleNewFile} onNewFolder={handleNewFolder} />
+
+            {/* Breadcrumb */}
+            <PromptStashBreadcrumb items={breadcrumbItems} />
+
+            {/* File Grid */}
+            {filesLoading ? (
+              <div className="bg-muted/30 dark:bg-muted/30 flex-1 p-5">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
+                  {[...Array(12)].map((_, i) => (
+                    <Skeleton key={i} className="aspect-square" />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <PromptStashFileGrid files={fileItems} onFileClick={handleFileClick} />
+            )}
+          </main>
+        </div>
+      </div>
+
+      {/* File Editor Modal */}
+      <FileEditor
+        fileId={selectedFileId}
+        open={fileEditorOpen}
+        onOpenChange={handleFileEditorClose}
       />
 
-      {/* Main Container */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <aside className="bg-background flex w-60 flex-col overflow-hidden border-r">
-          <div className="border-b p-3">
-            <div className="bg-secondary hover:bg-accent hover:border-muted-foreground/20 flex h-9 cursor-pointer items-center justify-between rounded-md border px-3 text-[13px] font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all">
-              <span className="flex items-center gap-2">
-                <span>👤</span>
-                <span>User</span>
-              </span>
-              <span className="text-xs">▼</span>
-            </div>
-          </div>
-          <div className="flex-1 overflow-y-auto p-1.5">
-            <div className="space-y-0.5">
-              {[
-                'agents',
-                'commands',
-                'docs',
-                'hooks',
-                'plugins',
-                'prompts',
-                'sessions',
-                'skills',
-              ].map((folder) => (
-                <div
-                  key={folder}
-                  className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all"
-                >
-                  <span className="text-[#03A9F4]">📁</span>
-                  <span>{folder}</span>
-                </div>
-              ))}
-              <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all">
-                <span>📄</span>
-                <span>CLAUDE.md</span>
-              </div>
-              <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all">
-                <span>📄</span>
-                <span>AGENTS.md</span>
-              </div>
-              <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[13px] font-medium transition-all">
-                <span>⚙️</span>
-                <span>.mcp.json</span>
-              </div>
-            </div>
-          </div>
-        </aside>
+      {/* New File Modal */}
+      {activeStashId && newFileModalOpen && (
+        <NewFileModal
+          stashId={activeStashId}
+          onSuccess={handleFileCreated}
+          open={newFileModalOpen}
+          onOpenChange={setNewFileModalOpen}
+        />
+      )}
 
-        {/* Content Area */}
-        <main className="flex flex-1 flex-col overflow-hidden">
-          {/* Toolbar */}
-          <PromptStashToolbar onNewFile={handleNewFile} onNewFolder={handleNewFolder} />
+      {/* New Folder Modal */}
+      {activeStashId && newFolderModalOpen && (
+        <NewFolderModal
+          stashId={activeStashId}
+          onSuccess={handleFolderCreated}
+          open={newFolderModalOpen}
+          onOpenChange={setNewFolderModalOpen}
+        />
+      )}
 
-          {/* Breadcrumb */}
-          <PromptStashBreadcrumb items={breadcrumbItems} />
-
-          {/* File Grid */}
-          {filesLoading ? (
-            <div className="bg-muted/30 dark:bg-muted/30 flex-1 p-5">
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
-                {[...Array(12)].map((_, i) => (
-                  <Skeleton key={i} className="aspect-square" />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <PromptStashFileGrid files={fileItems} onFileClick={handleFileClick} />
-          )}
-        </main>
-      </div>
-    </div>
+      {/* Search Modal */}
+      <SearchModal
+        open={searchModalOpen}
+        onOpenChange={setSearchModalOpen}
+        onFileSelect={handleSearchFileSelect}
+      />
+    </>
   );
 }

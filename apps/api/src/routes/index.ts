@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { globalRateLimit } from '../middleware/rate-limit';
+import webVitalsRoutes from './analytics/web-vitals.routes';
 import fileRoutes from './file.routes';
 import folderRoutes from './folder.routes';
 import stashRoutes from './stash.routes';
+import tagRoutes from './tag.routes';
 import userRoutes from './user.routes';
 import validateRoutes from './validate.routes';
 
@@ -52,5 +54,19 @@ router.use('/folders', folderRoutes);
  * Handles validation for various file types
  */
 router.use('/validate', validateRoutes);
+
+/**
+ * Tag Routes
+ * Mounted at: /api/tags
+ * Handles tag CRUD operations
+ */
+router.use('/tags', tagRoutes);
+
+/**
+ * Analytics Routes
+ * Mounted at: /api/analytics
+ * Handles analytics and metrics collection
+ */
+router.use('/analytics', webVitalsRoutes);
 
 export default router;
