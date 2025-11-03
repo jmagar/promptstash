@@ -181,7 +181,9 @@ router.post("/", async (req: Request, res: Response) => {
     let validation: ValidationResult = { valid: true, errors: [], warnings: [] };
 
     if (fileType === "AGENT") {
-      validation = validateAgentFile(content, name);
+      // Extract filename from generated path (e.g., ".claude/agents/test-agent.md" -> "test-agent.md")
+      const filename = path.split('/').pop() || name;
+      validation = validateAgentFile(content, filename);
     } else if (fileType === "SKILL") {
       validation = validateSkillFile(content, path);
     } else if (fileType === "MCP") {
