@@ -155,8 +155,10 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/files/${id}`, {
       method: 'DELETE',
     });
+    // For void responses, just check if response is ok
     if (!res.ok) {
-      await handleResponse(res);
+      const errorData = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
     }
   },
 
@@ -213,8 +215,10 @@ export const apiClient = {
     const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
       method: 'DELETE',
     });
+    // For void responses, just check if response is ok
     if (!res.ok) {
-      await handleResponse(res);
+      const errorData = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
     }
   },
 
