@@ -23,17 +23,37 @@ router.get("/:id", async (req: Request, res: Response) => {
         stash: {
           select: { userId: true },
         },
-        children: true,
+        children: {
+          select: {
+            id: true,
+            name: true,
+            path: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
         files: {
           include: {
             tags: {
               include: {
-                tag: true,
+                tag: {
+                  select: {
+                    id: true,
+                    name: true,
+                    color: true,
+                  },
+                },
               },
             },
           },
         },
-        parent: true,
+        parent: {
+          select: {
+            id: true,
+            name: true,
+            path: true,
+          },
+        },
       },
     });
 

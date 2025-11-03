@@ -4,7 +4,6 @@ import * as React from "react";
 import { Search, Bell, Moon, Sun, HelpCircle, Settings, Layers } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "./button";
-import { Input } from "./input";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import {
   DropdownMenu,
@@ -50,7 +49,7 @@ export function PromptStashHeader({
       <div className="grid h-full grid-cols-[200px_1fr_200px] items-center gap-5 px-5">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-sm">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-[#03A9F4] to-[#0288D1] text-white shadow-[0_2px_4px_rgba(3,169,244,0.3)]">
             <Layers className="h-4 w-4" />
           </div>
           <span className="text-base font-semibold tracking-tight">PromptStash</span>
@@ -60,11 +59,11 @@ export function PromptStashHeader({
         <div className="flex justify-center">
           <button
             onClick={onSearchClick}
-            className="flex h-9 w-full max-w-[500px] items-center gap-2 rounded-md border bg-secondary px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:border-muted-foreground/20"
+            className="flex h-9 w-full max-w-[500px] items-center gap-2 rounded-md border bg-secondary px-3 text-[13px] text-muted-foreground transition-all hover:bg-accent hover:border-muted-foreground/20"
           >
             <Search className="h-4 w-4" />
             <span className="flex-1 text-left">Search files and folders...</span>
-            <kbd className="rounded border bg-muted px-1.5 py-0.5 text-xs font-mono text-muted-foreground">
+            <kbd className="rounded border bg-muted px-1.5 py-0.5 text-[11px] font-mono text-muted-foreground">
               ⌘K
             </kbd>
           </button>
@@ -76,7 +75,7 @@ export function PromptStashHeader({
             variant="ghost"
             size="icon"
             onClick={onNotificationsClick}
-            className="h-9 w-9"
+            className="h-9 w-9 text-muted-foreground hover:text-foreground transition-all"
           >
             <Bell className="h-4 w-4" />
             <span className="sr-only">Notifications</span>
@@ -87,7 +86,7 @@ export function PromptStashHeader({
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-9 w-9"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground transition-all"
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />
@@ -102,7 +101,7 @@ export function PromptStashHeader({
             variant="ghost"
             size="icon"
             onClick={onHelpClick}
-            className="h-9 w-9"
+            className="h-9 w-9 text-muted-foreground hover:text-foreground transition-all"
           >
             <HelpCircle className="h-4 w-4" />
             <span className="sr-only">Help</span>
@@ -112,7 +111,7 @@ export function PromptStashHeader({
             variant="ghost"
             size="icon"
             onClick={onSettingsClick}
-            className="h-9 w-9"
+            className="h-9 w-9 text-muted-foreground hover:text-foreground transition-all"
           >
             <Settings className="h-4 w-4" />
             <span className="sr-only">Settings</span>
@@ -123,7 +122,7 @@ export function PromptStashHeader({
               <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
                 <Avatar className="h-7 w-7">
                   {userImage && <AvatarImage src={userImage} alt={userEmail} />}
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-semibold text-white">
+                  <AvatarFallback className="bg-gradient-to-br from-[#03A9F4] to-[#0288D1] text-xs font-semibold text-white shadow-[0_2px_4px_rgba(3,169,244,0.3)] hover:shadow-[0_3px_6px_rgba(3,169,244,0.4)] transition-all">
                     {userInitials}
                   </AvatarFallback>
                 </Avatar>

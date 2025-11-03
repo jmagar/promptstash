@@ -123,6 +123,8 @@ model Stash {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
+  @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
   @@map("stash")
 }
 
@@ -163,6 +165,8 @@ model File {
   updatedAt     DateTime      @updatedAt
 
   @@index([stashId, folderId])
+  @@index([stashId, updatedAt(sort: Desc)])
+  @@index([stashId, fileType])
   @@index([path])
   @@map("file")
 }
@@ -201,7 +205,7 @@ model FileVersion {
   createdAt DateTime @default(now())
   createdBy String
 
-  @@index([fileId])
+  @@index([fileId, version(sort: Desc)])
   @@map("file_version")
 }
 
