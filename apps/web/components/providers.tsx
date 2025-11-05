@@ -11,16 +11,6 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import * as React from 'react';
 import { Toaster } from 'sonner';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000, // 1 minute
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
 function KeyboardShortcutsProvider({ children }: { children: React.ReactNode }) {
   const [showHelp, setShowHelp] = React.useState(false);
 
@@ -37,6 +27,21 @@ function KeyboardShortcutsProvider({ children }: { children: React.ReactNode }) 
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  // Create QueryClient inside component with lazy initializer to prevent memory leaks
+  // See: https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr
+  const [queryClient] = React.useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000, // 1 minute
+            retry: 1,
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+  );
+
   return (
     <ErrorBoundary>
       <NextThemesProvider

@@ -567,7 +567,7 @@ Multi-stage builds for production:
 pnpm docker:prod
 # Starts:
 # - web: http://localhost:3000
-# - api: http://localhost:4000
+# - api: http://localhost:3300
 # - postgres: localhost:5432
 ```
 

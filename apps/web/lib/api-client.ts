@@ -6,7 +6,7 @@
 
 import { clearCsrfToken, getCsrfHeaders } from './csrf';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3300/api';
 
 // Helper function for better error handling
 async function handleResponse<T>(response: Response): Promise<T> {

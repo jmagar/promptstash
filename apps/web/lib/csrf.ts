@@ -5,7 +5,7 @@
  * Tokens are required for all state-changing operations (POST, PUT, DELETE).
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3300/api';
 
 let csrfToken: string | null = null;
 
