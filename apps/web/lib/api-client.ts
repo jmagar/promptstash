@@ -4,11 +4,18 @@
  * Provides typed functions for interacting with the Express API
  */
 
+import { clearCsrfToken, getCsrfHeaders } from './csrf';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 // Helper function for better error handling
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
+    // Clear CSRF token on 403 to force refresh on next request
+    if (response.status === 403) {
+      clearCsrfToken();
+    }
+
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
     throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
   }
@@ -18,6 +25,11 @@ async function handleResponse<T>(response: Response): Promise<T> {
 // Helper function for void responses (delete operations)
 async function handleVoidResponse(response: Response): Promise<void> {
   if (!response.ok) {
+    // Clear CSRF token on 403 to force refresh on next request
+    if (response.status === 403) {
+      clearCsrfToken();
+    }
+
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
     throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
   }
@@ -116,9 +128,14 @@ export const apiClient = {
   },
 
   async createStash(data: { name: string; scope: string; description?: string }): Promise<Stash> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/stashes`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeaders,
+      },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     return handleResponse<Stash>(res);
@@ -167,9 +184,13 @@ export const apiClient = {
     folderId?: string;
     tags?: string[];
   }): Promise<File> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/files`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeaders,
+      },
       credentials: 'include',
       body: JSON.stringify(data),
     });
@@ -184,17 +205,25 @@ export const apiClient = {
       tags?: string[];
     },
   ): Promise<File> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/files/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeaders,
+      },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     return handleResponse<File>(res);
   },
 
   async deleteFile(id: string): Promise<void> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/files/${id}`, {
       method: 'DELETE',
+      headers: csrfHeaders,
+      credentials: 'include',
     });
     return handleVoidResponse(res);
   },
@@ -205,9 +234,14 @@ export const apiClient = {
   },
 
   async revertFile(id: string, versionId: string): Promise<File> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/files/${id}/revert`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeaders,
+      },
+      credentials: 'include',
       body: JSON.stringify({ versionId }),
     });
     return handleResponse<File>(res);
@@ -226,9 +260,14 @@ export const apiClient = {
     stashId: string;
     parentId?: string;
   }): Promise<Folder> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/folders`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeaders,
+      },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     return handleResponse<Folder>(res);
@@ -241,22 +280,30 @@ export const apiClient = {
       path?: string;
     },
   ): Promise<Folder> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeaders,
+      },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     return handleResponse<Folder>(res);
   },
 
   async deleteFolder(id: string): Promise<void> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/folders/${id}`, {
       method: 'DELETE',
+      headers: csrfHeaders,
+      credentials: 'include',
     });
     return handleVoidResponse(res);
   },
 
-  // Validation
+  // Validation (public endpoints - no CSRF required)
   async validateAgent(content: string, filename: string) {
     const res = await fetch(`${API_BASE_URL}/validate/agent`, {
       method: 'POST',
@@ -305,26 +352,39 @@ export const apiClient = {
   },
 
   async createTag(data: { name: string; color?: string }): Promise<Tag> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/tags`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeaders,
+      },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     return handleResponse<Tag>(res);
   },
 
   async updateTag(id: string, data: { name?: string; color?: string }): Promise<Tag> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/tags/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeaders,
+      },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     return handleResponse<Tag>(res);
   },
 
   async deleteTag(id: string): Promise<void> {
+    const csrfHeaders = await getCsrfHeaders();
     const res = await fetch(`${API_BASE_URL}/tags/${id}`, {
       method: 'DELETE',
+      headers: csrfHeaders,
+      credentials: 'include',
     });
     return handleVoidResponse(res);
   },

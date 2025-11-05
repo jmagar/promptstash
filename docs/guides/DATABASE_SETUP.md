@@ -605,7 +605,7 @@ ALTER TABLE "User" ADD COLUMN "full_name" TEXT;
 await prisma.user.update({
   data: {
     firstName: "John", // Old
-    lastName: "Doe",    // Old
+    lastName: "Doe", // Old
     fullName: "John Doe", // New
   },
 });

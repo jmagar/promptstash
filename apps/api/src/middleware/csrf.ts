@@ -6,10 +6,11 @@ import type { NextFunction, Request, Response } from 'express';
  * Uses double-submit cookie pattern for CSRF protection
  */
 const {
-  generateToken, // Used to generate a CSRF token
+  generateCsrfToken, // Used to generate a CSRF token (correct function name)
   doubleCsrfProtection, // The CSRF protection middleware
 } = doubleCsrf({
   getSecret: () => process.env.CSRF_SECRET || 'default-csrf-secret-change-in-production',
+  getSessionIdentifier: (req) => req.session?.id || req.user?.id || 'anonymous',
   cookieName: '__Host-psifi.x-csrf-token',
   cookieOptions: {
     sameSite: 'strict',
@@ -26,7 +27,7 @@ const {
  * This should be mounted on a route that generates and returns a CSRF token
  */
 export const csrfTokenHandler = (req: Request, res: Response): void => {
-  const token = generateToken(req, res);
+  const token = generateCsrfToken(req, res);
   res.json({ csrfToken: token });
 };
 

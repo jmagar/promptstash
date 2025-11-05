@@ -20,7 +20,8 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
-    "@prisma/client": "catalog:core"
+    "@prisma/client": "catalog:core",
+    "@workspace/observability": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",

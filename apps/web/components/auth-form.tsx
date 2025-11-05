@@ -26,16 +26,16 @@ type AuthFormProps = React.ComponentProps<'div'> & {
 
 export function AuthForm({ mode, className, ...props }: AuthFormProps) {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const callbackUrl = searchParams.get('callbackUrl') || searchParams.get('redirectTo') || '/stash';
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuthUser();
   const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace('/'); // redirect without adding history entry
+      router.replace(callbackUrl); // redirect to the intended destination
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, router, callbackUrl]);
 
   // Don't render anything while checking or redirecting
   if (isLoading || isAuthenticated) return null;

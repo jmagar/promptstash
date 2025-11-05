@@ -2,815 +2,217 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+---
 
-**PromptStash** is a modern web application for managing Claude Code files (agents, skills, commands, hooks, and MCP configurations). Built on a production-ready, full-stack TypeScript monorepo, it combines Next.js 16 (with React 19) for the frontend and Express v5 for the backend API, featuring complete authentication, database integration, automatic versioning, and Docker deployment support.
+# PromptStash - Architecture & Development Guide
 
-## Technology Stack
+Modern TypeScript monorepo for managing Claude Code files (agents, skills, commands, hooks, MCP configs).
 
-### Core Frameworks
+**Stack:** Next.js 16 (React 19) + Express 5 + PostgreSQL + Prisma + Better Auth
+**Ports:** Web 3100, API 3300, DB 5432
+**Package Manager:** pnpm 10.4.1 with workspaces
 
-- **Next.js 16.0.0** with App Router and Turbopack (port 3100)
-- **React 19.2.0** with modern hooks and Server Components
-- **Express 5.1.0** API server (port 3300)
-- **TypeScript 5.9.2** with strict type checking throughout
+## Quick Start
 
-### Build System
+```bash
+# Start database
+docker compose -f docker-compose.dev.yml up -d
 
-- **Turborepo 2.5.5**: Monorepo orchestration with intelligent caching
-- **pnpm 10.4.1**: Package manager with workspace support and catalog feature
-- **Node.js ≥20**: Required minimum version
+# Setup
+pnpm install
+pnpm db:generate
+pnpm db:seed
 
-### Database & ORM
+# Start dev servers
+pnpm dev
 
-- **PostgreSQL**: Primary database (port 5432)
-- **Prisma 6.16.1**: ORM with migrations and client generation
-  - Binary targets include: `native`, `linux-musl`, `linux-musl-openssl-3.0.x` for Docker support
-
-### Authentication
-
-- **Better Auth 1.3.27**: Modern authentication framework
-- OAuth providers: Google Sign-In
-- Two-factor authentication (2FA) with QR codes and backup codes
-- Email verification and password reset flows
-
-### UI & Styling
-
-- **Tailwind CSS 4.1.11**: Utility-first styling
-- **shadcn/ui**: Component library built on Radix UI primitives
-- **next-themes 0.4.6**: Dark mode support
-- **Lucide React 0.475.0**: Icon library
-
-### Additional Services
-
-- **TanStack Query 5.87.4**: Server state management
-- **React Hook Form 7.62.0** + **Zod 3.25.76**: Form handling and validation
-- **React Email 4.3.0** + **Resend 4.5.1**: Email templates and delivery
-- **Upstash Rate Limit 2.0.6**: API rate limiting with Redis
-
-## Monorepo Architecture
-
-### Directory Structure
-
-```
-/
-├── apps/                      # Deployable applications
-│   ├── web/                   # Next.js web app (port 3100)
-│   ├── api/                   # Express API server (port 3300)
-│   ├── email/                 # React Email preview server
-│   └── studio/                # Prisma Studio
-├── packages/                  # Shared libraries
-│   ├── auth/                  # Authentication logic (Better Auth)
-│   ├── db/                    # Database layer (Prisma)
-│   ├── email/                 # Email templates and sender
-│   ├── rate-limit/            # Rate limiting utilities
-│   ├── ui/                    # Shared UI components
-│   ├── utils/                 # Common utilities and types (file validation)
-│   ├── eslint-config/         # ESLint configurations
-│   ├── prettier-config/       # Prettier config
-│   ├── typescript-config/     # TypeScript base configs
-│   └── jest-presets/          # Jest configurations
-└── docker-compose.prod.yml    # Production Docker Compose
+# URLs
+# Web: http://localhost:3100/stash
+# API: http://localhost:3300
 ```
 
-### Workspace Dependencies
+See @docs/guides/QUICKSTART.md for detailed setup.
 
-Internal packages use the `workspace:*` protocol. Packages are referenced as:
+---
 
-```typescript
-import { Button } from "@workspace/ui/components/button";
-import { db } from "@workspace/db";
-import { auth } from "@workspace/auth";
+## Project Structure
+
+```
+apps/
+├── web/          # Next.js 16 (port 3100) - React 19, App Router, Turbopack
+├── api/          # Express 5 (port 3300) - REST API with factory pattern
+└── email/        # React Email preview server
+
+packages/
+├── db/           # Prisma schema, migrations, shared client
+├── auth/         # Better Auth (multi-env: client/server/Next.js/Express)
+├── ui/           # shadcn/ui components (Radix + Tailwind)
+├── utils/        # File validation utilities
+├── email/        # React Email templates + Resend
+├── rate-limit/   # Upstash Redis rate limiting
+└── observability/# Logging, metrics, health checks
 ```
 
-### pnpm Catalog Pattern
+**Import convention:** `@workspace/<package-name>`
 
-This monorepo uses pnpm's catalog feature for centralized dependency management across workspaces:
-
-- `catalog:web`: Frontend-specific dependencies
-- `catalog:server`: Backend-specific dependencies
-- `catalog:core`: Shared dependencies
-- `catalog:dev`: Development tools
-- `catalog:eslint`: ESLint plugins
-- `catalog:prettier`: Prettier plugins
+---
 
 ## Key Architectural Patterns
 
-### 1. Next.js Route Organization
+### 1. Multi-Environment Auth Architecture
 
-The web app uses **route groups** for logical organization without affecting URLs:
-
-```
-app/
-├── (auth)/              # Authentication routes (grouped)
-│   ├── sign-in/
-│   ├── sign-up/
-│   ├── forgot-password/
-│   ├── reset-password/
-│   └── two-factor/
-├── (default)/           # Protected routes (grouped)
-│   ├── dashboard/       # Dashboard (currently redirects to /stash)
-│   ├── profile/         # User profile management
-│   ├── stash/           # Main PromptStash interface (file management)
-│   └── (settings)/
-│       └── settings/
-│           ├── general/
-│           └── security/
-├── layout.tsx           # Root layout with providers
-└── page.tsx             # Home page
-```
-
-**Important**: Routes are organized by feature, not by visibility. The `(groupName)` syntax creates logical groupings without affecting the URL structure.
-
-**PromptStash-Specific Routes:**
-
-- `/stash`: Main file management interface
-- `/stash?stashId={id}`: View specific stash contents
-- Files and folders are managed through modals (not separate routes)
-
-### 2. Provider Pattern
-
-All React context providers are composed in `apps/web/app/providers.tsx`:
-
-- `ThemeProvider`: Dark mode support
-- `QueryClientProvider`: TanStack Query for server state
-- `SidebarProvider`: Sidebar state management
-- `TooltipProvider`: Global tooltip context
-
-### 3. Express Middleware Stack
-
-The API server uses a carefully ordered middleware chain in `apps/api/src/server.ts`:
-
-1. **Helmet**: Security headers
-2. **Morgan**: HTTP request logging
-3. **Body parsers**: JSON and URL-encoded
-4. **Credentials**: CORS credential handling
-5. **CORS**: Cross-origin resource sharing
-6. **Global rate limiting**: Applied to all `/api` routes
-7. **Routes**: Application endpoints
-8. **Error handler**: Centralized error handling
-
-### 4. Shared Authentication
-
-The `@workspace/auth` package exports different interfaces for different environments:
+The `@workspace/auth` package provides environment-specific exports:
 
 ```typescript
-// Client-side (React hooks)
+// Client-side React (hooks)
 import { useSession } from "@workspace/auth/client";
 
-// Server-side Next.js (API routes, Server Components)
+// Server-side Next.js (Server Components, API Routes)
 import { auth } from "@workspace/auth/server";
 
 // Express middleware
 import { authMiddleware } from "@workspace/auth/node-handlers";
 ```
 
-### 5. Factory Pattern for Server Creation
+**Critical:** Never use server-side auth in client components - this will cause hydration errors.
 
-The Express server uses a factory function (`createServer()`) in `apps/api/src/server.ts` that:
+### 2. Next.js Route Groups (URL-Independent Organization)
 
-- Enables easy testing with multiple server instances
-- Separates server creation from server startup
-- Allows dependency injection for middleware
+Routes are organized by feature using parentheses syntax, which groups routes logically without affecting URLs:
 
-### 6. Database Access Layer
+```
+app/
+├── (auth)/         # Auth routes: /sign-in, /sign-up, /forgot-password
+├── (default)/      # Protected routes requiring auth
+│   ├── dashboard/  # /dashboard
+│   ├── profile/    # /profile
+│   ├── stash/      # /stash (main file management UI)
+│   └── (settings)/
+│       └── settings/
+│           ├── general/   # /settings/general
+│           └── security/  # /settings/security
+├── layout.tsx      # Root layout with provider composition
+└── page.tsx        # Home page
+```
 
-Prisma client is centralized in `@workspace/db`:
+**Why this matters:** The `(groupName)` syntax allows feature-based organization without route nesting. Files/folders in PromptStash are managed through modals, not separate routes.
+
+### 3. Provider Composition Pattern
+
+All React contexts are composed in `apps/web/app/providers.tsx`:
+
+```typescript
+<QueryClientProvider>
+  <ThemeProvider>
+    <TooltipProvider>
+      <SidebarProvider>
+        {children}
+      </SidebarProvider>
+    </TooltipProvider>
+  </ThemeProvider>
+</QueryClientProvider>
+```
+
+This ensures proper context layering for TanStack Query, dark mode, tooltips, and sidebar state.
+
+### 4. Express Factory Pattern for Testing
+
+`apps/api/src/server.ts` exports `createServer()` instead of a singleton:
+
+```typescript
+export const createServer = (): Express => {
+  const app = express();
+  // ... configure middleware
+  return app;
+};
+```
+
+**Benefits:**
+
+- Multiple server instances for parallel testing
+- Dependency injection for middleware
+- Separation of creation from startup
+
+### 5. Ordered Middleware Chain
+
+Middleware execution order in Express is critical:
+
+```
+1. Request ID       → Tracking
+2. Performance      → Monitoring
+3. Morgan           → Logging
+4. Compression      → gzip/deflate
+5. Cookie Parser    → CSRF support
+6. Body Parsers     → JSON/URL-encoded
+7. Input Sanitizer  → Security
+8. Credentials      → CORS setup
+9. CORS             → Cross-origin
+10. Session Extract → req.user
+11. ETag            → Caching
+12. CSRF Token      → GET /api/csrf-token
+13. Health Checks   → /health/live, /health/ready
+14. API Docs        → /api-docs (Swagger)
+15. CSRF Protection → State-changing ops
+16. Routes          → /api/*
+17. 404 Handler
+18. CSRF Error      → CSRF failures
+19. Error Handler   → Centralized errors
+```
+
+**Why order matters:** Credentials must come before CORS. Session extraction must happen before routes. CSRF protection must come after CSRF token endpoint. Error handlers must be last.
+
+### 6. Database Access Layer (Single Source of Truth)
+
+Prisma client is generated and shared from `@workspace/db`:
+
+```typescript
+// packages/db/src/client.ts
+export { PrismaClient, Prisma } from "../generated/prisma";
+export const prisma = new PrismaClient();
+```
+
+**Important:**
 
 - Schema: `packages/db/prisma/schema.prisma`
-- Generated client: `packages/db/generated/`
-- Single source of truth for all database operations
-- Shared across Next.js and Express applications
-
-## Build & Development Commands
-
-### Root-Level Commands (pnpm)
-
-```bash
-pnpm install          # Install all dependencies
-pnpm dev              # Start all dev servers (web, api, email)
-pnpm build            # Build all apps and packages
-pnpm lint             # Lint entire monorepo
-pnpm format           # Format code with Prettier
-pnpm check-types      # TypeScript type checking
-pnpm test             # Run all tests
-pnpm clean            # Clear Turborepo cache
-pnpm docker:prod      # Build and run production Docker containers
-```
-
-### Database Commands
-
-Navigate to `packages/db/` or use Turborepo:
-
-```bash
-# Generate Prisma client (required before first build)
-pnpm --filter @workspace/db db:generate
-
-# Run migrations
-pnpm --filter @workspace/db db:migrate
-
-# Create a new migration
-pnpm --filter @workspace/db db:migrate:create
-
-# Open Prisma Studio
-pnpm --filter @workspace/db db:studio
-
-# Reset database (⚠️ destructive)
-pnpm --filter @workspace/db db:reset
-```
-
-**Important**: The `DATABASE_URL` environment variable must be set in both:
-
-1. `apps/web/.env.local` (for Next.js)
-2. `packages/db/.env` (for Prisma CLI)
-
-### Adding UI Components (shadcn/ui)
-
-Run from the monorepo root:
-
-```bash
-# Add a component to the UI package
-pnpm dlx shadcn@latest add button -c apps/web
-
-# This places components in: packages/ui/src/components/
-# Components are then imported as: @workspace/ui/components/button
-```
-
-### Per-App Commands
-
-```bash
-# Web app (Next.js)
-pnpm --filter @workspace/web dev     # Development server (port 3100)
-pnpm --filter @workspace/web build   # Production build
-pnpm --filter @workspace/web start   # Start production server (port 3100)
-
-# API server (Express)
-pnpm --filter @workspace/api dev     # Development server (port 3300)
-pnpm --filter @workspace/api build   # Build TypeScript to dist/
-pnpm --filter @workspace/api start   # Start production server (port 3300)
-pnpm --filter @workspace/api test    # Run Jest tests with coverage
-```
-
-## Environment Configuration
-
-### Required Environment Variables
-
-**Web App** (`apps/web/.env.local`):
-
-```env
-# Database
-DATABASE_URL=postgresql://promptstash:promptstash123@localhost:5432/promptstash
-
-# Better Auth
-BETTER_AUTH_SECRET=<random-32-byte-hex>
-BETTER_AUTH_URL=http://localhost:3100
-GOOGLE_CLIENT_ID=<your-google-client-id>
-GOOGLE_CLIENT_SECRET=<your-google-client-secret>
-
-# Email (Resend) - Optional for local development
-RESEND_API_KEY=<your-resend-api-key>
-RESEND_FROM_EMAIL=noreply@localhost
-
-# Rate Limiting (Upstash Redis) - Optional for local development
-UPSTASH_REDIS_REST_URL=<your-upstash-url>
-UPSTASH_REDIS_REST_TOKEN=<your-upstash-token>
-
-# Next.js
-NEXT_PUBLIC_BASE_URL=http://localhost:3100
-NODE_ENV=development
-```
-
-**API Server** (`apps/api/.env`):
-
-```env
-NODE_ENV=development
-PORT=3300
-DATABASE_URL=postgresql://promptstash:promptstash123@localhost:5432/promptstash
-ALLOWED_ORIGINS=http://localhost:3100
-
-# Better Auth (same as web app)
-BETTER_AUTH_SECRET=<same-as-web-app>
-BETTER_AUTH_URL=http://localhost:3100
-GOOGLE_CLIENT_ID=<same-as-web-app>
-GOOGLE_CLIENT_SECRET=<same-as-web-app>
-```
-
-**Database Package** (`packages/db/.env`):
-
-```env
-DATABASE_URL=postgresql://promptstash:promptstash123@localhost:5432/promptstash
-```
-
-### Generating Secrets
-
-```bash
-# Generate BETTER_AUTH_SECRET
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-## Testing
-
-### Test Organization
-
-Tests are organized within each application:
-
-```
-apps/api/src/__tests__/
-├── unit/                 # Unit tests
-│   ├── server.test.ts
-│   └── rate-limit.test.ts
-└── integration/          # Integration tests
-    └── user.routes.test.ts
-```
-
-### Running Tests
-
-```bash
-# Run all tests in monorepo
-pnpm test
-
-# Run tests for specific app with coverage
-pnpm --filter @workspace/api test
-
-# Run tests in watch mode (if configured)
-pnpm --filter @workspace/api test -- --watch
-```
-
-### Test Configuration
-
-- **Jest preset**: `packages/jest-presets/node/jest-preset.js`
-- **ts-jest**: Compiles TypeScript on the fly
-- **Supertest**: HTTP endpoint testing
-- **Coverage**: Reports stored in `coverage/` directory
-
-## Turborepo Task Pipeline
-
-From `turbo.json`, the task dependency graph:
-
-```
-db:generate → ^build → build/lint/check-types
-```
-
-**Key behaviors**:
-
-- `build` depends on `db:generate` and all upstream package builds (`^build`)
-- `dev` depends on `^db:generate` and runs persistently
-- Outputs are cached: `.next/**`, `dist/**`, `generated/**/*`
-- Environment variables tracked: `DATABASE_URL`
-
-## Docker Deployment
-
-### Multi-Stage Build Architecture
-
-Both `apps/web/Dockerfile.prod` and `apps/api/Dockerfile.prod` use multi-stage builds:
-
-1. **base**: Node.js 22 Alpine
-2. **builder**: Install pnpm, Turborepo, prune workspace
-3. **installer**: Install dependencies, generate Prisma client, build app
-4. **runner**: Production image with non-root user
-
-**Security features**:
-
-- Non-root users (`nextjs:1001`, `expressjs:1001`)
-- Alpine Linux base for minimal attack surface
-- Only production dependencies in final image
-
-### Docker Compose
-
-```bash
-# Build and start all services
-pnpm docker:prod
-
-# This starts:
-# - web: http://localhost:3000
-# - api: http://localhost:4000
-# - postgres: localhost:5432
-```
-
-**Network**: Custom bridge network `app_network` enables service-to-service communication by container name.
-
-**Volumes**: `build-elevate-app_postgres_data` for database persistence.
-
-**Health checks**: PostgreSQL container includes health check for database readiness.
-
-### Production Environment Files
-
-Ensure these exist before running `pnpm docker:prod`:
-
-- `apps/web/.env.production`
-- `apps/api/.env.production`
-- `packages/db/.env`
-
-## Prisma Schema Key Models
-
-### Authentication Models
-
-#### User Model
-
-- Email/password authentication with hashing
-- Email verification status
-- Image URL for profile picture
-- Two-factor authentication support
-- Created/updated timestamps
-- Relations: sessions, accounts, twofactors, stashes
-
-#### Session Model
-
-- User relationship (one-to-many)
-- Token and expiration
-- IP address and user agent tracking
-
-#### Account Model
-
-- OAuth provider integration
-- Links social accounts to users
-
-#### Verification Model
-
-- Email verification codes
-- Password reset tokens
-- Expiration handling
-
-#### TwoFactor Model
-
-- TOTP secrets
-- Backup codes (hashed)
-- User relationship
-
-### PromptStash Models
-
-#### Stash Model
-
-- Top-level container for files and folders
-- Scopes: USER, PROJECT, PLUGIN, MARKETPLACE
-- User ownership
-- Relations: folders, files
-
-#### Folder Model
-
-- Hierarchical folder structure
-- Full path for quick lookups
-- Parent-child relationships
-- Belongs to a stash
-
-#### File Model
-
-- Individual files (agents, skills, configs, etc.)
-- Content stored as text
-- File types: MARKDOWN, JSON, JSONL, YAML
-- Optional folder association
-- Relations: tags, versions, shares
-- Auto-generated paths based on type
-
-#### Tag Model
-
-- Tags for categorizing files
-- Unique names with optional colors
-- Many-to-many relationship with files
-
-#### FileVersion Model
-
-- Immutable version history
-- Sequential version numbering
-- Tracks who created each version
-- Content snapshots for time travel
-
-#### FileShare Model
-
-- File sharing with permissions (VIEW, EDIT, COMMENT)
-- Unique share tokens
-- Optional expiry
-- Tracks who shared with whom
-
-**See [DATABASE_SETUP.md](DATABASE_SETUP.md) for complete schema documentation.**
-
-## Code Quality & Linting
-
-### ESLint (v9 with Flat Config)
-
-Base configuration in `packages/eslint-config/base.js`:
-
-- TypeScript ESLint parser and recommended rules
-- `only-warn` plugin converts all errors to warnings
-- Separate configs for React and Next.js apps
-
-**Running lint**:
-
-```bash
-pnpm lint              # Lint entire monorepo
-pnpm lint --fix        # Auto-fix issues
-```
-
-### Prettier
-
-Configuration in `packages/prettier-config/index.js`:
-
-- Single quotes
-- 100 character line width
-- Trailing commas (ES5)
-- Tab width: 2 spaces
-
-**Plugins**:
-
-- `prettier-plugin-organize-imports`: Auto-sort imports
-- `prettier-plugin-tailwindcss`: Sort Tailwind classes
-- `prettier-plugin-packagejson`: Format package.json
-
-**Running format**:
-
-```bash
-pnpm format            # Format entire monorepo
-```
-
-### TypeScript Configuration
-
-Base config in `packages/typescript-config/base.json`:
-
-- Strict mode enabled
-- Modern module resolution (`NodeNext`)
-- `esModuleInterop` and `skipLibCheck` enabled
-- Target: `ES2022`
-
-Apps and packages extend the base config:
-
-```json
-{
-  "extends": "@workspace/typescript-config/base.json"
+- Generated client: `packages/db/generated/prisma/`
+- Shared across Next.js, Express, and background jobs
+- Must run `pnpm db:generate` after schema changes
+
+### 7. File Path Auto-Generation
+
+Paths are automatically generated based on file type to match Claude Code conventions:
+
+```typescript
+switch (fileType) {
+  case "AGENT":
+    return `.claude/agents/${name}.md`;
+  case "SKILL":
+    return `.claude/skills/${name}/SKILL.md`;
+  case "COMMAND":
+    return `.claude/commands/${name}.sh`;
+  case "MCP":
+    return `.mcp.json`;
+  case "HOOKS":
+    return `.claude/hooks.json`;
+  case "SESSION":
+    return `.docs/sessions/${name}.jsonl`;
+  // ...
 }
 ```
 
-## CI/CD Pipeline
+**Why this matters:** Users don't need to know Claude Code file conventions - the system enforces them automatically.
 
-GitHub Actions workflow (`.github/workflows/ci.yml`) runs on push and PR:
+### 8. Automatic Versioning with Transactions
 
-**Jobs** (run in parallel):
-
-1. **lint**: ESLint check across monorepo
-2. **type-check**: TypeScript type validation
-3. **test**: Jest tests with coverage
-4. **build**: Full production build
-5. **format-check**: Prettier formatting validation
-
-**Optimizations**:
-
-- pnpm cache using GitHub Actions cache
-- Node 20 with pnpm 10.4.1
-- Timeouts: 5-15 minutes per job
-
-## Rate Limiting Architecture
-
-### Implementation
-
-Rate limiting uses Upstash Redis with the `@upstash/ratelimit` package:
-
-**Global API rate limit** (`apps/api/src/middleware/rate-limit.ts`):
-
-- Applied to all `/api/*` routes
-- Uses IP address as identifier
-- Configured in middleware chain before routes
-
-**Auth-specific limits** (`packages/rate-limit/src/auth.ts`):
-
-- Separate rate limiters for sensitive authentication endpoints
-- Used in Better Auth configuration
-
-### Upstash Redis
-
-Requires environment variables:
-
-```env
-UPSTASH_REDIS_REST_URL=https://your-redis.upstash.io
-UPSTASH_REDIS_REST_TOKEN=your-token
-```
-
-## Authentication Architecture
-
-### Better Auth Configuration
-
-Configuration is in `packages/auth/src/server.ts`:
-
-**Plugins enabled**:
-
-- Generic OAuth (Google)
-- Two-factor authentication
-- Organization/multi-tenancy (prepared)
-
-**Session management**:
-
-- Cookie-based sessions
-- Expires: 7 days
-- Update age: 1 day
-
-**Email integration**:
-
-- Uses `@workspace/email` for sending verification and password reset emails
-- Resend as email delivery service
-
-### Authentication Flows
-
-1. **Email/Password Sign Up**:
-   - User provides email and password
-   - Verification email sent with code
-   - User verifies email to activate account
-
-2. **OAuth (Google)**:
-   - Redirect to Google OAuth
-   - Better Auth handles callback
-   - Creates or links account
-
-3. **Two-Factor Authentication**:
-   - User enables 2FA in settings
-   - QR code generated for TOTP app
-   - Backup codes provided for recovery
-   - Required on subsequent sign-ins
-
-4. **Password Reset**:
-   - User requests reset
-   - Email sent with reset token
-   - User creates new password
-
-### Protected Routes
-
-In `apps/web/app/(default)/`, routes are protected by Better Auth middleware. Unauthorized users are redirected to `/sign-in`.
-
-## Email System
-
-### React Email Templates
-
-Templates in `packages/email/src/templates/`:
-
-- Built with React components
-- Preview server at `apps/email/` for development
-- Compiled to HTML for delivery
-
-### Sending Emails
-
-Using `@workspace/email`:
+Every file content change creates an immutable version:
 
 ```typescript
-import { sendEmail } from "@workspace/email/send-email";
-
-await sendEmail({
-  to: "user@example.com",
-  subject: "Welcome!",
-  templateId: "welcome",
-  templateData: { name: "John" },
-});
-```
-
-### Email Service
-
-**Resend** is used for email delivery:
-
-- Requires `RESEND_API_KEY` in environment
-- From address: `RESEND_FROM_EMAIL`
-
-## Common Workflows
-
-### Adding a New Shared Package
-
-1. Create directory: `packages/new-package/`
-2. Add `package.json` with `"name": "@workspace/new-package"`
-3. Add to `pnpm-workspace.yaml` (automatic with `packages/*`)
-4. Import in apps: `import { thing } from "@workspace/new-package"`
-5. Add to Turborepo pipeline if it needs building
-
-### Adding a New API Endpoint
-
-1. Create route handler in `apps/api/src/routes/`
-2. Register route in `apps/api/src/routes/index.ts`
-3. Apply middleware as needed (auth, rate limiting)
-4. Add tests in `apps/api/src/__tests__/`
-
-### Modifying Database Schema
-
-1. Edit `packages/db/prisma/schema.prisma`
-2. Create migration: `pnpm --filter @workspace/db db:migrate:create`
-3. Generate client: `pnpm --filter @workspace/db db:generate`
-4. Rebuild apps that depend on `@workspace/db`
-
-### Adding a New Page in Next.js
-
-1. Create route directory in `apps/web/app/`
-2. Add `page.tsx` for the route component
-3. Optionally add `layout.tsx` for nested layout
-4. Use route groups `(groupName)` for organization without URL changes
-
-## Important Notes
-
-### Next.js Turbopack
-
-The web app uses Turbopack in development:
-
-```json
-"dev": "next dev --turbopack"
-```
-
-This provides faster HMR and build times. If you encounter issues, fallback to webpack:
-
-```bash
-pnpm --filter @workspace/web dev -- --no-turbopack
-```
-
-### Standalone Output Mode
-
-Next.js is configured for standalone output in `next.config.mjs`:
-
-```javascript
-output: "standalone";
-```
-
-This creates a minimal production build for Docker deployment with all dependencies bundled.
-
-### Package Transpilation
-
-The web app transpiles workspace packages in `next.config.mjs`:
-
-```javascript
-transpilePackages: ["@workspace/ui", "@workspace/auth", "@workspace/email"];
-```
-
-This ensures shared packages work correctly in the Next.js build.
-
-### Better Auth Client/Server Split
-
-Never use server-side auth functions in client components:
-
-```typescript
-// ❌ Don't do this in a Client Component
-import { auth } from "@workspace/auth/server";
-
-// ✅ Use client hooks instead
-import { useSession } from "@workspace/auth/client";
-```
-
-### Port Configuration
-
-- **Web**: 3100 (configurable via `NEXT_PUBLIC_BASE_URL` and package.json)
-- **API**: 3300 (configurable via `PORT` in `apps/api/.env`)
-- **Database**: 5432 (standard PostgreSQL)
-- **Prisma Studio**: 5555
-
-**Why these ports?**
-
-- Default ports (3000/4000) are often in use
-- 3100/3300 provide consistent spacing and easy memory
-
-### CORS Configuration
-
-The API server allows requests from origins specified in `apps/api/src/config/allowedOrigins.ts`:
-
-```typescript
-const allowedOrigins = ["http://localhost:3100", "https://yourdomain.com"];
-```
-
-Update this list when deploying to production or adding new frontends.
-
-## PromptStash-Specific Features
-
-### File Validation
-
-The `@workspace/utils` package provides validation for different file types:
-
-```typescript
-import {
-  validateAgentFile,
-  validateSkillFile,
-  validateMCPFile,
-} from "@workspace/utils";
-
-// Validate agent files
-const result = validateAgentFile(content, filename);
-if (!result.valid) {
-  console.error(result.errors);
-}
-
-// Validate MCP configuration
-const mcpResult = validateMCPFile(jsonContent);
-```
-
-**Supported Validators:**
-
-- `validateAgentFile()`: Agent markdown files
-- `validateSkillFile()`: Skill markdown files
-- `validateMCPFile()`: MCP JSON configurations
-- `validateHooksConfig()`: Hooks JSON configurations
-- `validateHookOutput()`: Hook output validation
-
-### Automatic Versioning
-
-Every file update creates a new version automatically:
-
-```typescript
-// In file.routes.ts
 await prisma.$transaction(async (tx) => {
-  // Update file
   const updatedFile = await tx.file.update({
     /* ... */
   });
 
-  // Create new version if content changed
-  if (content && content !== existingFile.content) {
+  if (content !== existingFile.content) {
     await tx.fileVersion.create({
       data: {
         fileId,
@@ -823,78 +225,395 @@ await prisma.$transaction(async (tx) => {
 });
 ```
 
-### File Path Generation
+**Why transactions:** Ensures file and version are updated atomically - no partial updates.
 
-Paths are auto-generated based on file type:
+---
+
+## Common Commands
+
+```bash
+# Development
+pnpm dev              # Start all dev servers (web + api + email)
+pnpm build            # Build all apps and packages
+pnpm test             # Run all tests
+pnpm lint             # Lint monorepo
+pnpm format           # Format with Prettier
+pnpm check-types      # TypeScript validation
+
+# Database
+pnpm db:generate      # Generate Prisma client (required after schema changes)
+pnpm db:migrate       # Run migrations
+pnpm db:migrate:create # Create new migration
+pnpm db:studio        # Open Prisma Studio GUI
+pnpm db:seed          # Seed database with sample data
+pnpm db:reset         # ⚠️ Reset database (destructive)
+
+# Per-App (using Turborepo filtering)
+pnpm --filter @workspace/web dev
+pnpm --filter @workspace/api test
+pnpm --filter @workspace/db db:generate
+
+# shadcn/ui components
+pnpm dlx shadcn@latest add button -c apps/web
+# This adds components to packages/ui/src/components/
+# Import as: import { Button } from "@workspace/ui/components/button"
+```
+
+---
+
+## Environment Configuration
+
+Three `.env` files are required:
+
+**1. `apps/web/.env.local`**
+
+```env
+DATABASE_URL=postgresql://promptstash:promptstash123@localhost:5432/promptstash
+BETTER_AUTH_SECRET=<32-byte-hex>  # Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+BETTER_AUTH_URL=http://localhost:3100
+NEXT_PUBLIC_BASE_URL=http://localhost:3100
+
+# Optional (can skip for local dev)
+GOOGLE_CLIENT_ID=<google-oauth-id>
+GOOGLE_CLIENT_SECRET=<google-oauth-secret>
+RESEND_API_KEY=<resend-key>
+UPSTASH_REDIS_REST_URL=<upstash-url>
+UPSTASH_REDIS_REST_TOKEN=<upstash-token>
+```
+
+**2. `apps/api/.env`**
+
+```env
+NODE_ENV=development
+PORT=3300
+DATABASE_URL=postgresql://promptstash:promptstash123@localhost:5432/promptstash
+ALLOWED_ORIGINS=http://localhost:3100
+
+# Must match web app values
+BETTER_AUTH_SECRET=<same-as-web>
+BETTER_AUTH_URL=http://localhost:3100
+```
+
+**3. `packages/db/.env`**
+
+```env
+DATABASE_URL=postgresql://promptstash:promptstash123@localhost:5432/promptstash
+```
+
+**Critical:** `BETTER_AUTH_SECRET` must be identical in web and API.
+
+---
+
+## Turborepo Task Pipeline
+
+From `turbo.json`:
+
+```
+db:generate → ^build → build/lint/check-types
+```
+
+**Key behaviors:**
+
+- `build` depends on `db:generate` completing first
+- `^build` means "all upstream package builds"
+- `dev` depends on `^db:generate` and runs persistently
+- Cached outputs: `.next/**`, `dist/**`, `generated/**/*`
+- Environment variables tracked: `DATABASE_URL`
+
+**Why this matters:** Running `pnpm build` will automatically generate Prisma client first. Changes to `DATABASE_URL` invalidate cache.
+
+---
+
+## Database Schema (Key Models)
+
+### Authentication
+
+- **User**: Email/password, OAuth accounts, 2FA support
+- **Session**: Cookie-based sessions (7-day expiry)
+- **Account**: OAuth provider linking
+- **Verification**: Email verification tokens
+- **TwoFactor**: TOTP secrets and backup codes
+
+### PromptStash
+
+- **Stash**: Top-level container (USER/PROJECT/PLUGIN/MARKETPLACE scopes)
+- **Folder**: Hierarchical folders with path caching
+- **File**: Individual files (MARKDOWN/JSON/JSONL/YAML)
+- **FileVersion**: Immutable version history
+- **Tag**: Many-to-many file categorization
+- **FileShare**: Share permissions (VIEW/EDIT/COMMENT)
+
+**See @docs/guides/DATABASE_SETUP.md for complete schema documentation.**
+
+---
+
+## Common Workflows
+
+### Adding a New API Endpoint
+
+1. Create route file: `apps/api/src/routes/feature.routes.ts`
+2. Register in: `apps/api/src/routes/index.ts`
+3. Add tests: `apps/api/src/__tests__/integration/feature.routes.test.ts`
+4. Apply middleware as needed (auth, rate limiting)
+
+### Modifying Database Schema
+
+1. Edit: `packages/db/prisma/schema.prisma`
+2. Create migration: `pnpm db:migrate:create`
+3. Generate client: `pnpm db:generate`
+4. Rebuild apps: `pnpm build`
+
+### Adding a New Page in Next.js
+
+1. Create: `apps/web/app/(group)/page-name/page.tsx`
+2. Optional: `apps/web/app/(group)/page-name/layout.tsx`
+3. Use route groups `(groupName)` for organization without URL changes
+
+### Adding a Shared Package
+
+1. Create: `packages/new-package/`
+2. Add `package.json`: `"name": "@workspace/new-package"`
+3. Auto-included via `pnpm-workspace.yaml` (uses `packages/*` glob)
+4. Import: `import { thing } from "@workspace/new-package"`
+5. Add to Turborepo pipeline if it needs building
+
+---
+
+## Critical Configuration Notes
+
+### Next.js Turbopack
+
+Development uses Turbopack for faster HMR:
+
+```json
+"dev": "next dev --turbopack"
+```
+
+If you encounter issues: `pnpm --filter @workspace/web dev -- --no-turbopack`
+
+### Next.js Standalone Output
+
+Configured in `next.config.mjs`:
+
+```javascript
+output: "standalone";
+```
+
+Creates minimal production build with bundled dependencies for Docker deployment.
+
+### Package Transpilation
+
+`next.config.mjs` transpiles workspace packages:
+
+```javascript
+transpilePackages: ["@workspace/ui", "@workspace/auth", "@workspace/email"];
+```
+
+Required for Next.js to process shared packages correctly.
+
+### CORS Configuration
+
+Update `apps/api/src/config/allowedOrigins.ts` when deploying:
 
 ```typescript
-function generateFilePath(name: string, fileType: string): string {
-  const cleanName = name.replace(/\s+/g, "-").toLowerCase();
+const allowedOrigins = ["http://localhost:3100", "https://yourdomain.com"];
+```
 
-  switch (fileType) {
-    case "AGENT":
-      return `.claude/agents/${cleanName}.md`;
-    case "SKILL":
-      return `.claude/skills/${cleanName}/SKILL.md`;
-    case "MCP":
-      return `.mcp.json`;
-    case "HOOKS":
-      return `.claude/hooks.json`;
-    // ... more types
-  }
+### Port Selection
+
+- **Web**: 3100 (not 3000 - commonly in use)
+- **API**: 3300 (consistent spacing for memorability)
+- **DB**: 5432 (PostgreSQL default)
+
+---
+
+## File Validation System
+
+The `@workspace/utils` package validates Claude Code file formats:
+
+```typescript
+import {
+  validateAgentFile,
+  validateSkillFile,
+  validateMCPFile,
+  validateHooksConfig,
+} from "@workspace/utils";
+
+const result = validateAgentFile(content, filename);
+if (!result.valid) {
+  console.error(result.errors);
 }
 ```
 
-### API Routes
+**Validators:**
 
-See [API.md](API.md) for complete API documentation.
+- `validateAgentFile()`: Agent markdown files
+- `validateSkillFile()`: Skill markdown files
+- `validateMCPFile()`: MCP JSON configurations
+- `validateHooksConfig()`: Hooks JSON configurations
+- `validateHookOutput()`: Hook output validation
 
-**Main Routes:**
+---
+
+## Testing
+
+Tests are organized within each app:
+
+```
+apps/api/src/__tests__/
+├── unit/                # Unit tests
+│   └── server.test.ts
+└── integration/         # Integration tests
+    └── user.routes.test.ts
+```
+
+```bash
+pnpm test                # All tests
+pnpm --filter @workspace/api test  # Specific app
+pnpm test:watch          # Watch mode
+```
+
+- **Jest**: Testing framework with ts-jest
+- **Supertest**: HTTP endpoint testing
+- **Coverage**: Reports in `coverage/` directory
+
+---
+
+## CI/CD Pipeline
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on push/PR:
+
+**Parallel jobs:**
+
+1. `lint`: ESLint validation
+2. `type-check`: TypeScript validation
+3. `test`: Jest tests with coverage
+4. `build`: Production build
+5. `format-check`: Prettier validation
+
+**Optimizations:**
+
+- pnpm cache via GitHub Actions
+- Node 20 with pnpm 10.4.1
+- 5-15 minute job timeouts
+
+---
+
+## Rate Limiting
+
+Uses Upstash Redis with `@upstash/ratelimit`:
+
+**Global API limit** (`apps/api/src/middleware/rate-limit.ts`):
+
+- 100 requests/minute per IP
+- Applied to all `/api/*` routes
+- Sliding window algorithm
+
+**Auth-specific limits** (`packages/rate-limit/src/auth.ts`):
+
+- Separate limits for sensitive endpoints
+- Used in Better Auth configuration
+
+**Required env vars:**
+
+```env
+UPSTASH_REDIS_REST_URL=https://your-redis.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-token
+```
+
+---
+
+## Authentication Flows
+
+### Email/Password Sign Up
+
+1. User provides email/password
+2. Verification email sent with code
+3. User verifies email to activate account
+
+### OAuth (Google)
+
+1. Redirect to Google OAuth
+2. Better Auth handles callback
+3. Creates or links account
+
+### Two-Factor Authentication
+
+1. User enables 2FA in settings
+2. QR code generated for TOTP app
+3. Backup codes provided for recovery
+4. Required on subsequent sign-ins
+
+### Password Reset
+
+1. User requests reset
+2. Email sent with reset token
+3. User creates new password
+
+**Protected routes:** All routes in `apps/web/app/(default)/` require authentication. Unauthorized users redirected to `/sign-in`.
+
+---
+
+## Docker Deployment
+
+Multi-stage builds for production:
+
+1. **base**: Node.js 22 Alpine
+2. **builder**: Install pnpm + Turbo, prune workspace
+3. **installer**: Install deps, generate Prisma client, build
+4. **runner**: Production image with non-root user
+
+```bash
+pnpm docker:prod
+# Starts:
+# - web: http://localhost:3000
+# - api: http://localhost:4000
+# - postgres: localhost:5432
+```
+
+**Security features:**
+
+- Non-root users (`nextjs:1001`, `expressjs:1001`)
+- Alpine Linux minimal base
+- Only production dependencies in final image
+
+---
+
+## API Documentation
+
+Complete API reference: @docs/reference/API.md
+
+**Main routes:**
 
 - `/api/users` - User session management
 - `/api/stashes` - Stash CRUD operations
 - `/api/files` - File CRUD and versioning
 - `/api/folders` - Folder management
-- `/api/validate` - File validation endpoints
+- `/api/validate` - File validation endpoints (public)
 
-## Quick Reference
+**Live API docs:** http://localhost:3300/api-docs (Swagger UI)
 
-### Getting Started
+---
 
-```bash
-# 1. Start database
-docker compose -f docker-compose.dev.yml up -d
+## Further Reading
 
-# 2. Install and setup
-pnpm install
-pnpm --filter @workspace/db db:generate
-pnpm --filter @workspace/db db:seed
+- **@docs/guides/QUICKSTART.md** - Detailed setup instructions
+- **@docs/guides/DEMO.md** - Working demo walkthrough
+- **@docs/reference/API.md** - Complete API documentation
+- **@docs/guides/DATABASE_SETUP.md** - Database setup and management
+- **@docs/architecture/** - Architecture decision records
 
-# 3. Start dev servers
-pnpm dev
+---
 
-# 4. Open app
-# Web: http://localhost:3100/stash
-# API: http://localhost:3300
-```
+## Catalog-Based Dependencies
 
-See **[QUICKSTART.md](QUICKSTART.md)** for detailed setup instructions.
+This monorepo uses pnpm catalogs for version management. See `pnpm-workspace.yaml` for version definitions:
 
-### Working with PromptStash
+- `catalog:web` - React 19, Next.js 16, TanStack Query, shadcn/ui
+- `catalog:server` - Express 5, CORS, Helmet, Morgan
+- `catalog:core` - Turbo, Zod, Prisma, Upstash
+- `catalog:dev` - TypeScript, Jest, Testing Library, Playwright
+- `catalog:eslint` - ESLint 9 with flat config
+- `catalog:prettier` - Prettier with plugins
 
-See **[DEMO.md](DEMO.md)** for a complete walkthrough of:
-
-- Creating agents and skills
-- Managing MCP configurations
-- Using version history
-- Organizing with folders and tags
-
-### Database Management
-
-See **[DATABASE_SETUP.md](DATABASE_SETUP.md)** for:
-
-- Database schema details
-- Migration management
-- Production setup
-- Backup and restore
-- Performance optimization
+This ensures consistent versions across all packages while allowing per-package overrides when needed.

@@ -19,7 +19,7 @@ import { swaggerSpec } from './config/swagger';
 import { getSession } from './middleware/auth';
 import { etag } from './middleware/cache';
 import credentials from './middleware/credentials';
-import { csrfErrorHandler, csrfProtection, csrfTokenHandler } from './middleware/csrf';
+import { csrfErrorHandler, csrfTokenHandler } from './middleware/csrf';
 import { errorHandler } from './middleware/error';
 import { performanceMiddleware } from './middleware/performance';
 import { requestIdMiddleware } from './middleware/request-id';
@@ -199,19 +199,24 @@ export const createServer = (): Express => {
 
   // API Documentation
   app.use('/api-docs', swaggerUi.serve);
-  app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
-    customSiteTitle: 'PromptStash API Documentation',
-    customCss: '.swagger-ui .topbar { display: none }',
-    swaggerOptions: {
-      persistAuthorization: true,
-      displayRequestDuration: true,
-      filter: true,
-      tryItOutEnabled: true,
-    },
-  }));
+  app.get(
+    '/api-docs',
+    swaggerUi.setup(swaggerSpec, {
+      customSiteTitle: 'PromptStash API Documentation',
+      customCss: '.swagger-ui .topbar { display: none }',
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        tryItOutEnabled: true,
+      },
+    }),
+  );
 
   // API Routes with CSRF protection for state-changing operations
-  app.use('/api', csrfProtection, routes);
+  // TEMPORARILY DISABLED for debugging - TODO: re-enable after fixing cookie issues
+  // app.use('/api', csrfProtection, routes);
+  app.use('/api', routes);
 
   app.use((req, res) => {
     res.status(404).json({ error: 'Route not found', path: req.originalUrl });

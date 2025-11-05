@@ -48,12 +48,17 @@
     "onlyBuiltDependencies": [
       "@prisma/client",
       "@prisma/engines",
+      "@scarf/scarf",
       "@tailwindcss/oxide",
+      "core-js-pure",
       "esbuild",
       "prisma",
       "sharp",
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "prettier": "catalog:prettier"
+    }
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

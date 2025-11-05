@@ -1,15 +1,33 @@
-import bundleAnalyzer from '@next/bundle-analyzer';
-
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-  openAnalyzer: true,
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['@workspace/ui', '@workspace/auth', '@workspace/email'],
   output: 'standalone',
-  serverExternalPackages: ['prettier'],
+  
+  // External packages that should not be bundled (native Node.js dependencies)
+  serverExternalPackages: [
+    'pino',
+    'pino-pretty',
+    'thread-stream',
+    '@workspace/observability',
+  ],
+  
+  // Allow cross-origin requests from custom domain during development
+  allowedDevOrigins: ['https://promptstash.tootie.tv'],
+  
+  // Webpack configuration to ignore optional dependencies
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Ignore pino and its dependencies during bundling
+      config.externals = config.externals || [];
+      config.externals.push({
+        'pino': 'commonjs pino',
+        'pino-pretty': 'commonjs pino-pretty',
+        'thread-stream': 'commonjs thread-stream',
+      });
+    }
+    return config;
+  },
+  
   env: {
     NEXT_PUBLIC_DISABLE_AUTH: process.env.NEXT_PUBLIC_DISABLE_AUTH,
   },
@@ -26,4 +44,4 @@ const nextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default nextConfig;

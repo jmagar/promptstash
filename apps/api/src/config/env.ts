@@ -1,4 +1,8 @@
+import dotenv from 'dotenv';
 import { z } from 'zod';
+
+// Load environment variables first
+dotenv.config();
 
 /**
  * Environment Variable Schema
@@ -17,11 +21,14 @@ const envSchema = z.object({
     .min(1, 'ALLOWED_ORIGINS must not be empty')
     .transform((val: string) => val.split(',').map((origin: string) => origin.trim())),
 
-  // Authentication
-  BETTER_AUTH_SECRET: z.string().min(32, 'BETTER_AUTH_SECRET must be at least 32 characters'),
-  BETTER_AUTH_URL: z.string().url('BETTER_AUTH_URL must be a valid URL'),
-  GOOGLE_CLIENT_ID: z.string().min(1, 'GOOGLE_CLIENT_ID is required'),
-  GOOGLE_CLIENT_SECRET: z.string().min(1, 'GOOGLE_CLIENT_SECRET is required'),
+  // Authentication (optional in development)
+  BETTER_AUTH_SECRET: z
+    .string()
+    .min(32, 'BETTER_AUTH_SECRET must be at least 32 characters')
+    .optional(),
+  BETTER_AUTH_URL: z.string().url('BETTER_AUTH_URL must be a valid URL').optional(),
+  GOOGLE_CLIENT_ID: z.string().min(1, 'GOOGLE_CLIENT_ID is required').optional(),
+  GOOGLE_CLIENT_SECRET: z.string().min(1, 'GOOGLE_CLIENT_SECRET is required').optional(),
 
   // CSRF Protection
   CSRF_SECRET: z

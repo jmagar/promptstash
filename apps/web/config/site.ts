@@ -2,6 +2,7 @@ import { FolderKanban, Home, Settings, User } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const siteConfig: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3100'),
   title: 'PromptStash',
   description:
     'Manage and organize your Claude Code prompts, agents, skills, commands, hooks, and settings.',
