@@ -214,9 +214,7 @@ export const createServer = (): Express => {
   );
 
   // API Routes with CSRF protection for state-changing operations
-  // TEMPORARILY DISABLED for debugging - TODO: re-enable after fixing cookie issues
-  // app.use('/api', csrfProtection, routes);
-  app.use('/api', routes);
+  app.use('/api', csrfProtection, routes);
 
   app.use((req, res) => {
     res.status(404).json({ error: 'Route not found', path: req.originalUrl });
