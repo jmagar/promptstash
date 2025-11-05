@@ -28,6 +28,7 @@ model User {
   accounts         Account[]
   twofactors       TwoFactor[]
   stashes          Stash[]
+  tags             Tag[]
 
   @@unique([email])
   @@map("user")
@@ -45,6 +46,9 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([userId, expiresAt])
   @@map("session")
 }
 
@@ -64,6 +68,8 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  @@index([userId])
+  @@index([accountId, providerId])
   @@map("account")
 }
 
@@ -175,12 +181,16 @@ model File {
 
 model Tag {
   id        String    @id @default(cuid())
-  name      String    @unique
+  name      String
   color     String?
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   files     FileTag[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  @@unique([userId, name])
+  @@index([userId])
   @@index([name])
   @@map("tag")
 }
@@ -208,6 +218,7 @@ model FileVersion {
   createdAt DateTime @default(now())
   createdBy String
 
+  @@unique([fileId, version])
   @@index([fileId, version(sort: Desc)])
   @@map("file_version")
 }

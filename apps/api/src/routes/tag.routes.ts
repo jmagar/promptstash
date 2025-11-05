@@ -9,11 +9,18 @@ router.use(requireAuth);
 
 /**
  * GET /api/tags
- * Get all tags
+ * Get all tags for the authenticated user
  */
 router.get('/', async (req: Request, res: Response) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const tags = await prisma.tag.findMany({
+      where: {
+        userId: req.user.id,
+      },
       include: {
         _count: {
           select: { files: true },
@@ -31,14 +38,21 @@ router.get('/', async (req: Request, res: Response) => {
 
 /**
  * GET /api/tags/:id
- * Get a specific tag by ID
+ * Get a specific tag by ID (must be owned by user)
  */
 router.get('/:id', async (req: Request, res: Response) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const { id } = req.params;
 
-    const tag = await prisma.tag.findUnique({
-      where: { id },
+    const tag = await prisma.tag.findFirst({
+      where: {
+        id,
+        userId: req.user.id,
+      },
       include: {
         files: {
           include: {
@@ -72,10 +86,14 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 /**
  * POST /api/tags
- * Create a new tag
+ * Create a new tag for the authenticated user
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const { name, color } = req.body;
 
     // Validate required fields
@@ -85,14 +103,17 @@ router.post('/', async (req: Request, res: Response) => {
       });
     }
 
-    // Check if tag with this name already exists
-    const existingTag = await prisma.tag.findUnique({
-      where: { name },
+    // Check if user already has a tag with this name
+    const existingTag = await prisma.tag.findFirst({
+      where: {
+        userId: req.user.id,
+        name,
+      },
     });
 
     if (existingTag) {
       return res.status(400).json({
-        error: 'Tag with this name already exists',
+        error: 'You already have a tag with this name',
       });
     }
 
@@ -101,6 +122,7 @@ router.post('/', async (req: Request, res: Response) => {
       data: {
         name,
         color: color || null,
+        userId: req.user.id,
       },
       include: {
         _count: {
@@ -121,10 +143,14 @@ router.post('/', async (req: Request, res: Response) => {
 
 /**
  * PUT /api/tags/:id
- * Update an existing tag
+ * Update an existing tag (must be owned by user)
  */
 router.put('/:id', async (req: Request, res: Response) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const { id } = req.params;
     const { name, color } = req.body;
 
@@ -133,24 +159,30 @@ router.put('/:id', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Tag ID is required' });
     }
 
-    // Check if tag exists
-    const existingTag = await prisma.tag.findUnique({
-      where: { id },
+    // Check if tag exists and is owned by user
+    const existingTag = await prisma.tag.findFirst({
+      where: {
+        id,
+        userId: req.user.id,
+      },
     });
 
     if (!existingTag) {
       return res.status(404).json({ error: 'Tag not found' });
     }
 
-    // If name is being changed, check for conflicts
+    // If name is being changed, check for conflicts with user's other tags
     if (name && name !== existingTag.name) {
-      const conflictingTag = await prisma.tag.findUnique({
-        where: { name },
+      const conflictingTag = await prisma.tag.findFirst({
+        where: {
+          userId: req.user.id,
+          name,
+        },
       });
 
       if (conflictingTag) {
         return res.status(400).json({
-          error: 'Tag with this name already exists',
+          error: 'You already have a tag with this name',
         });
       }
     }
@@ -178,15 +210,22 @@ router.put('/:id', async (req: Request, res: Response) => {
 
 /**
  * DELETE /api/tags/:id
- * Delete a tag
+ * Delete a tag (must be owned by user)
  */
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const { id } = req.params;
 
-    // Check if tag exists
-    const tag = await prisma.tag.findUnique({
-      where: { id },
+    // Check if tag exists and is owned by user
+    const tag = await prisma.tag.findFirst({
+      where: {
+        id,
+        userId: req.user.id,
+      },
     });
 
     if (!tag) {
