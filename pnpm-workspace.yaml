@@ -61,7 +61,7 @@ catalogs:
     typescript: ^5.9.2
     esbuild: ^0.20.1
     esbuild-register: ^3.5.0
-    "@types/node": ^20.19.9
+    "@types/node": ^24.10.0
     tsx: ^4.19.2
     nodemon: ^3.1.10
     "@turbo/gen": ^2.5.5
