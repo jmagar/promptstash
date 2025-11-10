@@ -45,6 +45,6 @@
     "@workspace/typescript-config": "workspace:*",
     "jest": "catalog:dev",
     "ts-jest": "catalog:dev",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   }
 }
