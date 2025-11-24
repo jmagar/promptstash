@@ -32,7 +32,7 @@
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:eslint",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.6",
+    "lint-staged": "^16.2.7",
     "prettier": "catalog:prettier",
     "prettier-plugin-organize-imports": "catalog:prettier",
     "prettier-plugin-packagejson": "catalog:prettier",
