@@ -27,7 +27,7 @@
     "csrf-csrf": "^4.0.3",
     "dotenv": "catalog:core",
     "express": "catalog:server",
-    "express-validator": "^7.3.0",
+    "express-validator": "^7.3.1",
     "helmet": "catalog:server",
     "morgan": "catalog:server",
     "swagger-jsdoc": "^6.2.8",
