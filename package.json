@@ -27,12 +27,12 @@
     "build-storybook": "pnpm --filter web build-storybook"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.1.0",
-    "@commitlint/config-conventional": "^20.0.0",
+    "@commitlint/cli": "^20.2.0",
+    "@commitlint/config-conventional": "^20.2.0",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:eslint",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.6",
+    "lint-staged": "^16.2.7",
     "prettier": "catalog:prettier",
     "prettier-plugin-organize-imports": "catalog:prettier",
     "prettier-plugin-packagejson": "catalog:prettier",
